@@ -1,5 +1,5 @@
 import { createPool } from "mysql2/promise";
-import { config } from "./index.js";
+import { config } from "../../config/index.js";
 
 const databaseCredentials = config.database;
 
