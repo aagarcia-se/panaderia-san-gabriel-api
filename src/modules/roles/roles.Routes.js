@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { consultarRolesController, ingresarRolController, actualizarRolController, eliminarRolController } from "./roles.Controller.js";
+import authMiddleware from "../../middlewares/authMiddleware.js";
 
 export const rolesRoute = Router();
 
-rolesRoute.get("/consultarRoles", consultarRolesController);
-rolesRoute.post("/ingresarRol", ingresarRolController);
-rolesRoute.put("/actualizarRol/", actualizarRolController);
-rolesRoute.delete("/eliminarRol/:idRol", eliminarRolController);
+rolesRoute.get("/consultarRoles", authMiddleware, consultarRolesController);
+rolesRoute.post("/ingresarRol", authMiddleware, ingresarRolController);
+rolesRoute.put("/actualizarRol/", authMiddleware, actualizarRolController);
+rolesRoute.delete("/eliminarRol/:idRol", authMiddleware, eliminarRolController);

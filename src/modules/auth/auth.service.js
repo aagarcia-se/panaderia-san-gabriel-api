@@ -1,4 +1,7 @@
+import CustomError from "../../utils/CustomError.js";
 import { iniciarSesionDao } from "./auth.dao.js";
+import jwtService from "../../utils/jwtService.js";
+import { getError } from "../../utils/generalErrors.js";
 
 
 export const iniciarSesionService = async (data) => {
@@ -9,8 +12,9 @@ export const iniciarSesionService = async (data) => {
         const error = getError(1);
         throw new CustomError(error);
       }
+      const autenticateUser = jwtService.generateToken(usuarioLogin);
   
-      return usuarioLogin;
+      return autenticateUser;
     } catch (error) {
       throw error;
     }
