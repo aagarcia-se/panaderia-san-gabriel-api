@@ -30,7 +30,12 @@ const databaseErrorMap = {
     message: "Acceso denegado. No hay token.",
     statusCode: 401,
     code:401
-  }
+  },
+  8:{
+    message: "Usuario o con contraseña ivalidos",
+    statusCode: 404,
+    code:404
+  },
   
 
   // Agregar más errores de base de datos aquí según sea necesario

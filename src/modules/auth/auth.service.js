@@ -8,8 +8,8 @@ export const iniciarSesionService = async (data) => {
     try {
       const usuarioLogin = await iniciarSesionDao(data);
   
-      if (usuarioLogin.length === 0) {
-        const error = getError(1);
+      if (usuarioLogin === 0) {
+        const error = getError(8);
         throw new CustomError(error);
       }
       const autenticateUser = jwtService.generateToken(usuarioLogin);

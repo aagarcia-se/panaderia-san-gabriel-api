@@ -14,14 +14,15 @@ export const iniciarSesionDao = async (data) => {
             AND u.contrasena = ?
             AND u.estadoUsuario = 'A';`;
 
-        const resuserData = await Connection.execute(queryUsuario, [data.usuario, data.contrasena]);
+        const resUserData = await Connection.execute(queryUsuario, [data.usuario, data.contrasena]);
+
 
         // Si no se encuentra el usuario, devolver null o manejar el error
-        if (!resuserData || resuserData.length === 0) {
-            return { error: "Usuario o contraseña incorrectos." };
+        if (!resUserData || resUserData.rows.length === 0) {
+            return 0;
         }
 
-        const userData = resuserData.rows[0];
+        const userData = resUserData.rows[0];
 
         // Query para obtener los permisos del usuario
         const queryPermisos = `
@@ -56,6 +57,7 @@ export const iniciarSesionDao = async (data) => {
         return response;
 
     } catch (error) {
+        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
