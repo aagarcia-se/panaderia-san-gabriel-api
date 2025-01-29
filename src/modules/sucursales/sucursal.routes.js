@@ -5,11 +5,12 @@ import {
   eliminarSucursalController,
   actualizarSucursalController,
 } from "./sucursales.controller.js";
+import authMiddleware from "../../middlewares/authMiddleware.js";
 
 export const sucursalesRoute = Router();
 
-sucursalesRoute.get("/getSucursales", consultarSucursalesController);
-sucursalesRoute.post("/ingresarSucursal", ingresarSucursalController);
-sucursalesRoute.put("/actualizarSucursal", actualizarSucursalController);
-sucursalesRoute.delete("/eliminarSucursal/:idSucursal", eliminarSucursalController);
+sucursalesRoute.get("/getSucursales", authMiddleware, consultarSucursalesController);
+sucursalesRoute.post("/ingresarSucursal", authMiddleware, ingresarSucursalController);
+sucursalesRoute.put("/actualizarSucursal", authMiddleware, actualizarSucursalController);
+sucursalesRoute.delete("/eliminarSucursal/:idSucursal", authMiddleware, eliminarSucursalController);
 
