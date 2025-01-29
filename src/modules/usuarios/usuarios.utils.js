@@ -61,3 +61,6 @@ export const generaContrasena = (nombreUsuario) => {
 
   return contraseña;
 };
+
+
+/* este es un comentario para el fork */
