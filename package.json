@@ -1,0 +1,32 @@
+{
+  "name": "panaderia-san-gabriel-api",
+  "version": "1.0.0",
+  "description": "Servicios backend para la aplicacion de la panaderia San Gabriel",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "ing Angel Garcia - angelgarciap.dev@gmail.com",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.17.0",
+    "npm": ">=10.8.2"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0",
+    "nodemailer": "^6.9.16",
+    "pdfkit": "^0.16.0",
+    "twilio": "^5.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
