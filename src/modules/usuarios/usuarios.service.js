@@ -1,6 +1,8 @@
 import hashPassword from "../../auth/hashPassword.js";
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
+import { enviarEmail } from "../emails/enviarcorresos.service.js";
+import generarPlantillaCreacionUsuario from "../emails/plantillasenviarcorreo/notiCreacionUsuario.js";
 import sendSMS, { createMessage } from "../enviarsms/enviarsms.service.js";
 import { actualizarUsuarioDao, consultarUsuariosDao, crearUsuarioDao, bloquearUsuarioDao, elminarUsuarioDao, desbloquearUsuarioDao } from "./usuarios.dao.js";
 import { generaContrasena, generaNombreUsuario } from "./usuarios.utils.js";
@@ -8,9 +10,9 @@ import { generaContrasena, generaNombreUsuario } from "./usuarios.utils.js";
 export const crearUsuarioService = async (dataUsuario) => {
     try {  
 
-      const usuario = generaNombreUsuario(dataUsuario);//generar usuario
-      const passGenerada = generaContrasena();
-      const hashedPass = await hashPassword.hashPassword(passGenerada);
+      const usuario = generaNombreUsuario(dataUsuario);//Generar usuario
+      const passGenerada = generaContrasena(); //Generar contraseña
+      const hashedPass = await hashPassword.hashPassword(passGenerada);//Hasear contraseña
       
       const infoUsuario = {
         ...dataUsuario, 
@@ -26,8 +28,13 @@ export const crearUsuarioService = async (dataUsuario) => {
         throw new CustomError(error);
       }
 
-      const mensaje = createMessage(infoUsuario);
-      await sendSMS(infoUsuario, mensaje);
+      const dataCooreo = {
+        correoDestino: dataUsuario.correoUsuario,
+        asunto: "Notificacion creacion de usuario No-Replay",
+      }
+
+      const plantillaCorreo = generarPlantillaCreacionUsuario(usuario, passGenerada);
+      await enviarEmail(dataCooreo, plantillaCorreo);
   
       return userCreado;
     } catch (error) {

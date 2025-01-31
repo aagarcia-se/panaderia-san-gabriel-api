@@ -42,6 +42,7 @@ export const iniciarSesionDao = async (usuario) => {
         nombre: userData.nombreUsuario,
         apellido: userData.apellidoUsuario,
         telefono: userData.telefonoUsuario,
+        correo: userData.correoUsuario,
         idRol: userData.idRol,
         rol: userData.nombreRol,
         estadoUsuario: userData.estadoUsuario

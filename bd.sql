@@ -13,6 +13,8 @@ CREATE TABLE USUARIOS (
     apellidoUsuario TEXT NOT NULL,
     usuario TEXT NOT NULL UNIQUE,
     contrasena TEXT NOT NULL,
+    aliasUsuario TEXT,
+    correoUsuario TEXT,
     telefonoUsuario TEXT,
     idRol INTEGER NOT NULL,
     estadoUsuario TEXT NOT NULL CHECK(estadoUsuario IN ('A', 'B')) DEFAULT 'A',
@@ -92,4 +94,4 @@ INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 3);
 INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 2);
 
 -- Crear usuio administrador --
-INSERT INTO usuarios ("idUsuario", "nombreUsuario", "apellidoUsuario", "usuario", "contrasena", "telefonoUsuario", "idRol", "estadoUsuario", "fechaCreacion", "estado") VALUES(1, 'Angel', 'Garcia', 'aagarcia', 'Seguridad25*', '50746730', 1, 'A', '2025-01-25', 'A');
+INSERT INTO usuarios ("idUsuario", "nombreUsuario", "apellidoUsuario", "usuario", "contrasena", "correoUsuario", "idRol", "estadoUsuario", "fechaCreacion", "estado") VALUES(1, 'admin', '', 'admin', '$2b$10$Hc2gvMXzcEqWAghdz1MvluiJFBq3slluVrhq/1LCI7EZ7nmIy43NS', 'panaderiasangabrields@gmail.com', 1, 'A', '2025-01-25', 'A');
