@@ -29,9 +29,11 @@ export const createMessage = (data) => {
 
   const nombreMensaje = `${nombre} ${apellido}`;
 
-  return `        ${nombreMensaje} se ha creado tu usuario para https://sangabrielpanaderia.vercel.app/
+  return `Hola ${nombreMensaje},
+          Se han creado tus credenciales para el ingreso a https://sangabrielpanaderia.vercel.app/
           Usuario: ${data.usuario}
-          Contraseña: ${data.contrasena}`;
+          constasena_ ${data.passGenerada}
+          Por seguridad, te recomendamos cambiar tu contraseña después del primer inicio de sesión.`;
 }
 
 
