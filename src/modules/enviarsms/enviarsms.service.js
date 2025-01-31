@@ -16,8 +16,10 @@ export const sendSMS = async (data, mensaje) => {
       from: '+17633143352', // Tu número de Twilio
       to: `+502${data.telefonoUsuario}`            // Número de destino
     });
+    console.log({ success: true, messageSid: message.sid });
     return { success: true, messageSid: message.sid };
   } catch (error) {
+    console.log(error)
     return { success: false, error: error.message };
   }
 };
