@@ -27,8 +27,8 @@ export const enviroment = {
       port: process.env.SERVER_PROD || 3000,
     },
     smsConfig: {
-      sid_twilio: process.env.ACCOUNTSID_PROD,
-      token_twilio: process.env.AUTHTOKEN_PROD,
+      sid_twilio: process.env.ACCOUNTSID_PIL,
+      token_twilio: process.env.AUTHTOKEN_PIL,
     },
   },
   prod: {
