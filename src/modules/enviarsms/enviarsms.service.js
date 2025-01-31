@@ -8,6 +8,9 @@ export const sendSMS = async (data, mensaje) => {
   const accountSid = smsconfig.sid_twilio; // Obtén tu SID de cuenta desde Twilio
   const authToken = smsconfig.token_twilio;   // Obtén tu token de autenticación desde Twilio
 
+  console.log(accountSid)
+  console.log(authToken)
+
   const client = twilio(accountSid, authToken);
 
   try {
