@@ -15,6 +15,10 @@ export const iniciarSesionService = async (data) => {
       throw new CustomError(getError(9));// Código de error para "Usuario no encontrado"
     }
 
+    if(usuarioLogin.usuario.estadoUsuario === "B"){
+      throw new CustomError(getError(17));// Código de error para "Usuario Bloqueado"
+    }
+
     // 3. Validar la contraseña
     const isValid = await hashPassword.comparePassword(data.contrasena, usuarioLogin.contrasena);
     if (!isValid) {

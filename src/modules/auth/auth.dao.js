@@ -5,12 +5,12 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 export const iniciarSesionDao = async (usuario) => {
   try {
     // 1. Query para obtener los datos del usuario (incluyendo la contraseña hasheada)
-    const queryUsuario = `
-      SELECT u.idUsuario, u.nombreUsuario, u.apellidoUsuario, u.telefonoUsuario, u.idRol, 
-      u.contrasena, r.nombreRol FROM USUARIOS u
-      INNER JOIN ROLES r ON u.idRol = r.idRol
-      WHERE u.usuario = ?
-      AND u.estadoUsuario = 'A';`;
+    const queryUsuario = `SELECT u.idUsuario, u.nombreUsuario, u.apellidoUsuario,
+                          u.telefonoUsuario, u.idRol, r.nombreRol, u.contrasena, u.estadoUsuario
+                          FROM USUARIOS u
+                          INNER JOIN ROLES r ON u.idRol = r.idRol
+                          WHERE u.usuario = ?
+                          AND u.estado = 'A';`;
 
     const resUserData = await Connection.execute(queryUsuario, [usuario]);
 
@@ -44,6 +44,7 @@ export const iniciarSesionDao = async (usuario) => {
         telefono: userData.telefonoUsuario,
         idRol: userData.idRol,
         rol: userData.nombreRol,
+        estadoUsuario: userData.estadoUsuario
       },
       permisos: userPermisos.map((permiso) => ({
         idPermiso: permiso.idPermiso,

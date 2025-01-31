@@ -90,6 +90,11 @@ const databaseErrorMap = {
     statusCode: 500,
     code: 500,
   },
+  17: {
+    message: "Usuario bloqueado",
+    statusCode: 403,
+    code: 403,
+  },
 
   // Agregar más errores de base de datos aquí según sea necesario
 };
