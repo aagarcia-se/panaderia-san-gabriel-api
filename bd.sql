@@ -92,4 +92,4 @@ INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 3);
 INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 2);
 
 -- Crear usuio administrador --
-INSERT INTO usuarios ("idUsuario", "nombreUsuario", "apellidoUsuario", "usuario", "contrasena", "idRol", "estadoUsuario", "fechaCreacion", "estado") VALUES(1, 'Angel', 'Garcia', 'agarcia', 'Seguridad25', 1, 'A', '2025-01-25', 'A');
+INSERT INTO usuarios ("idUsuario", "nombreUsuario", "apellidoUsuario", "usuario", "contrasena", "telefonoUsuario", "idRol", "estadoUsuario", "fechaCreacion", "estado") VALUES(1, 'Angel', 'Garcia', 'aagarcia', 'Seguridad25*', '50746730', 1, 'A', '2025-01-25', 'A');

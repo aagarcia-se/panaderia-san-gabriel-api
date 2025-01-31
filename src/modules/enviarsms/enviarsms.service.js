@@ -7,7 +7,7 @@ const smsconfig = config.smsConfig;
 export const sendSMS = async (data, mensaje) => {
   const accountSid = smsconfig.sid_twilio; // Obtén tu SID de cuenta desde Twilio
   const authToken = smsconfig.token_twilio;   // Obtén tu token de autenticación desde Twilio
-
+  
   const client = twilio(accountSid, authToken);
 
   try {
@@ -16,8 +16,10 @@ export const sendSMS = async (data, mensaje) => {
       from: '+17633143352', // Tu número de Twilio
       to: `+502${data.telefonoUsuario}`            // Número de destino
     });
+    console.log({ success: true, messageSid: message.sid });
     return { success: true, messageSid: message.sid };
   } catch (error) {
+    console.log(error)
     return { success: false, error: error.message };
   }
 };
@@ -29,9 +31,11 @@ export const createMessage = (data) => {
 
   const nombreMensaje = `${nombre} ${apellido}`;
 
-  return `        ${nombreMensaje} se ha creado tu usuario para https://sangabrielpanaderia.vercel.app/
+  return `Hola ${nombreMensaje},
+          Se han creado tus credenciales para el ingreso a https://sangabrielpanaderia.vercel.app/
           Usuario: ${data.usuario}
-          Contraseña: ${data.contrasena}`;
+          constasena_ ${data.passGenerada}
+          Por seguridad, te recomendamos cambiar tu contraseña después del primer inicio de sesión.`;
 }
 
 

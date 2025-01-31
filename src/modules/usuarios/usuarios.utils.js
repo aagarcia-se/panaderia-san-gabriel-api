@@ -1,5 +1,7 @@
+import crypto from 'crypto';
+
 export const generaNombreUsuario = (data) => {
-  const { nombreUsuario, apellidoUsuario } = data;
+const { nombreUsuario, apellidoUsuario } = data;
 
   if (!nombreUsuario || !apellidoUsuario) {
     throw new Error("Datos incompletos: nombre y apellido son obligatorios");
@@ -39,28 +41,16 @@ export const generaNombreUsuario = (data) => {
   return estrategiaSeleccionada().replace(/[^a-z0-9]/g, ""); // Asegurarse de que no tenga caracteres especiales
 };
 
-export const generaContrasena = (nombreUsuario) => {
-  const caracteresEspeciales = "@";
-  const numeros = "0123456789";
+export const generaContrasena = () => {
+  const numeros = "0123456789"; // Cadena de números posibles
+  let contrasena = "Sg-"; // Inicia con "Sg-"
 
-  // Tomar las primeras 4 letras del nombre de usuario
-  const primerasLetras = nombreUsuario.substring(0, 4).toLowerCase();
+  // Generar 7 números aleatorios usando crypto
+  for (let i = 0; i < 7; i++) {
+    const randomByte = crypto.randomBytes(1)[0]; // Genera un byte aleatorio
+    const numeroAleatorio = numeros[randomByte % numeros.length]; // Selecciona un número aleatorio
+    contrasena += numeroAleatorio; // Concatenar cada número aleatorio
+  }
 
-  // Elegir un carácter especial aleatorio
-  const caracterEspecial = caracteresEspeciales.charAt(
-    Math.floor(Math.random() * caracteresEspeciales.length)
-  );
-
-  // Elegir un número aleatorio
-  const numeroAleatorio = numeros.charAt(
-    Math.floor(Math.random() * numeros.length)
-  );
-
-  // Concatenar todo: primeras 4 letras, un carácter especial y un número
-  const contraseña = `${primerasLetras}${caracterEspecial}${numeroAleatorio}`;
-
-  return contraseña;
+  return contrasena; // Devolver la contraseña en el formato deseado
 };
-
-
-/* este es un comentario para el fork */

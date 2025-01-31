@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
-import CustomError from "./CustomError.js";
-import { getError } from "./generalErrors.js";
+import CustomError from "../utils/CustomError.js";
+import { getError } from "../utils/generalErrors.js";
+
 
 const generateToken = (usuarioAuth) => {
   return jwt.sign(

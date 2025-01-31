@@ -1,6 +1,8 @@
+
+import jwt from "../auth/jwt.js";
 import CustomError from "../utils/CustomError.js";
 import { getError } from "../utils/generalErrors.js";
-import jwtService from "../utils/jwtService.js";
+
 
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -11,7 +13,7 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwtService.verifyToken(token);
+    const decoded = jwt.verifyToken(token);
     req.user = decoded;
     next();
   } catch (error) {

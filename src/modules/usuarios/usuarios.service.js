@@ -1,3 +1,4 @@
+import hashPassword from "../../auth/hashPassword.js";
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import sendSMS, { createMessage } from "../enviarsms/enviarsms.service.js";
@@ -8,10 +9,14 @@ export const crearUsuarioService = async (dataUsuario) => {
     try {  
 
       const usuario = generaNombreUsuario(dataUsuario);//generar usuario
-      const contrasena = generaContrasena(dataUsuario.nombreUsuario);
+      const passGenerada = generaContrasena();
+      const hashedPass = await hashPassword.hashPassword(passGenerada);
       
       const infoUsuario = {
-        ...dataUsuario, usuario, contrasena
+        ...dataUsuario, 
+        usuario, 
+        contrasena: hashedPass,
+        passGenerada
       }
 
       const userCreado = await crearUsuarioDao(infoUsuario);
