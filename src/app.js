@@ -8,6 +8,7 @@ import { rolesPermisosRoute } from "./modules/rolespermisos/rolespermisos.routes
 import { usuariosRoute } from "./modules/usuarios/usuarios.routes.js";
 import { smsRoute } from "./modules/enviarsms/enviarsms.routes.js";
 import { authRoute } from "./modules/auth/auth.routes.js";
+import { productosRoute } from "./modules/productos/productos.routes.js";
 
 
 
@@ -23,6 +24,7 @@ app.use("/api", sucursalesRoute);
 app.use("/api", permisosRoute);
 app.use("/api", rolesPermisosRoute);
 app.use("/api", usuariosRoute);
+app.use("/api", productosRoute);
 app.use("/api", smsRoute);
 
 // Middleware de manejo de errores
