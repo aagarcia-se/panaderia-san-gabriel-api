@@ -9,6 +9,7 @@ import { usuariosRoute } from "./modules/usuarios/usuarios.routes.js";
 import { smsRoute } from "./modules/enviarsms/enviarsms.routes.js";
 import { authRoute } from "./modules/auth/auth.routes.js";
 import { productosRoute } from "./modules/productos/productos.routes.js";
+import { preciosRoute } from "./modules/precios/precios.routes.js";
 
 
 
@@ -26,6 +27,7 @@ app.use("/api", rolesPermisosRoute);
 app.use("/api", usuariosRoute);
 app.use("/api", productosRoute);
 app.use("/api", smsRoute);
+app.use("/api", preciosRoute);
 
 // Middleware de manejo de errores
 app.use(errorHandler);

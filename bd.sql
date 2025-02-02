@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS CATEGORIAS (
 -- Tabla Productos
 CREATE TABLE IF NOT EXISTS PRODUCTOS (
     idProducto INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombreProducto TEXT NOT NULL,
+    nombreProducto TEXT NOT NULL UNIQUE,
     idCategoria INTEGER NOT NULL,
     fechaCreacion TEXT,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
@@ -104,13 +104,13 @@ CREATE TABLE IF NOT EXISTS PRODUCTOS (
 -- Tabla Precios
 CREATE TABLE IF NOT EXISTS PRECIOS (
     idPrecio INTEGER PRIMARY KEY AUTOINCREMENT,
-    idProducto INTEGER NOT NULL,
+    idProducto INTEGER NOT NULL UNIQUE,
     cantidad INTEGER NOT NULL,
     precio DECIMAL(10, 2) NOT NULL,
     precioPorUnidad DECIMAL(10, 2) NOT NULL,
     fechaInicio DATETIME DEFAULT CURRENT_TIMESTAMP,
     fechaFin DATETIME,
-    FOREIGN KEY (idProucto) REFERENCES Productos(idProducto)
+    FOREIGN KEY (idProducto) REFERENCES Productos(idProducto)
 );
 
 -- Tabla PedidosProduccion
@@ -167,10 +167,3 @@ insert into productos (nombreProducto, idCategoria, fechaCreacion) values
 --iNGRESO DE PRECIOS
 insert into precios (idProducto, cantidad, precio, precioPorUnidad, fechaInicio)
 values (1, 3, 1, 0.33, '20225-01-31');
-
-SELECT p.idProducto, p.nombreProducto, pr.cantidad, pr.precio, pr.precioPorUnidad,
-pr.fechaInicio,  pr.fechaFin
-FROM PRODUCTOS p
-JOIN PRECIOS pr ON p.idProducto = pr.idProducto
-WHERE p.estado = 'A' -- Solo productos activos
-AND (pr.fechaFin IS NULL OR pr.fechaFin >= CURRENT_TIMESTAMP); -- Precios vigentes

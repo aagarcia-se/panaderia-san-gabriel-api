@@ -32,11 +32,11 @@ export const consultarProductosController = async (req, res, next) => {
   
   export const actualizarProductoController= async (req, res, next) => {
     try {
-      const rolActualizado = await actualizarProductoService(req.body);
+      const precioActualizado = await actualizarProductoService(req.body);
       const responseData = {
         status: 200,
         message: "Actualización exitosa",
-        rol: rolActualizado,
+        precioActualizado
       };
       res.status(200).json(responseData);
     } catch (error) {

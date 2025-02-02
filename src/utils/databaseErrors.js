@@ -26,7 +26,7 @@ const databaseErrorMap = {
 
   },
   "SQLite error: FOREIGN KEY constraint failed":{
-    message: "Este registro se encuentra relacionado a otro",
+    message: "Este registro se encuentra relacionado a otro o no existe",
     statusCode: 409,
     code: 402
   }
