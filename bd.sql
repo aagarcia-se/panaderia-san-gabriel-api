@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS ACCESOS_USUARIOS;
 DROP TABLE IF EXISTS SUCURSALES;
 DROP TABLE IF EXISTS CATEGORIAS;
 DROP TABLE IF EXISTS PRODUCTOS;
+DROP TABLE IF EXISTS PRODUCTOSiMAGENES;
 DROP TABLE IF EXISTS PRECIOS;
 
 -- Tabla USUARIOS (Información general del usuario)
@@ -96,9 +97,19 @@ CREATE TABLE IF NOT EXISTS PRODUCTOS (
     idProducto INTEGER PRIMARY KEY AUTOINCREMENT,
     nombreProducto TEXT NOT NULL UNIQUE,
     idCategoria INTEGER NOT NULL,
-    fechaCreacion TEXT,
+    fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idCategoria) REFERENCES categorias(idCategoria)
+);
+
+
+CREATE TABLE IF NOT EXISTS PRODUCTOSIMAGENES (
+    idImagen INTEGER PRIMARY KEY AUTOINCREMENT,
+    idProducto INTEGER NOT NULL UNIQUE,
+    imagenB64 TEXT NOT NULL CHECK (LENGTH(imagenB64) <= 1000000), -- Límite de 1MB en Base64
+    fechaCreacion DATE NOT NULL, 
+    estado TEXT NOT NULL DEFAULT 'A' CHECK (estado IN ('A', 'N')), 
+    FOREIGN KEY (idProducto) REFERENCES Productos(idProducto) ON DELETE CASCADE
 );
 
 -- Tabla Precios
@@ -108,11 +119,17 @@ CREATE TABLE IF NOT EXISTS PRECIOS (
     cantidad INTEGER NOT NULL,
     precio DECIMAL(10, 2) NOT NULL,
     precioPorUnidad DECIMAL(10, 2) NOT NULL,
-    fechaInicio DATETIME DEFAULT CURRENT_TIMESTAMP,
-    fechaFin DATETIME,
+    fechaInicio DATE NOT NULL,
+    fechaFin DATE,
     FOREIGN KEY (idProducto) REFERENCES Productos(idProducto)
 );
 
+
+
+
+
+/*-----------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------*/
 -- Tabla PedidosProduccion
 CREATE TABLE IF NOT EXISTS PEDIDOSPRODUCCION (
     id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
