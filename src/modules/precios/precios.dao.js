@@ -4,8 +4,8 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const IngresarPrecioProductoDao = async (dataPrecio) => {
     try {
-        const query = `insert into precios (idProducto, cantidad, precio, precioPorUnidad, fechaInicio)
-                      values (?, ?, ?, ?, ?);`;
+        const query = `insert into precios (idProducto, cantidad, precio, precioPorUnidad, fechaInicio, fechaFin)
+                      values (?, ?, ?, ?, ?, ?);`;
 
         const resPrecio = await Connection.execute(query, [
             dataPrecio.idProducto,
@@ -13,6 +13,7 @@ export const IngresarPrecioProductoDao = async (dataPrecio) => {
             dataPrecio.precio,
             dataPrecio.precioPorUnidad,
             dataPrecio.fechaInicio,
+            dataPrecio.fechaFin
         ]);
     
         return resPrecio.toJSON().lastInsertRowid;
@@ -26,14 +27,22 @@ export const IngresarPrecioProductoDao = async (dataPrecio) => {
 export const consultarPreciosProductosDao = async () => {
   try {
     // Consulta SQL
-    const query = `SELECT p.idProducto, p.nombreProducto, ca.nombreCategoria, pr.cantidad, pr.idPrecio, pr.precio, pr.precioPorUnidad,
-                    pr.fechaInicio, pr.fechaFin, img.imagenB64
-                    FROM PRODUCTOS p
-                    JOIN PRECIOS pr ON p.idProducto = pr.idProducto
-  				          JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
-  				          JOIN PRODUCTOSIMAGENES img ON p.idProducto = img.idProducto
-                    WHERE p.estado = 'A' -- Solo productos activos
-                    AND (pr.fechaFin IS NULL OR pr.fechaFin >= CURRENT_TIMESTAMP); -- Precios vigentes`
+    const query = `SELECT p.idProducto, 
+                        p.nombreProducto, 
+                        ca.nombreCategoria, 
+                        pr.cantidad, 
+                        pr.idPrecio, 
+                        pr.precio, 
+                        pr.precioPorUnidad,
+                        pr.fechaInicio, 
+                        pr.fechaFin, 
+                        img.imagenB64
+                  FROM PRODUCTOS p
+                  JOIN PRECIOS pr ON p.idProducto = pr.idProducto
+                  JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+                  LEFT JOIN PRODUCTOSIMAGENES img ON p.idProducto = img.idProducto -- LEFT JOIN para incluir productos sin imagen
+                  WHERE p.estado = 'A' -- Solo productos activos
+                  AND (pr.fechaFin IS NULL OR pr.fechaFin >= CURRENT_TIMESTAMP);-- Precios vigentes`
 
     // Ejecutar la consulta
     const preciosProductos = await Connection.execute(query);

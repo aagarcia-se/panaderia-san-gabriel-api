@@ -13,10 +13,15 @@ import { preciosRoute } from "./modules/precios/precios.routes.js";
 import { productoImgRoutes } from "./modules/imagenesproductos/imgproductos.routes.js";
 
 const app = express();
-app.use(express.json());
+
+// Aumentar el límite del body-parser a 10MB o más si es necesario
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
+// Habilitar CORS
 app.use(cors());
 
-// Tus rutas
+// Rutas de la API
 app.use("/api", authRoute);
 app.use("/api", rolesRoute);
 app.use("/api", sucursalesRoute);
