@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS CATEGORIAS (
 -- Tabla Productos
 CREATE TABLE IF NOT EXISTS PRODUCTOS (
     idProducto INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombreProducto TEXT NOT NULL UNIQUE,
+    nombreProducto TEXT NOT NULL,
     idCategoria INTEGER NOT NULL,
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
@@ -187,7 +187,7 @@ values ('Reposteria', 'Productos pasteles, pan de banano, etc', '2025-01-31');
 
 --iNGRESO DE PRODUTOS
 insert into productos (nombreProducto, idCategoria, fechaCreacion) values 
-('Freances', 1, '2025-01-31');
+('Frances', 1, '2025-01-31');
 
 --iNGRESO DE PRECIOS
 insert into precios (idProducto, cantidad, precio, precioPorUnidad, fechaInicio)

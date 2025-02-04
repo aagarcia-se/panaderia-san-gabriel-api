@@ -42,7 +42,8 @@ export const consultarPreciosProductosDao = async () => {
                   JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
                   LEFT JOIN PRODUCTOSIMAGENES img ON p.idProducto = img.idProducto -- LEFT JOIN para incluir productos sin imagen
                   WHERE p.estado = 'A' -- Solo productos activos
-                  AND (pr.fechaFin IS NULL OR pr.fechaFin >= CURRENT_TIMESTAMP);-- Precios vigentes`
+                  AND (pr.fechaFin IS NULL OR pr.fechaFin >= CURRENT_TIMESTAMP)
+                  AND p.estado = 'A';-- Precios vigentes`
 
     // Ejecutar la consulta
     const preciosProductos = await Connection.execute(query);
@@ -50,7 +51,6 @@ export const consultarPreciosProductosDao = async () => {
     // Devolver los registros encontrados
     return preciosProductos.rows;
   } catch (error) {
-    console.log(error)
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
