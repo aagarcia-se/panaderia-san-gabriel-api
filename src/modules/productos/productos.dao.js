@@ -67,7 +67,6 @@ export const eliminarProductoDao = async (idProducto) => {
 }
 
 export const desactivarProductoDao = async (idProducto) => {
-  console.log(idProducto)
   try {
     const query = "update productos set estado = 'N' where idProducto = ?;";
     const producto = await Connection.execute(query, [idProducto]);
