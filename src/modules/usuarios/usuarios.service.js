@@ -3,7 +3,6 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { enviarEmail } from "../emails/enviarcorresos.service.js";
 import generarPlantillaCreacionUsuario from "../emails/plantillasenviarcorreo/notiCreacionUsuario.js";
-import sendSMS, { createMessage } from "../enviarsms/enviarsms.service.js";
 import { actualizarUsuarioDao, consultarUsuariosDao, crearUsuarioDao, bloquearUsuarioDao, elminarUsuarioDao, desbloquearUsuarioDao } from "./usuarios.dao.js";
 import { generaContrasena, generaNombreUsuario } from "./usuarios.utils.js";
 
