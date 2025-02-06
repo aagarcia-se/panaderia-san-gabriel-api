@@ -1,10 +1,4 @@
-import {
-  actualizarProductoService,
-  consultarProductoService,
-  crearProductoService,
-  desactivarProductoService,
-  elminarProductoService,
-} from "./productos.service.js";
+import { actualizarProductoService, consultarProductoService, crearProductoService, desactivarProductoService, elminarProductoService, } from "./productos.service.js";
 
 export const ingresarProductoController = async (req, res, next) => {
   try {

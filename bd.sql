@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS SUCURSALES (
 
 CREATE TABLE IF NOT EXISTS CATEGORIAS (
     idCategoria INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombreCategoria TEXT NOT NULL UNIQUE,
+    nombreCategoria TEXT NOT NULL,
     descripcionCategoria TEXT,
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A'
@@ -166,14 +166,16 @@ CREATE TABLE IF NOT EXISTS VENTAS (
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") VALUES(1, 'Dashboard', 'Visualizacion de graficas estadisticas', '/dashboard', '2025-01-25', 'A');
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") VALUES(2, 'Crear usuarios', 'Crear usuarios para ingreso al sistema', '/users/create', '2025-01-25', 'A');
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") VALUES(3, 'Control de Roles', 'Crear roles para asignar al usaurio', '/users/roles', '2025-01-25', 'A');
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") VALUES(4, 'Gestion de productos', 'Ingresos, modificacion y elminacion de productos', '/productos', '2025-01-25', 'A');
 
 -- Crear Rol administrador por defecto--
 INSERT INTO roles ("idRol", "nombreRol", "descripcionRol", "fechaCreacion", "estado") VALUES(1, 'Admin', 'Administrador de todo el sistema', '2025-01-25', 'A');
 
 -- Permisos del rol administrador --
 INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 1);
-INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 3);
 INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 2);
+INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 3);
+INSERT INTO rolespermisos ("idRol", "idPermiso") VALUES(1, 4);
 
 -- Crear usuio administrador --
 INSERT INTO usuarios ("idUsuario", "nombreUsuario", "apellidoUsuario", "usuario", "contrasena", "correoUsuario", "idRol", "estadoUsuario", "fechaCreacion", "estado") VALUES(1, 'admin', '', 'admin', '$2b$10$Hc2gvMXzcEqWAghdz1MvluiJFBq3slluVrhq/1LCI7EZ7nmIy43NS', 'panaderiasangabrields@gmail.com', 1, 'A', '2025-01-25', 'A');
