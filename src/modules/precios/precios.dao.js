@@ -29,6 +29,7 @@ export const consultarPreciosProductosDao = async () => {
     // Consulta SQL
     const query = `SELECT p.idProducto, 
                         p.nombreProducto, 
+                        ca.idCategoria,
                         ca.nombreCategoria, 
                         pr.cantidad, 
                         pr.idPrecio, 
