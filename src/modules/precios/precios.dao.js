@@ -36,15 +36,11 @@ export const consultarPreciosProductosDao = async () => {
                         pr.precio, 
                         pr.precioPorUnidad,
                         pr.fechaInicio, 
-                        pr.fechaFin, 
-                        img.imagenB64
+                        pr.fechaFin
                   FROM PRODUCTOS p
                   JOIN PRECIOS pr ON p.idProducto = pr.idProducto
                   JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
-                  LEFT JOIN PRODUCTOSIMAGENES img ON p.idProducto = img.idProducto -- LEFT JOIN para incluir productos sin imagen
-                  WHERE p.estado = 'A' -- Solo productos activos
-                  AND (pr.fechaFin IS NULL OR pr.fechaFin >= CURRENT_TIMESTAMP)
-                  AND p.estado = 'A';-- Precios vigentes`
+                  WHERE p.estado = 'A'; -- Solo productos activos`
 
     // Ejecutar la consulta
     const preciosProductos = await Connection.execute(query);
