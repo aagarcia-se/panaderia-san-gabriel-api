@@ -48,7 +48,6 @@ export const actualizarProductoDao = async (dataProducto) => {
 
     return productos.toJSON().rowsAffected;
   } catch (error) {
-    console.log(error)
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }

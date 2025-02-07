@@ -9,6 +9,8 @@ DROP TABLE IF EXISTS PRODUCTOSiMAGENES;
 DROP TABLE IF EXISTS PRECIOS;
 DROP TABLE IF EXISTS PRODUCTOS;
 DROP TABLE IF EXISTS CATEGORIAS;
+DROP TABLE IF EXISTS PEDIDOSPRODUCCION;
+DROP TABLE IF EXISTS VENTAS;
 
 -- Tabla USUARIOS (Información general del usuario)
 CREATE TABLE IF NOT EXISTS USUARIOS (
@@ -139,28 +141,28 @@ END;
 /*-----------------------------------------------------------------------------------------
   -----------------------------------------------------------------------------------------*/
 -- Tabla PedidosProduccion
-CREATE TABLE IF NOT EXISTS PEDIDOSPRODUCCION (
-    id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_producto INTEGER NOT NULL,
-    cantidad_bandejas INTEGER NOT NULL,
-    unidades_por_bandeja INTEGER NOT NULL,
-    fecha_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
-    fecha_entrega DATETIME,
-    estado TEXT DEFAULT 'Pendiente',
-    FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
-);
+-- CREATE TABLE IF NOT EXISTS PEDIDOSPRODUCCION (
+--     id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
+--     id_producto INTEGER NOT NULL,
+--     cantidad_bandejas INTEGER NOT NULL,
+--     unidades_por_bandeja INTEGER NOT NULL,
+--     fecha_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     fecha_entrega DATETIME,
+--     estado TEXT DEFAULT 'Pendiente',
+--     FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
+-- );
 
--- Tabla VentasEstimadas
-CREATE TABLE IF NOT EXISTS VENTAS (
-    id_venta_estimada INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_pedido INTEGER NOT NULL,
-    id_precio INTEGER NOT NULL,
-    unidades_totales INTEGER NOT NULL,
-    venta_estimada DECIMAL(10, 2) NOT NULL,
-    fecha_calculo DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_pedido) REFERENCES PedidosProduccion(id_pedido),
-    FOREIGN KEY (id_precio) REFERENCES Precios(id_precio)
-);
+-- -- Tabla VentasEstimadas
+-- CREATE TABLE IF NOT EXISTS VENTAS (
+--     id_venta_estimada INTEGER PRIMARY KEY AUTOINCREMENT,
+--     id_pedido INTEGER NOT NULL,
+--     id_precio INTEGER NOT NULL,
+--     unidades_totales INTEGER NOT NULL,
+--     venta_estimada DECIMAL(10, 2) NOT NULL,
+--     fecha_calculo DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     FOREIGN KEY (id_pedido) REFERENCES PedidosProduccion(id_pedido),
+--     FOREIGN KEY (id_precio) REFERENCES Precios(id_precio)
+-- );
 
 -- Insertar permisos ----
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") VALUES(1, 'Dashboard', 'Visualizacion de graficas estadisticas', '/dashboard', '2025-01-25', 'A');
