@@ -5,14 +5,16 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 export const consultarDetalleOrdenProduccionDao = async () => {
     try {
       // Consulta SQL
-      const query = `SELECT op.idOrdenProduccion, op.idSUcursal, op.nombrepanadero, op.fechaAProducir, op.estadoOrden,
+      const query = `SELECT op.idOrdenProduccion, op.idSucursal, s.nombresucursal, op.nombrepanadero, 
+                        op.fechaAProducir, op.estadoOrden,
                         (
                             SELECT COUNT(*) 
                             FROM DETALLESORDENESPRODUCCION AS dp 
                             WHERE dp.idOrdenProduccion = op.idOrdenProduccion
-                            ) AS cantidadProductos
-                        FROM ORDENESPRODUCCION AS op
-                        order by op.idOrdenProduccion desc;`;
+                        ) AS cantidadProductos
+                    FROM ORDENESPRODUCCION AS op
+                    INNER JOIN SUCURSALES AS s ON op.idSucursal = s.idSucursal
+                    ORDER BY op.idOrdenProduccion DESC;`;
 
       // Ejecutar la consulta
       const ordenesProduccion = await Connection.execute(query);
