@@ -26,3 +26,17 @@ export const consultarDetalleOrdenProduccionDao = async () => {
       throw new CustomError(dbError);
     }
 }
+
+export const eliminarOrdenProduccionDao = async (idOrdenProduccion) => {
+  try {
+    const query = "delete from ordenesproduccion where idOrdenProduccion = ?;";
+    const res = await Connection.execute(query, [idOrdenProduccion]);
+
+    return res.toJSON().rowsAffected;
+  } catch (error) {
+    console.log(error)
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+
+}
