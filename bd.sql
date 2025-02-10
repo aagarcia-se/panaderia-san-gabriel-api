@@ -131,10 +131,12 @@ CREATE TABLE IF NOT EXISTS CONFIGPRODUCCION (
 CREATE TABLE IF NOT EXISTS ORDENESPRODUCCION (
     idOrdenProduccion INTEGER PRIMARY KEY AUTOINCREMENT,
     idSucursal INTEGER,
+    ordenTurno TEXT NOT NULL, 
     nombrePanadero TEXT NOT NULL,
     fechaAProducir DATE NOT NULL,
     idUsuario INTEGER,
-    estadoOrden TEXT NOT NULL CHECK(estadoOrden IN ('C', 'p')) DEFAULT 'C',
+    estadoOrden TEXT NOT NULL CHECK(estadoOrden IN ('C', 'P')) DEFAULT 'P',
+    fechaCierre DATE NULL,
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario) ON DELETE SET NULL,
@@ -201,8 +203,8 @@ INSERT INTO CONFIGPRODUCCION (idProducto, unidadesPorBandeja, fechaCreacion) VAL
 INSERT INTO SUCURSALES (nombreSucursal, direccionSucursal, municipioSucursal, departamentoSucursal, telefonoSucursal, correoSucursal, fechaCreacion) VALUES
 ('San Gabriel Dueñas', 'Calle Real zona 1', 'San Miguel Dueñas', 'Sacatepéquez', '78541245', 'sangabrielpanaderia@gmail.com', '2025-02-07');
 
-insert into ordenesproduccion (idSucursal, nombrePanadero, fechaAProducir, idUsuario, fechaCreacion)
-values (1, 'Angel Garcia', '2025-02-08', 1, '2025-02-07');
+insert into ordenesproduccion (idSucursal, ordenTurno, nombrePanadero, fechaAProducir, idUsuario, fechaCreacion)
+values (1, 'AM', 'Angel Garcia', '2025-02-08', 1, '2025-02-07');
 
 insert into DETALLESORDENESPRODUCCION (idOrdenProduccion, idProducto, cantidadBandejas, cantidadUnidades, fechaCreacion )
 values (1, 1, 40, 120, '2025-02-07' );
