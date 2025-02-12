@@ -7,11 +7,11 @@ import {
 
 export const consultarSucursalesController = async (req, res, next) => {
   try {
-    const sucrusales = await consultarSucursalesServices();
+    const sucursales = await consultarSucursalesServices();
     const responseData = {
       status: 200,
       message: "Consulta exitosa",
-      sucrusales,
+      sucursales,
     };
     res.status(200).json(responseData);
   } catch (error) {
