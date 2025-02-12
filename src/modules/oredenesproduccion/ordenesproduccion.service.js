@@ -1,6 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, eliminarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
+import { consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
+import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
 export const consultarOrdenProduccionService = async () => {
     try {
@@ -45,3 +46,29 @@ export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
     throw error;
   }
 };
+
+export const ingresarOrdenProduccionService = async (ordenProduccion) => {
+  try {
+    const { encabezadoOrden, detalleOrden } = ordenProduccion;
+
+    const detallesActualizados = await procesarDetallesOrden(detalleOrden);
+    
+    const ordenParaDAO = {
+      orden: encabezadoOrden,
+      detallesOrden: detallesActualizados
+    };
+
+    const resultado = await ingresarOrdenProduccionDao(ordenParaDAO);
+
+    if (resultado === 0) {
+      const errorInfo = getError(2);
+      throw new CustomError(errorInfo);
+    }
+
+    return resultado;
+  } catch (error) {
+    throw error;
+  }
+};
+
+

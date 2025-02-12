@@ -79,3 +79,51 @@ export const eliminarOrdenProduccionDao = async (idOrdenProduccion) => {
   }
 
 }
+
+export const ingresarOrdenProduccionDao = async (ordenProduccion) => {
+  const { orden, detallesOrden } = ordenProduccion;
+  
+  try {
+    // 1. Insertar encabezado
+    const queryEncabezado = `INSERT INTO ordenesproduccion( idSucursal,  ordenTurno, nombrePanadero, fechaAProducir, idUsuario, fechaCreacion)
+                                  VALUES (?, ?, ?, ?, ?, ?);
+                            `;
+
+    const resultadoEncabezado = await Connection.execute(queryEncabezado, [
+      orden.idSucursal,
+      orden.ordenTurno,
+      orden.nombrePanadero,
+      orden.fechaAProducir,
+      orden.idUsuario,
+      orden.fechaCreacion
+    ]);
+    const idOrdenGenerada = resultadoEncabezado.toJSON().lastInsertRowid;
+
+    if (!idOrdenGenerada) {
+      return 0;
+    }
+
+    // 2. Insertar detalles usando el ID generado     
+    const queryDetalle = `INSERT INTO detallesordenesproduccion(idOrdenProduccion, idProducto, cantidadBandejas, cantidadUnidades, fechaCreacion )
+                            VALUES (?, ?, ?, ?, ?);
+                            `;
+
+    const batch = detallesOrden.map((detalle) => ({
+      sql: queryDetalle,
+      args: [
+        idOrdenGenerada,  // <- Usamos el ID generado aquí
+        detalle.idProducto,
+        detalle.cantidadBandejas,
+        detalle.cantidadUnidades,
+        detalle.fechaCreacion
+      ]
+    }));
+
+    await Connection.batch(batch);
+    return parseInt(idOrdenGenerada);
+
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+};
