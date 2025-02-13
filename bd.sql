@@ -160,6 +160,45 @@ CREATE INDEX idx_productos_idCategoria ON PRODUCTOS(idCategoria);
 CREATE INDEX idx_precios_idProducto ON PRECIOS(idProducto);
 CREATE INDEX idx_usuarios_idRol ON USUARIOS(idRol);
 
+
+--tablas para control de materia prima--
+-----------------------------------------------------
+-----------------------------------------------------
+
+-- Crear tabla INGREDIENTES
+CREATE TABLE IF NOT EXISTS INGREDIENTES (
+    idIngrediente INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombreIngrediente TEXT NOT NULL,
+    unidadMedida TEXT NOT NULL, -- Unidad de medida base (kg, gr, litros, etc.)
+    stockActual REAL NOT NULL, -- Cantidad actual del ingrediente en inventario
+    fechaCreacion DATE NOT NULL,
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A'
+);
+
+-- Crear tabla RECETAS
+CREATE TABLE IF NOT EXISTS RECETAS (
+    idReceta INTEGER PRIMARY KEY AUTOINCREMENT,
+    idProducto INTEGER NOT NULL,
+    idIngrediente INTEGER NOT NULL,
+    cantidadNecesaria REAL NOT NULL, -- Cantidad de ingrediente necesaria para producir una unidad del producto
+    unidadMedida TEXT NOT NULL, -- Unidad de medida (kg, gr, litros, etc.)
+    fechaCreacion DATE NOT NULL,
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY (idIngrediente) REFERENCES INGREDIENTES(idIngrediente) ON DELETE CASCADE
+);
+
+-- Crear tabla CONSUMOSORDENESPRODUCCION
+CREATE TABLE IF NOT EXISTS CONSUMOSORDENESPRODUCCION (
+    idConsumoOrdenProduccion INTEGER PRIMARY KEY AUTOINCREMENT,
+    idOrdenProduccion INTEGER NOT NULL,
+    idIngrediente INTEGER NOT NULL,
+    cantidadUsada REAL NOT NULL, -- Cantidad de ingrediente usada en esta orden
+    unidadMedida TEXT NOT NULL, -- Unidad de medida (kg, gr, litros, etc.)
+    fechaCreacion DATE NOT NULL,
+    FOREIGN KEY (idOrdenProduccion) REFERENCES ORDENESPRODUCCION(idOrdenProduccion) ON DELETE CASCADE,
+    FOREIGN KEY (idIngrediente) REFERENCES INGREDIENTES(idIngrediente) ON DELETE CASCADE
+);
+
 -- Insertar permisos
 INSERT INTO PERMISOS (idPermiso, nombrePermiso, descripcionPermiso, rutaAcceso, fechaCreacion, estado) VALUES
 (1, 'Dashboard', 'Visualización de gráficas estadísticas', '/dashboard', '2025-01-25', 'A'),
@@ -208,3 +247,15 @@ values (1, 'AM', 'Angel Garcia', '2025-02-08', 1, '2025-02-07');
 
 insert into DETALLESORDENESPRODUCCION (idOrdenProduccion, idProducto, cantidadBandejas, cantidadUnidades, fechaCreacion )
 values (1, 1, 40, 120, '2025-02-07' );
+
+-- Insertar un ingrediente de ejemplo
+INSERT INTO INGREDIENTES (nombreIngrediente, unidadMedida, stockActual, fechaCreacion, estado)
+VALUES ('Harina', 'lb', '100', '2025-02-13', 'A');
+
+-- Insertar receta de frances
+INSERT INTO RECETAS (idProducto, idIngrediente, cantidadNecesaria, unidadMedida, fechaCreacion)
+VALUES (1, 1, 0.0385, 'lb', '2025-02-13'); -- Para hacer 1 Pan Francés, se necesitan 0.5 kg de harina
+
+-- Insertar un consumo de ejemplo
+INSERT INTO CONSUMOSORDENESPRODUCCION (idOrdenProduccion, idIngrediente, cantidadUsada, unidadMedida, fechaCreacion)
+VALUES (1, 1, 0.0385, 'lb', '2024-02-13'); -- En la orden 1, se usaron 25 kg de harina
