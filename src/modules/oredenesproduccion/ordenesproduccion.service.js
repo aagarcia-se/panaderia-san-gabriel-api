@@ -73,7 +73,10 @@ export const ingresarOrdenProduccionService = async (ordenProduccion) => {
     };
 
     const consumoOrdenProduccion = await CalcularCantidadIngredientes(OrdenProdNew); // Obtener ingredientes y cantidades a consumir
-    await registrarBatchConsumoOrdenProduccionServices(consumoOrdenProduccion); // Guardar los ingredientes
+
+    if(consumoOrdenProduccion.length !== 0){
+      await registrarBatchConsumoOrdenProduccionServices(consumoOrdenProduccion); // Guardar los ingredientes
+    }
 
     if (resultado.idOrdenGenerada === 0) {
       const errorInfo = getError(2);

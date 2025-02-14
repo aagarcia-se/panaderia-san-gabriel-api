@@ -253,12 +253,8 @@ values (1, 1, 40, 120, '2025-02-07' );
 
 -- Insertar un ingrediente de ejemplo
 INSERT INTO INGREDIENTES (nombreIngrediente, unidadMedida, stockActual, fechaCreacion, estado)
-VALUES ('Harina', 'lb', '100', '2025-02-13', 'A');
+VALUES ('Harina', 'Lb', '100', '2025-02-13', 'A');
 
 -- Insertar receta de frances
 INSERT INTO RECETAS (idProducto, idIngrediente, cantidadNecesaria, unidadMedida, fechaCreacion)
-VALUES (1, 1, 0.0385, 'lb', '2025-02-13'); -- Para hacer 1 Pan Francés, se necesitan 0.5 kg de harina
-
--- Insertar un consumo de ejemplo
-INSERT INTO CONSUMOSORDENESPRODUCCION (idDetalleOrdenProduccion, idIngrediente, cantidadUsada, unidadMedida, fechaCreacion)
-VALUES (1, 1, 0.0385, 'lb', '2024-02-13'); -- En la orden 1, se usaron 25 kg de harina
+VALUES (1, 1, 0.0385, 'Lb', '2025-02-13'); -- Para hacer 1 Pan Francés, se necesitan 0.5 kg de harina
