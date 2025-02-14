@@ -11,6 +11,9 @@ DROP TABLE IF EXISTS ORDENESPRODUCCION;
 DROP TABLE IF EXISTS CONFIGPRODUCCION;
 DROP TABLE IF EXISTS PRODUCTOS;
 DROP TABLE IF EXISTS CATEGORIAS;
+DROP TABLE IF EXISTS CONSUMOSORDENESPRODUCCION;
+DROP TABLE IF EXISTS RECETAS;
+DROP TABLE IF EXISTS INGREDIENTES;
 
 
 
@@ -190,12 +193,12 @@ CREATE TABLE IF NOT EXISTS RECETAS (
 -- Crear tabla CONSUMOSORDENESPRODUCCION
 CREATE TABLE IF NOT EXISTS CONSUMOSORDENESPRODUCCION (
     idConsumoOrdenProduccion INTEGER PRIMARY KEY AUTOINCREMENT,
-    idOrdenProduccion INTEGER NOT NULL,
+    idDetalleOrdenProduccion INTEGER NOT NULL,
     idIngrediente INTEGER NOT NULL,
     cantidadUsada REAL NOT NULL, -- Cantidad de ingrediente usada en esta orden
     unidadMedida TEXT NOT NULL, -- Unidad de medida (kg, gr, litros, etc.)
     fechaCreacion DATE NOT NULL,
-    FOREIGN KEY (idOrdenProduccion) REFERENCES ORDENESPRODUCCION(idOrdenProduccion) ON DELETE CASCADE,
+    FOREIGN KEY (idDetalleOrdenProduccion) REFERENCES DETALLESORDENESPRODUCCION(idDetalleOrdenProduccion) ON DELETE CASCADE,
     FOREIGN KEY (idIngrediente) REFERENCES INGREDIENTES(idIngrediente) ON DELETE CASCADE
 );
 
@@ -257,5 +260,5 @@ INSERT INTO RECETAS (idProducto, idIngrediente, cantidadNecesaria, unidadMedida,
 VALUES (1, 1, 0.0385, 'lb', '2025-02-13'); -- Para hacer 1 Pan Francés, se necesitan 0.5 kg de harina
 
 -- Insertar un consumo de ejemplo
-INSERT INTO CONSUMOSORDENESPRODUCCION (idOrdenProduccion, idIngrediente, cantidadUsada, unidadMedida, fechaCreacion)
+INSERT INTO CONSUMOSORDENESPRODUCCION (idDetalleOrdenProduccion, idIngrediente, cantidadUsada, unidadMedida, fechaCreacion)
 VALUES (1, 1, 0.0385, 'lb', '2024-02-13'); -- En la orden 1, se usaron 25 kg de harina

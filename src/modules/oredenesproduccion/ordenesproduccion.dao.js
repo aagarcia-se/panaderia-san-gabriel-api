@@ -119,8 +119,15 @@ export const ingresarOrdenProduccionDao = async (ordenProduccion) => {
       ]
     }));
 
-    await Connection.batch(batch);
-    return parseInt(idOrdenGenerada);
+    const resBatch = await Connection.batch(batch);
+
+    // Extraer solo los lastInsertRowid de los resultados del batch
+    const lastInsertRowids = resBatch.map(result => result.lastInsertRowid);
+
+    return {
+      idOrdenGenerada: parseInt(idOrdenGenerada),
+      idDetalleOrdenProduccion: lastInsertRowids.map(id => parseInt(id)) // Convert each ID to a numeric value
+    };
 
   } catch (error) {
     const dbError = getDatabaseError(error.message);
