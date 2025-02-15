@@ -10,7 +10,9 @@ import { smsRoute } from "./modules/enviarsms/enviarsms.routes.js";
 import { authRoute } from "./modules/auth/auth.routes.js";
 import { productosRoute } from "./modules/productos/productos.routes.js";
 import { preciosRoute } from "./modules/precios/precios.routes.js";
-import { productoImgRoutes } from "./modules/imagenesproductos/imgproductos.routes.js";
+import { categoriasRoute } from "./modules/categorias/categorias.routes.js";
+import { ordenesRoutes } from "./modules/oredenesproduccion/ordenesproduccion.routes.js";
+import { consumoIngredientesRoute } from "./modules/consumosordenesproduccion/consumosordenes.routes.js";
 
 const app = express();
 
@@ -31,7 +33,9 @@ app.use("/api", usuariosRoute);
 app.use("/api", productosRoute);
 app.use("/api", smsRoute);
 app.use("/api", preciosRoute);
-app.use("/api", productoImgRoutes);
+app.use("/api", categoriasRoute);
+app.use("/api", ordenesRoutes);
+app.use("/api", consumoIngredientesRoute);
 
 // Middleware de manejo de errores
 app.use(errorHandler);
