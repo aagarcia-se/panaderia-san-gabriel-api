@@ -33,7 +33,7 @@ const procesarVentaService = async (venta) => {
 
         // 3. Procesar productos de panadería o repostería (si existen)
         const productosPanaderiaProcesados = productosPanaderiaReposteria.length > 0
-            ? await obtenerProductosPanaderiaVendidos(productosPanaderiaReposteria)
+            ? await obtenerProductosPanaderiaVendidos(encabezadoVenta.idOrdenProduccion, productosPanaderiaReposteria)
             : [];
 
         // 4. Combinar productos procesados y no procesados

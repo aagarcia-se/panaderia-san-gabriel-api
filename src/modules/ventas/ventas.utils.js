@@ -48,13 +48,12 @@ const calcularSubtotalVenta = (unidadesVendidas, precioUnidad) => {
  * @param {Array} ventaDetalle - Detalle de la venta.
  * @returns {Promise<Array>} - Detalle de la venta con las unidades vendidas calculadas.
  */
-export const obtenerProductosPanaderiaVendidos = (ventaDetalle) => {
+export const obtenerProductosPanaderiaVendidos = (idOrdenProduccion, ventaDetalle) => {
     return Promise.all(
         ventaDetalle.map(async (detalle) => {
             try {
                 // Consultar unidades producidas
-                const productoProducido = await consultarUnidadesDeProductoPorOrdenService(detalle.idOrdenProduccion, detalle.idProducto);
-
+                const productoProducido = await consultarUnidadesDeProductoPorOrdenService(idOrdenProduccion, detalle.idProducto);
                 // Calcular las unidades vendidas
                 const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoProducido.detalleOrden.cantidadUnidades, detalle.unidadesNoVendidas);
 
