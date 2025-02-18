@@ -95,6 +95,11 @@ const databaseErrorMap = {
     statusCode: 403,
     code: 403,
   },
+  18: {
+    message: "Unidades restantes no puede ser mayor a las unidades producidas",
+    statusCode: 422,
+    code: 422,
+  },
 
   // Agregar más errores de base de datos aquí según sea necesario
 };

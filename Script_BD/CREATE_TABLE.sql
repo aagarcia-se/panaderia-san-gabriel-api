@@ -14,6 +14,10 @@ DROP TABLE IF EXISTS CATEGORIAS;
 DROP TABLE IF EXISTS CONSUMOSORDENESPRODUCCION;
 DROP TABLE IF EXISTS RECETAS;
 DROP TABLE IF EXISTS INGREDIENTES;
+DROP TABLE IF EXISTS VENTAS;
+DROP TABLE IF EXISTS DETALLESVENTAS;
+DROP TABLE IF EXISTS VENTAS;
+DROP TABLE IF EXISTS DETALLESVENTAS;
 
 
 
@@ -85,6 +89,7 @@ CREATE TABLE IF NOT EXISTS PERMISOS (
 CREATE TABLE IF NOT EXISTS ROLESPERMISOS (
     idRol INTEGER NOT NULL,
     idPermiso INTEGER NOT NULL,
+    PRIMARY KEY (idRol, idPermiso),
     FOREIGN KEY (idRol) REFERENCES ROLES(idRol) ON DELETE CASCADE,
     FOREIGN KEY (idPermiso) REFERENCES PERMISOS(idPermiso) ON DELETE CASCADE
 );
@@ -109,16 +114,18 @@ CREATE TABLE IF NOT EXISTS PRODUCTOS (
 );
 
 -- Tabla PRECIOS
-CREATE TABLE IF NOT EXISTS PRECIOS (
+CREATE TABLE PRECIOS (
     idPrecio INTEGER PRIMARY KEY AUTOINCREMENT,
     idProducto INTEGER NOT NULL,
-    cantidad INTEGER NOT NULL,
-    precio DECIMAL(10, 2) NOT NULL,
-    precioPorUnidad DECIMAL(10, 2) NOT NULL,
+    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    precio DECIMAL(10,2) NOT NULL CHECK (precio >= 0),
+    precioPorUnidad DECIMAL(10,2) GENERATED ALWAYS AS (precio / cantidad) STORED,
     fechaInicio DATE NOT NULL,
-    fechaFin DATE,
-    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE
+    fechaFin DATE NOT NULL CHECK (fechaFin > fechaInicio),
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto),
+    CONSTRAINT unique_precio_producto_periodo UNIQUE (idProducto, fechaInicio, fechaFin)
 );
+
 
 -- Tabla CONFIGPRODUCCION
 CREATE TABLE IF NOT EXISTS CONFIGPRODUCCION (
@@ -139,7 +146,7 @@ CREATE TABLE IF NOT EXISTS ORDENESPRODUCCION (
     fechaAProducir DATE NOT NULL,
     idUsuario INTEGER,
     estadoOrden TEXT NOT NULL CHECK(estadoOrden IN ('C', 'P')) DEFAULT 'P',
-    fechaCierre DATE NULL,
+    fechaCierre DATE NULL CHECK (fechaCierre IS NULL OR fechaCierre >= fechaAProducir),
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario) ON DELETE SET NULL,
@@ -164,7 +171,7 @@ CREATE INDEX idx_precios_idProducto ON PRECIOS(idProducto);
 CREATE INDEX idx_usuarios_idRol ON USUARIOS(idRol);
 
 
---------tablas para control de materia prima--------
+--------tablas para control de materia prima---------
 -----------------------------------------------------
 -----------------------------------------------------
 
@@ -200,4 +207,35 @@ CREATE TABLE IF NOT EXISTS CONSUMOSORDENESPRODUCCION (
     fechaCreacion DATE NOT NULL,
     FOREIGN KEY (idDetalleOrdenProduccion) REFERENCES DETALLESORDENESPRODUCCION(idDetalleOrdenProduccion) ON DELETE CASCADE,
     FOREIGN KEY (idIngrediente) REFERENCES INGREDIENTES(idIngrediente) ON DELETE CASCADE
+);
+
+
+-------- Tablas para control de VENTAS --------------
+-----------------------------------------------------
+-----------------------------------------------------
+
+-- Crear la tabla VEVTAS (Ventas)
+CREATE TABLE IF NOT EXISTS VENTAS (
+    idVenta INTEGER PRIMARY KEY AUTOINCREMENT,  -- Identificador único de la venta
+    idUsuario INTEGER NOT NULL,                -- Identificador del usuario que realizó la venta
+    idSucursal INTEGER NOT NULL,               -- Identificador de la sucursal donde se realizó la venta
+    fechaVenta DATETIME NOT NULL,              -- Fecha y hora en que se realizó la venta
+    totalVenta DECIMAL(10, 2) NOT NULL,        -- Total de la venta en dinero
+    estadoVenta TEXT NOT NULL,                 -- Estado de la venta (por ejemplo, "Completada", "Cancelada")
+    fechaCreacion DATETIME NOT NULL,  -- Fecha de creación del registro de la venta
+    FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario),  -- Integridad referencial con la tabla de usuarios
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)  -- Integridad referencial con la tabla de sucursales
+);
+
+-- Crear la tabla DETALESVENTAS (Detalles de la Venta)
+CREATE TABLE IF NOT EXISTS DETALLESVENTAS (
+    idDetalleVenta INTEGER PRIMARY KEY AUTOINCREMENT,  -- Identificador único del detalle
+    idVenta INTEGER NOT NULL,                         -- Identificador de la venta
+    idProducto INTEGER NOT NULL,                      -- Identificador del producto vendido
+    cantidadVendida INTEGER NOT NULL,                 -- Cantidad vendida del producto
+    precioUnitario DECIMAL(10, 2) NOT NULL,           -- Precio unitario al momento de la venta
+    descuento DECIMAL(10, 2) DEFAULT 0.00,            -- Descuento aplicado al producto
+    subtotal DECIMAL(10, 2) GENERATED ALWAYS AS (cantidadVendida * precioUnitario - descuento) STORED,  -- Subtotal calculado
+    FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta),  -- Integridad referencial con la tabla de ventas
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto)  -- Integridad referencial con la tabla de productos
 );

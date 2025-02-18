@@ -134,3 +134,25 @@ export const ingresarOrdenProduccionDao = async (ordenProduccion) => {
     throw new CustomError(dbError);
   }
 };
+
+export const consultarUnidadesDeProductoPorOrdenDao = async (idProducto) => {
+  try {
+    const queryDetalle = `SELECT do.idDetalleOrdenProduccion, do.idOrdenProduccion, do.idProducto, p.idCategoria, do.cantidadUnidades
+                          FROM DETALLESORDENESPRODUCCION AS do
+                          INNER JOIN ORDENESPRODUCCION AS op ON do.idOrdenProduccion = op.idOrdenProduccion
+                          INNER JOIN PRODUCTOS AS p ON do.idProducto = p.idProducto
+                          INNER JOIN CATEGORIAS AS cat ON p.idCategoria = cat.idCategoria
+                          WHERE do.idProducto = ?;`;
+
+    const detalleOrden = await Connection.execute(queryDetalle, [idProducto]);
+
+    // Devolver los registros encontrados
+    return {
+      detalleOrden: detalleOrden.rows
+    };
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+  
+}
