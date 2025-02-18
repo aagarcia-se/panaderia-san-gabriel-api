@@ -2,41 +2,39 @@ import { Connection } from "../../config/database/databaseSqlite.js";
 import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
-export const ingresarVentaDao = async (ventas) => {
-    const {venta, detalleVenta} = ventas;
-    
+export const ingresarVentaDao = async (venta) => {
+    const {encabezadoVenta, detallesVenta} = venta;
     try {
       // 1. Insertar encabezado
-      const ventaInsert = `INSERT INTO VENTAS (idUsuario, idSucursal, fechaVenta, totalVenta, estadoVenta, fechaCreacion)
-                                VALUES (?, ?, ?, ?, ?, ?);`;
+      const ventaInsert = `INSERT INTO VENTAS (idUsuario, idSucursal, fechaVenta, totalVenta, fechaCreacion)
+                                VALUES (?, ?, ?, ?, ?);`;
   
       const resVenta = await Connection.execute(ventaInsert, [
-        venta.idUsuario,
-        venta.idSucursal,
-        venta.fechaVenta, 
-        venta.totalVenta,
-        venta.estadoVenta,
-        venta.fechaCreacion
+        encabezadoVenta.idUsuario,
+        encabezadoVenta.idSucursal,
+        encabezadoVenta.fechaVenta, 
+        encabezadoVenta.totalVenta,
+        encabezadoVenta.fechaCreacion
       ]);
       const idVenta = resVenta.toJSON().lastInsertRowid;
-  
+
       if (!idVenta) {
         return 0;
       }
   
       // 2. Insertar detalles usando el ID generado     
-      const ventaDetalleInsert = `INSERT INTO DETALLESVENTAS (idVenta, idProducto, cantidadVendida, precioUnitario, descuento)
+      const ventaDetalleInsert = `INSERT INTO DETALLESVENTAS (idVenta, idProducto, cantidadVendida, precioUnitario, subtotal)
                                   VALUES (?, ?, ?, ?, ?);
                                  `;
   
-      const batchDetalleVenta = detalleVenta.map((detalle) => ({
+      const batchDetalleVenta = detallesVenta.map((detalle) => ({
         sql: ventaDetalleInsert,
         args: [
             idVenta,
             detalle.idProducto,
             detalle.cantidadVendida,
             detalle.precioUnitario,
-            detalle.descuento,
+            detalle.subtotal
         ]
       }));
   
@@ -45,10 +43,7 @@ export const ingresarVentaDao = async (ventas) => {
       // Extraer solo los lastInsertRowid de los resultados del batch
       const lastInsertRowids = resBatch.map(result => result.lastInsertRowid);
   
-      return {
-        idVenta: parseInt(idVenta),
-        idDetalleVenta: lastInsertRowids.map(id => parseInt(id)) // Convert each ID to a numeric value
-      };
+      return venta;
   
     } catch (error) {
       const dbError = getDatabaseError(error.message);

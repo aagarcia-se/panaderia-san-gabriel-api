@@ -84,3 +84,24 @@ export const elimarPrecioProductoDao = async (idProducto) => {
     throw new CustomError(dbError);
   }
 }
+
+export const consultarPrecioProductoPorIdDao = async (idProducto) => {
+  try {
+    // Consulta SQL
+    const query = `SELECT p.idProducto, p.nombreProducto, ca.nombreCategoria,  pr.precio, pr.precioPorUnidad
+                  FROM PRODUCTOS p
+                  JOIN PRECIOS pr ON p.idProducto = pr.idProducto
+                  JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+                  WHERE p.estado = 'A'
+                  and p.idProducto = ?;`
+
+    // Ejecutar la consulta
+    const produtco = await Connection.execute(query, [idProducto]);
+
+    // Devolver los registros encontrados
+    return produtco.rows[0];
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}

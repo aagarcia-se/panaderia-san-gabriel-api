@@ -89,9 +89,9 @@ export const ingresarOrdenProduccionService = async (ordenProduccion) => {
   }
 };
 
-export const consultarUnidadesDeProductoPorOrdenService = async (idProducto) => {
+export const consultarUnidadesDeProductoPorOrdenService = async (idOrdenProduccion, idProducto) => {
   try {
-    const detalleOrden = await consultarUnidadesDeProductoPorOrdenDao(idProducto);
+    const detalleOrden = await consultarUnidadesDeProductoPorOrdenDao(idOrdenProduccion, idProducto);
 
     if (detalleOrden.length === 0) {
       throw new CustomError(getError(1));

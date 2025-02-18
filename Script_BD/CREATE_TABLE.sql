@@ -16,8 +16,8 @@ DROP TABLE IF EXISTS RECETAS;
 DROP TABLE IF EXISTS INGREDIENTES;
 DROP TABLE IF EXISTS VENTAS;
 DROP TABLE IF EXISTS DETALLESVENTAS;
-DROP TABLE IF EXISTS VENTAS;
 DROP TABLE IF EXISTS DETALLESVENTAS;
+DROP TABLE IF EXISTS VENTAS;
 
 
 
@@ -220,8 +220,8 @@ CREATE TABLE IF NOT EXISTS VENTAS (
     idUsuario INTEGER NOT NULL,                -- Identificador del usuario que realizó la venta
     idSucursal INTEGER NOT NULL,               -- Identificador de la sucursal donde se realizó la venta
     fechaVenta DATETIME NOT NULL,              -- Fecha y hora en que se realizó la venta
-    totalVenta DECIMAL(10, 2) NOT NULL,        -- Total de la venta en dinero
-    estadoVenta TEXT NOT NULL,                 -- Estado de la venta (por ejemplo, "Completada", "Cancelada")
+    totalVenta DECIMAL(10, 2),        -- Total de la venta en dinero
+    estadoVenta TEXT NOT NULL CHECK(estadoVenta IN ('C', 'P')) DEFAULT 'C',                -- Estado de la venta (por ejemplo, "Completada", "Cancelada")
     fechaCreacion DATETIME NOT NULL,  -- Fecha de creación del registro de la venta
     FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario),  -- Integridad referencial con la tabla de usuarios
     FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)  -- Integridad referencial con la tabla de sucursales
@@ -235,7 +235,7 @@ CREATE TABLE IF NOT EXISTS DETALLESVENTAS (
     cantidadVendida INTEGER NOT NULL,                 -- Cantidad vendida del producto
     precioUnitario DECIMAL(10, 2) NOT NULL,           -- Precio unitario al momento de la venta
     descuento DECIMAL(10, 2) DEFAULT 0.00,            -- Descuento aplicado al producto
-    subtotal DECIMAL(10, 2) GENERATED ALWAYS AS (cantidadVendida * precioUnitario - descuento) STORED,  -- Subtotal calculado
+    subtotal DECIMAL(10, 2) ,  -- Subtotal calculado
     FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta),  -- Integridad referencial con la tabla de ventas
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto)  -- Integridad referencial con la tabla de productos
 );

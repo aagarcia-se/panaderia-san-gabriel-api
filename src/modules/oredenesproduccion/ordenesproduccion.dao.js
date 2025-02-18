@@ -135,20 +135,21 @@ export const ingresarOrdenProduccionDao = async (ordenProduccion) => {
   }
 };
 
-export const consultarUnidadesDeProductoPorOrdenDao = async (idProducto) => {
+export const consultarUnidadesDeProductoPorOrdenDao = async (idOrdenProduccion, idProducto) => {
   try {
     const queryDetalle = `SELECT do.idDetalleOrdenProduccion, do.idOrdenProduccion, do.idProducto, p.idCategoria, do.cantidadUnidades
                           FROM DETALLESORDENESPRODUCCION AS do
                           INNER JOIN ORDENESPRODUCCION AS op ON do.idOrdenProduccion = op.idOrdenProduccion
                           INNER JOIN PRODUCTOS AS p ON do.idProducto = p.idProducto
                           INNER JOIN CATEGORIAS AS cat ON p.idCategoria = cat.idCategoria
-                          WHERE do.idProducto = ?;`;
+                          WHERE op.idOrdenProduccion = ?
+                          AND   do.idProducto = ?;`;
 
-    const detalleOrden = await Connection.execute(queryDetalle, [idProducto]);
+    const detalleOrden = await Connection.execute(queryDetalle, [idOrdenProduccion, idProducto]);
 
     // Devolver los registros encontrados
     return {
-      detalleOrden: detalleOrden.rows
+      detalleOrden: detalleOrden.rows[0]
     };
   } catch (error) {
     const dbError = getDatabaseError(error.message);
