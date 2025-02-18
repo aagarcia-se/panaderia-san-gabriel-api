@@ -25,38 +25,49 @@ const procesarVentaService = async (venta) => {
     try {
         const { encabezadoVenta, detalleVenta } = venta;
 
-        // 1. Filtrar productos de panadería o repostería
+        // 1. Filtrar productos de panadería o repostería (categorías 1 y 2)
         const productosPanaderiaReposteria = filtrarProductosPorCategoria(detalleVenta, [1, 2]);
 
-        // 2. Procesar productos de panadería o repostería (si existen)
-        const productosProcesados = productosPanaderiaReposteria.length > 0
+        // 2. Filtrar productos que no son de panadería (categoría 3)
+        const productosNoPanaderia = detalleVenta.filter(detalle => ![1, 2].includes(detalle.idCategoria));
+
+        // 3. Procesar productos de panadería o repostería (si existen)
+        const productosPanaderiaProcesados = productosPanaderiaReposteria.length > 0
             ? await obtenerProductosPanaderiaVendidos(productosPanaderiaReposteria)
-            : detalleVenta;
+            : [];
 
-        // 3. Agregar precios unitarios a los productos
-        const productosConPrecios = await agregarPreciosAProductosVenta(productosProcesados);
+        // 4. Combinar productos procesados y no procesados
+        const todosLosProductos = [
+            ...productosPanaderiaProcesados, // Productos de panadería procesados
+            ...productosNoPanaderia, // Productos que no son de panadería
+        ];
 
-        // 4. Calcular subtotales por producto
+        // 5. Agregar precios unitarios a todos los productos
+        const productosConPrecios = await agregarPreciosAProductosVenta(todosLosProductos);
+
+        // 6. Calcular subtotales por producto
         const detallesConSubtotal = calcularSubtotalVentaPorProductos(productosConPrecios);
 
-        // 5. Calcular el total de la venta
+        // 7. Calcular el total de la venta
         const ventaTotal = calcularVentaTotal(detallesConSubtotal);
 
-        // 6. Actualizar el encabezado de la venta con el total
-        const encabezadoActualizado = actualizarEncabezadoVenta(encabezadoVenta, ventaTotal);
+        // 8. Actualizar el encabezado de la venta con el total
+        const encabezadoActualizado = {
+            ...encabezadoVenta,
+            totalVenta: ventaTotal,
+        };
 
-        // 7. Retornar la venta procesada
+        // 9. Retornar la venta procesada
         const ventaProcesada = {
             encabezadoVenta: encabezadoActualizado,
             detallesVenta: detallesConSubtotal,
         };
+
         return ventaProcesada;
     } catch (error) {
         throw error;
     }
 };
-
-
 
 
 
