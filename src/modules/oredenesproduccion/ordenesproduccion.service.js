@@ -2,7 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarBatchConsumoOrdenProduccionServices } from "../consumosordenesproduccion/consumosordenes.service.js";
 import { CalcularCantidadIngredientes } from "../consumosordenesproduccion/cosumoordenesproduccion.utils.js";
-import { consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
+import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
 export const consultarOrdenProduccionService = async () => {
@@ -98,6 +98,21 @@ export const consultarUnidadesDeProductoPorOrdenService = async (idOrdenProducci
     }
 
     return detalleOrden;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const actualizarEstadoOrdenProduccionServices = async (idOrdenProduccion) => {
+  try {
+
+    const ordenActualizada = await actualizarEstadoOrdenProduccionDao(idOrdenProduccion);
+
+    if (ordenActualizada === 0) {
+       throw new CustomError(getError(3));
+    }
+
+    return ordenActualizada;
   } catch (error) {
     throw error;
   }

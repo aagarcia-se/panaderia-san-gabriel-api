@@ -1,5 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
+import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { ingresarVentaDao } from "./ventas.dao.js";
 import { filtrarProductosPorCategoria, obtenerProductosPanaderiaVendidos, agregarPreciosAProductosVenta, calcularSubtotalVentaPorProductos, calcularVentaTotal, actualizarEncabezadoVenta, } from "./ventas.utils.js";
 
@@ -10,6 +11,7 @@ export const ingresarVentaService = async (venta) => {
 
         // Guardar la venta en la base de datos
         const resVenta = await ingresarVentaDao(ventaDetalleProcesado);
+        await actualizarEstadoOrdenProduccionServices(resVenta.encabezadoVenta.idOrdenProduccion);
 
         if (resVenta === 0) {
             throw new CustomError(getError(2));

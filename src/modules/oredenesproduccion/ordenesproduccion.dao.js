@@ -157,3 +157,21 @@ export const consultarUnidadesDeProductoPorOrdenDao = async (idOrdenProduccion, 
   }
   
 }
+
+export const actualizarEstadoOrdenProduccionDao = async (idOrdenProduccion) => {
+
+  try {
+ 
+    const updateEstado = `update ordenesproduccion set estadoOrden = 'C'
+                          where idOrdenProduccion = ?;
+                                                      `;
+
+    const resultadoEncabezado = await Connection.execute(updateEstado, [idOrdenProduccion]);
+
+    return 1;
+
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+};
