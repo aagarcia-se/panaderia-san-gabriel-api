@@ -31,13 +31,14 @@ export const consultarDetalleOrdenProduccionDao = async (idOrdenProduccion) => {
   try {
     // Consulta SQL
     const queryHeader = `SELECT op.idOrdenProduccion, op.idSucursal, s.nombreSucursal, op.ordenTurno, op.nombrePanadero, 
-                          op.fechaAProducir, op.idUsuario, u.nombreUsuario, op.fechaCierre, op.fechaCreacion, op.estadoOrden
+                          op.fechaAProducir, op.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario )nombreUsuario, 
+  						            op.fechaCierre, op.fechaCreacion, op.estadoOrden
                           FROM ORDENESPRODUCCION AS op
                           INNER JOIN SUCURSALES AS s ON op.idSucursal = s.idSucursal
                           INNER JOIN USUARIOS AS u ON op.idUsuario = u.idUsuario
                           WHERE op.idOrdenProduccion = ?
                           AND op.estado = 'A'
-                          ORDER BY op.idOrdenProduccion DESC;`;
+                          ORDER BY op.idOrdenProduccion DESC`;
 
     // Ejecutar la consulta para retornar el encabezado
     const encabezadoOrden = await Connection.execute(queryHeader, [idOrdenProduccion]);
