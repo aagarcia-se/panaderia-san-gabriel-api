@@ -176,3 +176,50 @@ export const actualizarEstadoOrdenProduccionDao = async (idOrdenProduccion) => {
     throw new CustomError(dbError);
   }
 };
+
+export const consultarDetalleOrdenPorCriteriosDao = async (ordenTurno, fechaAproducir, idSucursal) => {
+  try {
+    // Consulta SQL
+    const queryHeader = `SELECT op.idOrdenProduccion, op.idSucursal, s.nombreSucursal, op.ordenTurno, op.nombrePanadero, 
+                          op.fechaAProducir, op.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario )nombreUsuario, 
+  						            op.fechaCierre, op.fechaCreacion, op.estadoOrden
+                          FROM ORDENESPRODUCCION AS op
+                          INNER JOIN SUCURSALES AS s ON op.idSucursal = s.idSucursal
+                          INNER JOIN USUARIOS AS u ON op.idUsuario = u.idUsuario
+                          WHERE op.ordenTurno = ?
+						              AND op.fechaAProducir = ?
+                          AND op.idSucursal =  ?
+                          AND op.estadoOrden != 'C'
+                          AND op.estado = 'A'
+                          ORDER BY op.idOrdenProduccion DESC;
+                          `;
+
+    // Ejecutar la consulta para retornar el encabezado
+    const encabezadoOrden = await Connection.execute(queryHeader, [ordenTurno, fechaAproducir, idSucursal]);
+
+    if(encabezadoOrden.rows[0].idOrdenProduccion === 0){
+      return 0;
+    }
+
+    const idOrdenProduccion = encabezadoOrden.rows[0].idOrdenProduccion;
+
+    const queryDetalle = `select do.idDetalleOrdenProduccion, do.idOrdenProduccion, do.idProducto, p.nombreProducto, 
+                          p.idCategoria, cat.nombrecategoria, do.cantidadBandejas, do.cantidadUnidades, do.fechaCreacion
+                          from DETALLESORDENESPRODUCCION AS do
+                          INNER JOIN ORDENESPRODUCCION as op on do.idOrdenProduccion = op.idOrdenProduccion
+                          INNER JOIN PRODUCTOS as p on do.idProducto = p.idProducto
+                          INNER JOIN CATEGORIAS as cat on p.idCategoria = cat.idCategoria
+                          where do.idOrdenProduccion = ?;`;
+
+    const detalleOrden = await Connection.execute(queryDetalle, [idOrdenProduccion]);
+
+    // Devolver los registros encontrados
+    return {
+      encabezadoOrden: encabezadoOrden.rows[0],
+      detalleOrden: detalleOrden.rows
+    };
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}

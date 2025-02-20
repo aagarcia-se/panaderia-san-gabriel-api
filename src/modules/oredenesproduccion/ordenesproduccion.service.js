@@ -2,7 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarBatchConsumoOrdenProduccionServices } from "../consumosordenesproduccion/consumosordenes.service.js";
 import { CalcularCantidadIngredientes } from "../consumosordenesproduccion/cosumoordenesproduccion.utils.js";
-import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
+import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
 export const consultarOrdenProduccionService = async () => {
@@ -118,4 +118,17 @@ export const actualizarEstadoOrdenProduccionServices = async (idOrdenProduccion)
   }
 };
 
+export const consultarDetalleOrdenPorCriteriosService = async (ordenTurno, fechaAproducir, idSucursal) => {
+  try {
+    const detalleOrden = await consultarDetalleOrdenPorCriteriosDao(ordenTurno, fechaAproducir, idSucursal);
 
+    if (detalleOrden.length === 0) {
+      const error = getError(1);
+      throw new CustomError(error);
+    }
+
+    return detalleOrden;
+  } catch (error) {
+    throw error;
+  }
+};
