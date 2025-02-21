@@ -59,7 +59,8 @@ export const consultarVentasPorUsuarioDao = async (idUsuario) => {
                       INNER JOIN usuarios u ON v.idUsuario = u.idUsuario
                       INNER JOIN SUCURSALES s ON v.idSucursal = s.idSucursal
                       where 
-                        (v.idUsuario = ? OR ? IS NULL OR ? = '');`
+                        (v.idUsuario = ? OR ? IS NULL OR ? = '')
+                        order by v.idVenta desc;`
   
       // Ejecutar la consulta
       const ventasPorUsuario = await Connection.execute(consulta, [idUsuario, idUsuario, idUsuario]);
