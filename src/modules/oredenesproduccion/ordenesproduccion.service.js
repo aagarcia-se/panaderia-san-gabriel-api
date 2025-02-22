@@ -122,7 +122,7 @@ export const consultarDetalleOrdenPorCriteriosService = async (ordenTurno, fecha
   try {
     const detalleOrden = await consultarDetalleOrdenPorCriteriosDao(ordenTurno, fechaAproducir, idSucursal);
 
-    if (detalleOrden.length === 0) {
+    if (detalleOrden === 0) {
       const error = getError(1);
       throw new CustomError(error);
     }

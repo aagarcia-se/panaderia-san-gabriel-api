@@ -197,7 +197,7 @@ export const consultarDetalleOrdenPorCriteriosDao = async (ordenTurno, fechaApro
     // Ejecutar la consulta para retornar el encabezado
     const encabezadoOrden = await Connection.execute(queryHeader, [ordenTurno, fechaAproducir, idSucursal]);
 
-    if(encabezadoOrden.rows[0].idOrdenProduccion === 0){
+    if(encabezadoOrden.rows.length === 0){
       return 0;
     }
 
