@@ -61,11 +61,11 @@ export const ingresarOrdenProduccionController = async (req, res, next) => {
 export const consultarDetalleOrdenPorCriteriosController = async (req, res, next) => {
   try {
     const {ordenTurno, fechaAproducir, idSucursal} = req.query;
-    const detalleOrden = await consultarDetalleOrdenPorCriteriosService(ordenTurno, fechaAproducir, idSucursal);
+    const orden = await consultarDetalleOrdenPorCriteriosService(ordenTurno, fechaAproducir, idSucursal);
     const responseData = {
       status: 200,
       message: "Consulta exitosa",
-      detalleOrden,
+      orden,
     };
     res.status(200).json(responseData);
   } catch (error) {
