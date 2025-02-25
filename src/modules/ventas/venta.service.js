@@ -26,23 +26,34 @@ export const ingresarVentaService = async (venta) => {
 const procesarVentaService = async (venta) => {
     try {
         const { encabezadoVenta, detalleVenta } = venta;
+        let productosPanaderiaReposteria;
+        let productosNoPanaderia;
+        let productosPanaderiaProcesados;
+        let todosLosProductos;
 
-        // 1. Filtrar productos de panadería o repostería (categorías 1 y 2)
-        const productosPanaderiaReposteria = filtrarProductosPorCategoria(detalleVenta, [1, 2]);
+        if(encabezadoVenta.idOrdenProduccion !== null){
+            // 1. Filtrar productos de panadería o repostería (categorías 1 y 2)
+            productosPanaderiaReposteria = filtrarProductosPorCategoria(detalleVenta, [1]);
 
-        // 2. Filtrar productos que no son de panadería (categoría 3)
-        const productosNoPanaderia = detalleVenta.filter(detalle => ![1, 2].includes(detalle.idCategoria));
+            // 2. Filtrar productos que no son de panadería
+            productosNoPanaderia = detalleVenta.filter(detalle => ![1].includes(detalle.idCategoria));
 
-        // 3. Procesar productos de panadería o repostería (si existen)
-        const productosPanaderiaProcesados = productosPanaderiaReposteria.length > 0
+            // 3. Procesar productos de panadería o repostería (si existen)
+            productosPanaderiaProcesados = productosPanaderiaReposteria.length > 0
             ? await obtenerProductosPanaderiaVendidos(encabezadoVenta.idOrdenProduccion, productosPanaderiaReposteria)
             : [];
 
-        // 4. Combinar productos procesados y no procesados
-        const todosLosProductos = [
-            ...productosPanaderiaProcesados, // Productos de panadería procesados
-            ...productosNoPanaderia, // Productos que no son de panadería
-        ];
+                    // 4. Combinar productos procesados y no procesados
+            todosLosProductos = [
+                ...productosPanaderiaProcesados, // Productos de panadería procesados
+                ...productosNoPanaderia, // Productos que no son de panadería
+            ];
+
+        }
+
+        if(encabezadoVenta.idOrdenProduccion === null){
+            todosLosProductos = detalleVenta;
+        }
 
         // 5. Agregar precios unitarios a todos los productos
         const productosConPrecios = await agregarPreciosAProductosVenta(todosLosProductos);
