@@ -48,26 +48,37 @@ const calcularSubtotalVenta = (unidadesVendidas, precioUnidad) => {
  * @param {Array} ventaDetalle - Detalle de la venta.
  * @returns {Promise<Array>} - Detalle de la venta con las unidades vendidas calculadas.
  */
-export const obtenerProductosPanaderiaVendidos = (idOrdenProduccion, ventaDetalle) => {
-    return Promise.all(
-        ventaDetalle.map(async (detalle) => {
-            try {
+export const obtenerProductosPanaderiaVendidos = async (idOrdenProduccion, ventaDetalle) => {
+    try {
+        // Filtrar y procesar solo los detalles que están en la orden
+        const detallesEnOrden = await Promise.all(
+            ventaDetalle.map(async (detalle) => {
                 // Consultar unidades producidas
                 const productoProducido = await consultarUnidadesDeProductoPorOrdenService(idOrdenProduccion, detalle.idProducto);
-                // Calcular las unidades vendidas
-                const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoProducido.detalleOrden.cantidadUnidades, detalle.unidadesNoVendidas);
 
-                // Retornar el detalle con la cantidad vendida calculada
-                return {
-                    ...detalle,
-                    cantidadProducida: productoProducido.detalleOrden.cantidadUnidades,
-                    cantidadVendida: cantidadVendida,
-                };
-            } catch (error) {
-                throw error;
-            }
-        })
-    );
+                // Si el producto está en la orden, calcular la cantidad vendida
+                if (productoProducido.detalleOrden.idDetalleOrdenProduccion !== 0) {
+                    const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoProducido.detalleOrden.cantidadUnidades, detalle.unidadesNoVendidas);
+
+                    // Retornar el detalle con la información adicional
+                    return {
+                        ...detalle,
+                        cantidadProducida: productoProducido.detalleOrden.cantidadUnidades,
+                        cantidadVendida: cantidadVendida,
+                    };
+                }
+
+                // Si no está en la orden, no retornar nada (será filtrado)
+                return null;
+            })
+        );
+
+        // Filtrar los detalles nulos (productos que no están en la orden)
+        return detallesEnOrden.filter((detalle) => detalle !== null);
+    } catch (error) {
+        // Manejar errores
+        throw error;
+    }
 };
 
 /**

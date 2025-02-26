@@ -150,7 +150,7 @@ export const consultarUnidadesDeProductoPorOrdenDao = async (idOrdenProduccion, 
 
     // Devolver los registros encontrados
     return {
-      detalleOrden: detalleOrden.rows[0]
+      detalleOrden: detalleOrden.rows[0] || {idDetalleOrdenProduccion : 0}
     };
   } catch (error) {
     const dbError = getDatabaseError(error.message);

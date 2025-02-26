@@ -11,10 +11,13 @@ export const ingresarVentaService = async (venta) => {
 
         // Guardar la venta en la base de datos
         const resVenta = await ingresarVentaDao(ventaDetalleProcesado);
-        await actualizarEstadoOrdenProduccionServices(resVenta.encabezadoVenta.idOrdenProduccion);
 
         if (resVenta === 0) {
             throw new CustomError(getError(2));
+        }
+
+        if(venta.encabezadoVenta.idOrdenProduccion){
+            await actualizarEstadoOrdenProduccionServices(resVenta.encabezadoVenta.idOrdenProduccion);
         }
 
         return resVenta;
@@ -43,7 +46,7 @@ const procesarVentaService = async (venta) => {
             ? await obtenerProductosPanaderiaVendidos(encabezadoVenta.idOrdenProduccion, productosPanaderiaReposteria)
             : [];
 
-                    // 4. Combinar productos procesados y no procesados
+            // 4. Combinar productos procesados y no procesados
             todosLosProductos = [
                 ...productosPanaderiaProcesados, // Productos de panadería procesados
                 ...productosNoPanaderia, // Productos que no son de panadería
