@@ -1,15 +1,15 @@
 /* Lista de productos*/
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (1, 'Frances', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (2, 'Pan de manteca', 1, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "controlarStock", "fechaCreacion", "estado") VALUES (1, 'Frances', 1, 0, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (2, 'Pan de dulce', 1, '2025-02-14', 'A');
 INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (3, 'Tostado', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (4, 'Pirujito', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (5, 'Baguett', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (6, 'Pan de agua', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (7, 'Pirujo grande', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (8, 'Integral', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (9, 'Pan manteca grande', 1, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "controlarStock", "fechaCreacion", "estado") VALUES (4, 'Pirujito', 1, 0, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "controlarStock", "fechaCreacion", "estado") VALUES (5, 'Baguett', 1, 0, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "controlarStock", "fechaCreacion", "estado") VALUES (6, 'Pan de agua', 1, 0, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "controlarStock", "fechaCreacion", "estado") VALUES (7, 'Pirujo grande', 1, 0, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "controlarStock", "fechaCreacion", "estado") VALUES (8, 'Pirujo Integral', 1, 0, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (9, 'Pan dulce grande', 1, '2025-02-14', 'A');
 INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (10, 'Galleta', 1, '2025-02-14', 'A');
-INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (11, 'Lenguas', 1, '2025-02-14', 'A');
+INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "controlarStock", "fechaCreacion", "estado") VALUES (11, 'Lenguas', 1, 0, '2025-02-14', 'A');
 INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (12, 'Magdalena', 2, '2025-02-14', 'A');
 INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (13, 'Magdalena 2 sab', 2, '2025-02-14', 'A');
 INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (14, 'Zepelin', 2, '2025-02-14', 'A');

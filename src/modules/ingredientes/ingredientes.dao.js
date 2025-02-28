@@ -5,7 +5,7 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const consultarIngredientes = async (idProducto) => {
     try{
-        const query = `select unidadesPorBandeja from configproduccion where idProducto = ?;`
+        const query = `select unidadesPorBandeja from CONFIGORDEN where idProducto = ?;`
         const result = await Connection.execute(query, [idProducto]);
         if(result.rows.length === 0){
             return 0;

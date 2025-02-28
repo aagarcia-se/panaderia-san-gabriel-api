@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS ACCESOSUSUARIOS;
 DROP TABLE IF EXISTS PRECIOS;
 DROP TABLE IF EXISTS DETALLESORDENESPRODUCCION;
 DROP TABLE IF EXISTS ORDENESPRODUCCION;
-DROP TABLE IF EXISTS CONFIGPRODUCCION;
+DROP TABLE IF EXISTS CONFIGORDEN;
 DROP TABLE IF EXISTS CONSUMOSORDENESPRODUCCION;
 DROP TABLE IF EXISTS RECETAS;
 DROP TABLE IF EXISTS INGREDIENTES;
@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS VENTAS;
 DROP TABLE IF EXISTS SUCURSALES;
 DROP TABLE IF EXISTS USUARIOS;
 DROP TABLE IF EXISTS ROLES;
+DROP TABLE IF EXISTS STOCKPRODUCTOS;
 DROP TABLE IF EXISTS PRODUCTOS;
 DROP TABLE IF EXISTS CATEGORIAS;
 
@@ -106,6 +107,7 @@ CREATE TABLE IF NOT EXISTS PRODUCTOS (
     idProducto INTEGER PRIMARY KEY AUTOINCREMENT,
     nombreProducto TEXT NOT NULL,
     idCategoria INTEGER NOT NULL,
+    controlarStock INTEGER NOT NULL DEFAULT 1 CHECK(controlarStock IN (0, 1)), -- 0 = No controlar, 1 = Controlar
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idCategoria) REFERENCES CATEGORIAS(idCategoria)
@@ -125,9 +127,14 @@ CREATE TABLE PRECIOS (
 );
 
 
--- Tabla CONFIGPRODUCCION
-CREATE TABLE IF NOT EXISTS CONFIGPRODUCCION (
-    idConfigProduccion INTEGER PRIMARY KEY AUTOINCREMENT,
+-------- Tablas para control de ingreso--------------
+------------- de ordenes a porudccion ---------------
+-----------------------------------------------------
+-----------------------------------------------------
+
+-- Tabla CONFIGORDEN
+CREATE TABLE IF NOT EXISTS CONFIGORDEN (
+    idConfigOrden INTEGER PRIMARY KEY AUTOINCREMENT,
     idProducto INTEGER NOT NULL UNIQUE,
     unidadesPorBandeja DECIMAL(10, 2) NOT NULL,
     fechaCreacion DATE NOT NULL,
@@ -237,3 +244,21 @@ CREATE TABLE IF NOT EXISTS DETALLESVENTAS (
     FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta) ON DELETE CASCADE,  -- Integridad referencial con la tabla de ventas
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto)  -- Integridad referencial con la tabla de productos
 );
+
+
+-------- Tablas para control stock -----------------
+-----------------------------------------------------
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
+    idStock INTEGER PRIMARY KEY AUTOINCREMENT,
+    idProducto INTEGER NOT NULL, 
+    idSucursal INTEGER NOT NULL,
+    stock INTEGER NOT NULL,
+    fechaActualizacion DATETIME NOT NULL,
+    fechaCreacion DATE NOT NULL,
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE CASCADE,
+    UNIQUE(idProducto, idSucursal) -- Evita duplicados de producto-sucursal
+);
+
