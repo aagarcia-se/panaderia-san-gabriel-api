@@ -3,7 +3,8 @@ INSERT INTO PERMISOS (idPermiso, nombrePermiso, descripcionPermiso, rutaAcceso, 
 (1, 'Dashboard', 'Visualización de gráficas estadísticas', '/dashboard', '2025-01-25', 'A'),
 (2, 'Crear usuarios', 'Crear usuarios para ingreso al sistema', '/users/create', '2025-01-25', 'A'),
 (3, 'Control de Roles', 'Crear roles para asignar al usuario', '/users/roles', '2025-01-25', 'A'),
-(4, 'Gestión de productos', 'Ingresos, modificación y eliminación de productos', '/productos', '2025-01-25', 'A');
+(4, 'Gestion de productos', 'Ingresos, modificación y eliminación de productos', '/productos', '2025-01-25', 'A');
+(5, 'Ingresar Orden Produccion', 'Ingresar orden de produccion', '/ingresar-orden', '2025-01-25', 'A');
 
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
