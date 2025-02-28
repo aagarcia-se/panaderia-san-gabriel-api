@@ -198,7 +198,10 @@ export const consultarDetalleOrdenPorCriteriosDao = async (ordenTurno, fechaApro
     const encabezadoOrden = await Connection.execute(queryHeader, [ordenTurno, fechaAproducir, idSucursal]);
 
     if(encabezadoOrden.rows.length === 0){
-      return 0;
+      return {
+        encabezadoOrden: null,
+        detalleOrden: []
+      };;
     }
 
     const idOrdenProduccion = encabezadoOrden.rows[0].idOrdenProduccion;
@@ -215,8 +218,8 @@ export const consultarDetalleOrdenPorCriteriosDao = async (ordenTurno, fechaApro
 
     // Devolver los registros encontrados
     return {
-      encabezadoOrden: encabezadoOrden.rows[0],
-      detalleOrden: detalleOrden.rows
+      encabezadoOrden: encabezadoOrden.rows[0] || null,
+      detalleOrden: detalleOrden.rows || []
     };
   } catch (error) {
     const dbError = getDatabaseError(error.message);

@@ -51,8 +51,15 @@ export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
 
 export const ingresarOrdenProduccionService = async (ordenProduccion) => {
   try {
+  
     const { encabezadoOrden, detalleOrden } = ordenProduccion;
+    const ordenExist = await consultarDetalleOrdenPorCriteriosService(encabezadoOrden.ordenTurno, encabezadoOrden.fechaAProducir, encabezadoOrden.idSucursal );
 
+    if(ordenExist.encabezadoOrden !== null){
+      const errorInfo = getError(19);
+      throw new CustomError(errorInfo);
+    }
+    
     // Detalles de la orden de producción con cantidad de unidades por bandeja
     const detallesActualizados = await procesarDetallesOrden(detalleOrden);
     

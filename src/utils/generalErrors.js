@@ -100,7 +100,11 @@ const databaseErrorMap = {
     statusCode: 422,
     code: 422,
   },
-
+  19: {
+    message: "Ya existe una orden con el turno, sucursal y fecha ingresada",
+    statusCode: 409,
+    code: 409,
+  }
   // Agregar más errores de base de datos aquí según sea necesario
 };
 
