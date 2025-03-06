@@ -43,7 +43,7 @@ export const ingresarVentaDao = async (venta) => {
       // Extraer solo los lastInsertRowid de los resultados del batch
       const lastInsertRowids = resBatch.map(result => result.lastInsertRowid);
   
-      return venta;
+      return {idVenta, ...venta};
   
     } catch (error) {
       const dbError = getDatabaseError(error.message);

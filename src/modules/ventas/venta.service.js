@@ -18,9 +18,9 @@ export const ingresarVentaService = async (venta) => {
             throw new CustomError(getError(2));
         }
 
-        const detalleingreso = crearPayloadingresos(ventaDetalleProcesado);
+        const detalleingreso = crearPayloadingresos(resVenta.idVenta, ventaDetalleProcesado);
 
-        await registrarIngresoDiarioPorTurnoService(detalleingreso, resVenta.encabezadoVenta.idVenta)
+        await registrarIngresoDiarioPorTurnoService(detalleingreso)
 
         if(venta.encabezadoVenta.idOrdenProduccion){
             await actualizarEstadoOrdenProduccionServices(resVenta.encabezadoVenta.idOrdenProduccion);

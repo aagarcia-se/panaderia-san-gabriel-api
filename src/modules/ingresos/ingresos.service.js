@@ -14,12 +14,12 @@ export const registrarIngresoDiarioPorTurnoService = async (detalleingreso) =>{
             diferencia: diferencia, // Agregar la diferencia calculada
         };
 
-        // const idIngreso = await registrarIngresosDiariosPorTurnoDao(detalleIngresoConDiferencia);
-        // if (idIngreso === 0) {
-        //     throw new CustomError(getError(2));
-        // }
+        const idIngreso = await registrarIngresosDiariosPorTurnoDao(detalleIngresoConDiferencia);
+        if (idIngreso === 0) {
+            throw new CustomError(getError(2));
+        }
 
-        // return idIngreso;
+        return idIngreso;
 
     }catch(error){
         throw error;

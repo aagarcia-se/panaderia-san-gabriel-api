@@ -1,11 +1,13 @@
 
 
-export const crearPayloadingresos = (venta) => {
+export const crearPayloadingresos = (idVenta, venta) => {
     const {encabezadoVenta, detalleIngreso} = venta;
 
    return {
+        idVenta: Number(idVenta),
         ...detalleIngreso,
-        montoEsperado: encabezadoVenta.totalVenta 
+        montoEsperado: encabezadoVenta.totalVenta,
+
     }
 }
 
