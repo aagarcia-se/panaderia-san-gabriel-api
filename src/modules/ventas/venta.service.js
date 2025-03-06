@@ -1,14 +1,13 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarIngresoDiarioPorTurnoService } from "../ingresos/ingresos.service.js";
+import { crearPayloadingresos } from "../ingresos/ingresos.utils.js";
 import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { consultarVentasPorUsuarioDao, ingresarVentaDao } from "./ventas.dao.js";
 import { filtrarProductosPorCategoria, obtenerProductosPanaderiaVendidos, agregarPreciosAProductosVenta, calcularSubtotalVentaPorProductos, calcularVentaTotal, actualizarEncabezadoVenta, } from "./ventas.utils.js";
 
 export const ingresarVentaService = async (venta) => {
     try {
-
-        // const {detalleIngresos} = venta;
         // Procesar detalles de la venta antes de ingresarla
         const ventaDetalleProcesado = await procesarVentaService(venta);
 
@@ -19,7 +18,9 @@ export const ingresarVentaService = async (venta) => {
             throw new CustomError(getError(2));
         }
 
-        // await registrarIngresoDiarioPorTurnoService(detalleIngresos)
+        const detalleingreso = crearPayloadingresos(ventaDetalleProcesado);
+
+        await registrarIngresoDiarioPorTurnoService(detalleingreso, resVenta.encabezadoVenta.idVenta)
 
         if(venta.encabezadoVenta.idOrdenProduccion){
             await actualizarEstadoOrdenProduccionServices(resVenta.encabezadoVenta.idOrdenProduccion);
@@ -33,7 +34,7 @@ export const ingresarVentaService = async (venta) => {
 
 const procesarVentaService = async (venta) => {
     try {
-        const { encabezadoVenta, detalleVenta } = venta;
+        const { encabezadoVenta, detalleVenta, detalleIngreso } = venta;
         let productosPanaderiaReposteria;
         let productosNoPanaderia;
         let productosPanaderiaProcesados;
@@ -82,6 +83,7 @@ const procesarVentaService = async (venta) => {
         const ventaProcesada = {
             encabezadoVenta: encabezadoActualizado,
             detallesVenta: detallesConSubtotal,
+            detalleIngreso: detalleIngreso, // Agregar detalleIngreso a ventaProcesada
         };
 
         return ventaProcesada;
