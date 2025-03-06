@@ -3,7 +3,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const ingresarVentaDao = async (venta) => {
-    const {encabezadoVenta, detallesVenta} = venta;
+    const {encabezadoVenta, detallesVenta, detalleIngreso} = venta;
     try {
       // 1. Insertar encabezado
       const ventaInsert = `INSERT INTO VENTAS (idUsuario, idSucursal, fechaVenta, totalVenta, fechaCreacion)
@@ -13,7 +13,7 @@ export const ingresarVentaDao = async (venta) => {
         encabezadoVenta.idUsuario,
         encabezadoVenta.idSucursal,
         encabezadoVenta.fechaVenta, 
-        encabezadoVenta.totalVenta,
+        detalleIngreso.montoTotalIngresado,
         encabezadoVenta.fechaCreacion
       ]);
       const idVenta = resVenta.toJSON().lastInsertRowid;
@@ -73,4 +73,8 @@ export const consultarVentasPorUsuarioDao = async (idUsuario) => {
     throw new CustomError(dbError);
   }
 
+}
+
+export const eliminarVenta = () => {
+  
 }

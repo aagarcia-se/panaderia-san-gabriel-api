@@ -13,6 +13,6 @@ export const crearPayloadingresos = (idVenta, venta) => {
 
 export const calcularDiferencia = (montoEsperado, montoTotalIngresado) => {
 
-    return montoEsperado - montoTotalIngresado;
+    return montoTotalIngresado - montoEsperado;
 
 }
