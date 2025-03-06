@@ -75,6 +75,15 @@ export const consultarVentasPorUsuarioDao = async (idUsuario) => {
 
 }
 
-export const eliminarVenta = () => {
-  
+export const eliminarVentaDao = async (idVenta) => {
+  try{
+    const scriptDelete = `DELETE FROM VENTAS WHERE idVenta = ?`;
+
+    const resDelete = await Connection.execute(scriptDelete, [idVenta]);
+
+    return resDelete.toJSON().rowsAffected;;
+  }catch(error){
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
