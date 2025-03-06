@@ -262,3 +262,16 @@ CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
     UNIQUE(idProducto, idSucursal) -- Evita duplicados de producto-sucursal
 );
 
+-------- Tablas para registro de ingresos------------
+-----------------------------------------------------
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS INGRESOSDIARIOS (
+    idIngreso INTEGER PRIMARY KEY AUTOINCREMENT,
+    idVenta INTEGER NOT NULL,
+    montoTotalIngresado DECIMAL(10, 2) NOT NULL,
+    montoEsperado DECIMAL(10, 2) NOT NULL,
+    diferencia DECIMAL(10, 2),
+    fechaIngreso DATE,
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
+    FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta) ON DELETE CASCADE
+);
