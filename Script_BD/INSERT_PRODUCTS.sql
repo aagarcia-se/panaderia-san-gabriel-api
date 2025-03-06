@@ -38,10 +38,10 @@ INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCrea
 INSERT INTO productos ("idProducto", "nombreProducto", "idCategoria", "fechaCreacion", "estado") VALUES (37, 'Donas de nutella', 2, '2025-02-14', 'A');
 
 /*-----------------Asignar precios a los productos--------------------------------------------*/
-INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (1, 1, 3, 1, 0.33, '2025-01-31', NULL);
-INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (2, 2, 3, 1, 0.33, '2025-02-14', NULL);
-INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (3, 3, 3, 1, 0.33, '2025-02-14', NULL);
-INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (4, 4, 3, 1, 0.33, '2025-02-14', NULL);
+INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (1, 1, 3, 1, 0.3333333333333333, '2025-01-31', NULL);
+INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (2, 2, 3, 1, 0.3333333333333333, '2025-02-14', NULL);
+INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (3, 3, 3, 1, 0.3333333333333333, '2025-02-14', NULL);
+INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (4, 4, 3, 1, 0.3333333333333333, '2025-02-14', NULL);
 INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (5, 5, 1, 1, 1, '2025-02-14', NULL);
 INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (6, 6, 1, 1, 1, '2025-02-14', NULL);
 INSERT INTO precios ("idPrecio", "idProducto", "cantidad", "precio", "precioPorUnidad", "fechaInicio", "fechaFin") VALUES (7, 7, 1, 1, 1, '2025-02-14', NULL);
