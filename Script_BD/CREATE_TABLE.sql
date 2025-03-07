@@ -224,6 +224,7 @@ CREATE TABLE IF NOT EXISTS VENTAS (
     idVenta INTEGER PRIMARY KEY AUTOINCREMENT,  -- Identificador único de la venta
     idUsuario INTEGER NOT NULL,                -- Identificador del usuario que realizó la venta
     idSucursal INTEGER NOT NULL,               -- Identificador de la sucursal donde se realizó la venta
+    ventaTurno TEXT NOT NULL,                  -- TUrno de la venta registrada
     fechaVenta DATETIME NOT NULL,              -- Fecha y hora en que se realizó la venta
     totalVenta DECIMAL(10, 2),        -- Total de la venta en dinero
     estadoVenta TEXT NOT NULL CHECK(estadoVenta IN ('C', 'P')) DEFAULT 'C',                -- Estado de la venta (por ejemplo, "Completada", "Cancelada")

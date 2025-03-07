@@ -1,4 +1,4 @@
-import { consultarVentasPorUsuarioService, eliminarVentaService, ingresarVentaService } from "./venta.service.js";
+import { consultarDetalleVentaService, consultarVentasPorUsuarioService, eliminarVentaService, ingresarVentaService } from "./venta.service.js";
 
 
 export const ingresarVentaController = async (req, res, next) => {
@@ -43,3 +43,19 @@ export const elminarVentaController = async (req, res, next) => {
     next(error); // Pasa el error al middleware de manejo de errores
   }
 };
+
+export const consultarDetalleVentaController = async (req, res, next) => {
+  try{
+    const {idVenta} = req.params;
+    const venta = await consultarDetalleVentaService(idVenta);
+    const responseData = {
+      status: 200,
+      message: "Consulta exitosa",
+      venta,
+    };
+    res.status(200).json(responseData);
+
+  }catch(error){
+    next(error);
+  }
+}

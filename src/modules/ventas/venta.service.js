@@ -4,6 +4,7 @@ import { registrarIngresoDiarioPorTurnoService } from "../ingresos/ingresos.serv
 import { crearPayloadingresos } from "../ingresos/ingresos.utils.js";
 import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/ordenesproduccion.service.js";
 import {
+  consultarDetalleVentaDao,
   consultarVentasPorUsuarioDao,
   eliminarVentaDao,
   ingresarVentaDao,
@@ -69,3 +70,18 @@ export const eliminarVentaService = async (idVenta) => {
     throw error;
   }
 };
+
+export const consultarDetalleVentaService = async (idVenta) => {
+  try{
+
+    const venta = await consultarDetalleVentaDao(idVenta);
+    if (venta === 0) {
+      const error = getError(1);
+      throw new CustomError(error);
+    }
+
+    return venta;
+  }catch(error){
+    throw error;
+  }
+}

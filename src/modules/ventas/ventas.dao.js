@@ -87,3 +87,47 @@ export const eliminarVentaDao = async (idVenta) => {
     throw new CustomError(dbError);
   }
 }
+
+export const consultarDetalleVentaDao = async (idVenta) => {
+  try{
+    const scriptVenta = `select v.idVenta, v.idUsuario, u.usuario, v.idSucursal, s.nombreSucursal,
+                          v.fechaVenta, v.totalVenta, v.estadoVenta 
+                          from ventas v
+                          INNER JOIN usuarios u on v.idUsuario = u.idUsuario
+                          INNER JOIN sucursales s on v.idSucursal = s.idSucursal
+                          where v.idVenta = ?;`;
+                          
+    const venta = await Connection.execute(scriptVenta, [idVenta]);
+
+    if( venta.rows.length === 0){
+      return 0;
+    }
+
+    const scriptDetalleVenta = `select dv.idDetalleVenta, dv.idVenta, dv.IdProducto, p.nombreProducto,
+                                  dv.cantidadVendida, dv.precioUnitario, dv.descuento,
+                                  dv.subTotal from detallesventas dv
+                                  INNER JOIN ventas v on dv.idVenta = v.idVenta
+                                  INNER JOIN productos p on dv.idProducto = p.idProducto
+                                  where dv.idVenta = ?;`;
+
+    const detalleVenta = await Connection.execute(scriptDetalleVenta, [idVenta]);
+
+
+    const scriptIngresos = `select i.idIngreso, i.idVenta, i.montoTotalIngresado, i.montoEsperado, i.diferencia, i.fechaIngreso
+                            from ingresosdiarios i
+                            INNER JOIN ventas v on i.idVenta = v.idVenta
+                            where i.idVenta = ?;`;
+    
+    const detalleIngresos = await Connection.execute(scriptIngresos, [idVenta]);
+
+    return {
+      encabezadoVenta: venta.rows[0],
+      detalleVenta: detalleVenta.rows,
+      detalleIngresos: detalleIngresos.rows[0]
+    }
+
+  }catch(error){
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
