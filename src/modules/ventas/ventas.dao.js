@@ -6,12 +6,13 @@ export const ingresarVentaDao = async (venta) => {
     const {encabezadoVenta, detallesVenta, detalleIngreso} = venta;
     try {
       // 1. Insertar encabezado
-      const ventaInsert = `INSERT INTO VENTAS (idUsuario, idSucursal, fechaVenta, totalVenta, fechaCreacion)
-                                VALUES (?, ?, ?, ?, ?);`;
+      const ventaInsert = `INSERT INTO VENTAS (idUsuario, idSucursal, ventaTurno, fechaVenta, totalVenta, fechaCreacion)
+                                VALUES (?, ?, ?, ?, ?, ?);`;
   
       const resVenta = await Connection.execute(ventaInsert, [
         encabezadoVenta.idUsuario,
         encabezadoVenta.idSucursal,
+        encabezadoVenta.ventaTurno,
         encabezadoVenta.fechaVenta, 
         detalleIngreso.montoTotalIngresado,
         encabezadoVenta.fechaCreacion
@@ -90,7 +91,7 @@ export const eliminarVentaDao = async (idVenta) => {
 
 export const consultarDetalleVentaDao = async (idVenta) => {
   try{
-    const scriptVenta = `select v.idVenta, v.idUsuario, u.usuario, v.idSucursal, s.nombreSucursal,
+    const scriptVenta = `select v.idVenta, v.idUsuario, v.idVenta, u.usuario, v.idSucursal, v.ventaTurno, s.nombreSucursal,
                           v.fechaVenta, v.totalVenta, v.estadoVenta 
                           from ventas v
                           INNER JOIN usuarios u on v.idUsuario = u.idUsuario
