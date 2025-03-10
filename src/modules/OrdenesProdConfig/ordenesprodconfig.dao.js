@@ -20,6 +20,24 @@ export const ingresarCantidaUnidaesDao = async (dataProducto) => {
     }
 }
 
+
+export const modificarCantidaUnidaesDao = async (dataProducto) => {
+    try{
+        const updateConfig = ` update CONFIGORDEN set unidadesPorBandeja = ? 
+                              where idProducto = ?`;
+
+        const resUpdate = await Connection.execute(updateConfig, [
+            dataProducto.unidadesPorBandeja,
+            dataProducto.idProducto
+        ]);
+
+        return resUpdate.toJSON().rowsAffected;
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
+
 export const consultarCantidadUnidadesDao = async (idProducto) => {
     try{
         const query = `select unidadesPorBandeja from CONFIGORDEN where idProducto = ?;`

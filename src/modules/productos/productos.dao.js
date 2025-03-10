@@ -39,11 +39,12 @@ export const consultarProductosDao = async () => {
 
 export const actualizarProductoDao = async (dataProducto) => {
   try {
-    const query = `UPDATE PRODUCTOS SET nombreProducto = ?, idCategoria = ? 
-                  where idProducto = ?`;
+    const query = `UPDATE PRODUCTOS SET nombreProducto = ?, idCategoria = ?, controlarStock = ?
+                   where idProducto = ?`;
     const productos = await Connection.execute(query, [
         dataProducto.nombreProducto,
         dataProducto.idCategoria,
+        dataProducto.controlarStock,
         dataProducto.idProducto
     ]);
 

@@ -27,9 +27,9 @@ export const IngresarPrecioProductoDao = async (dataPrecio) => {
 export const consultarPreciosProductosDao = async () => {
   try {
     // Consulta SQL
-    const query = `SELECT p.idProducto, 
-                        p.nombreProducto, 
+    const query = `SELECT p.idProducto, p.nombreProducto, 
                         p.controlarStock,
+  						          conf.unidadesPorBandeja,
                         ca.idCategoria,
                         ca.nombreCategoria, 
                         pr.cantidad, 
@@ -39,8 +39,9 @@ export const consultarPreciosProductosDao = async () => {
                         pr.fechaInicio, 
                         pr.fechaFin
                   FROM PRODUCTOS p
-                  JOIN PRECIOS pr ON p.idProducto = pr.idProducto
-                  JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+                  INNER JOIN PRECIOS pr ON p.idProducto = pr.idProducto
+                  INNER JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+  				        LEFT JOIN CONFIGORDEN conf ON p.idProducto = conf.idProducto
                   WHERE p.estado = 'A'; -- Solo productos activos`
 
     // Ejecutar la consulta
