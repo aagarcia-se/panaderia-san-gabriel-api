@@ -1,4 +1,4 @@
-import { consultarDetalleOrdenProduccionService, consultarOrdenProduccionService, eliminarOrdenProduccionService, ingresarOrdenProduccionService } from "./ordenesproduccion.service.js";
+import { consultarDetalleOrdenPorCriteriosService, consultarDetalleOrdenProduccionService, consultarOrdenProduccionService, eliminarOrdenProduccionService, ingresarOrdenProduccionService } from "./ordenesproduccion.service.js";
 
 
 export const consultarOrdenProduccionController = async (req, res, next) => {
@@ -57,3 +57,18 @@ export const ingresarOrdenProduccionController = async (req, res, next) => {
     next(error); // Pasa el error al middleware de manejo de errores
   }
 }
+
+export const consultarDetalleOrdenPorCriteriosController = async (req, res, next) => {
+  try {
+    const {ordenTurno, fechaAproducir, idSucursal} = req.query;
+    const orden = await consultarDetalleOrdenPorCriteriosService(ordenTurno, fechaAproducir, idSucursal);
+    const responseData = {
+      status: 200,
+      message: "Consulta exitosa",
+      orden,
+    };
+    res.status(200).json(responseData);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de manejo de errores
+  }
+};

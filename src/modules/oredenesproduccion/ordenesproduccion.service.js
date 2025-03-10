@@ -2,7 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarBatchConsumoOrdenProduccionServices } from "../consumosordenesproduccion/consumosordenes.service.js";
 import { CalcularCantidadIngredientes } from "../consumosordenesproduccion/cosumoordenesproduccion.utils.js";
-import { consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
+import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
 export const consultarOrdenProduccionService = async () => {
@@ -51,8 +51,15 @@ export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
 
 export const ingresarOrdenProduccionService = async (ordenProduccion) => {
   try {
+  
     const { encabezadoOrden, detalleOrden } = ordenProduccion;
+    const ordenExist = await consultarDetalleOrdenPorCriteriosService(encabezadoOrden.ordenTurno, encabezadoOrden.fechaAProducir, encabezadoOrden.idSucursal );
 
+    if(ordenExist.encabezadoOrden !== null){
+      const errorInfo = getError(19);
+      throw new CustomError(errorInfo);
+    }
+    
     // Detalles de la orden de producción con cantidad de unidades por bandeja
     const detallesActualizados = await procesarDetallesOrden(detalleOrden);
     
@@ -89,4 +96,46 @@ export const ingresarOrdenProduccionService = async (ordenProduccion) => {
   }
 };
 
+export const consultarUnidadesDeProductoPorOrdenService = async (idOrdenProduccion, idProducto) => {
+  try {
+    const detalleOrden = await consultarUnidadesDeProductoPorOrdenDao(idOrdenProduccion, idProducto);
 
+    if (detalleOrden.length === 0) {
+      throw new CustomError(getError(1));
+    }
+
+    return detalleOrden;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const actualizarEstadoOrdenProduccionServices = async (idOrdenProduccion) => {
+  try {
+
+    const ordenActualizada = await actualizarEstadoOrdenProduccionDao(idOrdenProduccion);
+
+    if (ordenActualizada === 0) {
+       throw new CustomError(getError(3));
+    }
+
+    return ordenActualizada;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const consultarDetalleOrdenPorCriteriosService = async (ordenTurno, fechaAproducir, idSucursal) => {
+  try {
+    const detalleOrden = await consultarDetalleOrdenPorCriteriosDao(ordenTurno, fechaAproducir, idSucursal);
+
+    if (detalleOrden === 0) {
+      const error = getError(1);
+      throw new CustomError(error);
+    }
+
+    return detalleOrden;
+  } catch (error) {
+    throw error;
+  }
+};

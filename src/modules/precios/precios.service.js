@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarPrcioProductoDao, consultarPreciosProductosDao,  elimarPrecioProductoDao,  IngresarPrecioProductoDao } from "./precios.dao.js";
+import { actualizarPrcioProductoDao, consultarPrecioProductoPorIdDao, consultarPreciosProductosDao,  elimarPrecioProductoDao,  IngresarPrecioProductoDao } from "./precios.dao.js";
 
 
 export const ingresarPrecioProductoService = async (dataPrecio) => {
@@ -55,6 +55,20 @@ export const elminarPrecioProductoService = async (idProducto) => {
     }
 
     return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const consultarPrecioProductoPorIdService = async (idProducto) => {
+  try {
+    const produtco = await consultarPrecioProductoPorIdDao(idProducto);
+
+    if (produtco.length === 0) {
+      throw new CustomError(getError(1));
+    }
+
+    return produtco;
   } catch (error) {
     throw error;
   }

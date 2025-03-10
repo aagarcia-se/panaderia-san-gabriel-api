@@ -27,8 +27,9 @@ export const IngresarPrecioProductoDao = async (dataPrecio) => {
 export const consultarPreciosProductosDao = async () => {
   try {
     // Consulta SQL
-    const query = `SELECT p.idProducto, 
-                        p.nombreProducto, 
+    const query = `SELECT p.idProducto, p.nombreProducto, 
+                        p.controlarStock,
+  						          conf.unidadesPorBandeja,
                         ca.idCategoria,
                         ca.nombreCategoria, 
                         pr.cantidad, 
@@ -38,8 +39,9 @@ export const consultarPreciosProductosDao = async () => {
                         pr.fechaInicio, 
                         pr.fechaFin
                   FROM PRODUCTOS p
-                  JOIN PRECIOS pr ON p.idProducto = pr.idProducto
-                  JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+                  INNER JOIN PRECIOS pr ON p.idProducto = pr.idProducto
+                  INNER JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+  				        LEFT JOIN CONFIGORDEN conf ON p.idProducto = conf.idProducto
                   WHERE p.estado = 'A'; -- Solo productos activos`
 
     // Ejecutar la consulta
@@ -79,6 +81,27 @@ export const elimarPrecioProductoDao = async (idProducto) => {
     const precioProducto = await Connection.execute(query, [idProducto]);
 
     return precioProducto.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const consultarPrecioProductoPorIdDao = async (idProducto) => {
+  try {
+    // Consulta SQL
+    const query = `SELECT p.idProducto, p.nombreProducto, ca.nombreCategoria,  pr.precio, pr.precioPorUnidad
+                  FROM PRODUCTOS p
+                  JOIN PRECIOS pr ON p.idProducto = pr.idProducto
+                  JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+                  WHERE p.estado = 'A'
+                  and p.idProducto = ?;`
+
+    // Ejecutar la consulta
+    const produtco = await Connection.execute(query, [idProducto]);
+
+    // Devolver los registros encontrados
+    return produtco.rows[0];
   } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);

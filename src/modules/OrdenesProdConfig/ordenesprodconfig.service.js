@@ -1,5 +1,35 @@
-import { consultarCantidadUnidadesDao } from "./ordenesprodconfig.dao.js";
+import CustomError from "../../utils/CustomError.js";
+import { getError } from "../../utils/generalErrors.js";
+import { consultarCantidadUnidadesDao, ingresarCantidaUnidaesDao, modificarCantidaUnidaesDao } from "./ordenesprodconfig.dao.js";
 
+export const ingrearCantidadUnidadesService = async (dataProducto) => {
+  try{
+
+    const idConfig = ingresarCantidaUnidaesDao(dataProducto);
+    if (idConfig === 0) {
+      const error = getError(2);
+      throw new CustomError(error);
+    }
+
+    return idConfig;
+
+  }catch(error){
+    throw error;
+  }
+}
+
+export const modificarCantidaUnidaesService = async (dataProducto) => {
+  try{
+    const resModify = await modificarCantidaUnidaesDao(dataProducto);
+    if(resModify === 0){
+      CustomError(getError(3));
+    }
+
+    return resModify;
+  }catch(error){
+
+  }
+}
 
 export const consultarCantidadUnidadesService = async (idProducto) => {
   try {

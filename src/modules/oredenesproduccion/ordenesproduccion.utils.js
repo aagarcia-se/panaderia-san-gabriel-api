@@ -3,7 +3,7 @@ import { consultarCantidadUnidadesService } from "../OrdenesProdConfig/ordenespr
 
 const calcularUnidadesTotales = (cantidadBase, cantidadBandejas) => {
     return cantidadBase * cantidadBandejas;
-  };
+};
   
 
 export const procesarDetallesOrden = async (detalles) => {
@@ -12,8 +12,10 @@ export const procesarDetallesOrden = async (detalles) => {
         const cantidadBase = await consultarCantidadUnidadesService(detalle.idProducto);
         return {
           ...detalle,
-          cantidadUnidades: calcularUnidadesTotales(cantidadBase, detalle.cantidadBandejas)
+          cantidadUnidades: detalle.idCategoria === 1 ?
+           calcularUnidadesTotales(cantidadBase, detalle.cantidadBandejas)
+           : detalle.cantidadUnidades
         };
       })
     );
-  };
+};
