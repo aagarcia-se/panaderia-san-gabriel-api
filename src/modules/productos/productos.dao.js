@@ -4,16 +4,17 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const crearProductoDao = async (dataProductos) => {
     try {
-        const query =`insert into productos (nombreProducto, idCategoria, fechaCreacion) values 
-                      (?, ?, ?);`;
+        const query =`insert into productos (nombreProducto, idCategoria, controlarStock, fechaCreacion) values 
+                      (?, ?, ?, ?);`;
 
         const resProdcutosInsert = await Connection.execute(query, [
             dataProductos.nombreProducto,
             dataProductos.idCategoria,
+            dataProductos.controlarStock,
             dataProductos.fechaCreacion
         ]);
     
-        return resProdcutosInsert.toJSON().lastInsertRowid;
+        return Number(resProdcutosInsert.toJSON().lastInsertRowid);
       } catch (error) {
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);

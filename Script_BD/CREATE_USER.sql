@@ -1,26 +1,26 @@
 -- Insertar permisos
 -- Permiso para el Dashboard
-INSERT INTO "`permisos`"("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(1, 'Dashboard', 'Visualización de gráficas estadísticas', '/dashboard', '2025-01-25', 'A');
 
 -- Permiso para la gestión de usuarios (ruta principal)
-INSERT INTO "`permisos`"("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(2, 'Gestión de usuarios', 'Crear, modificar y eliminar usuarios', '/users', '2025-01-25', 'A');
 
 -- Permiso para el control de roles (ruta principal)
-INSERT INTO "`permisos`"("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(3, 'Control de Roles', 'Crear, modificar y eliminar roles', '/users/roles', '2025-01-25', 'A');
 
 -- Permiso para la gestión de productos (ruta principal)
-INSERT INTO "`permisos`"("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(4, 'Gestión de productos', 'Ingresos, modificación y eliminación de productos', '/productos', '2025-01-25', 'A');
 
 -- Permiso para las órdenes de producción (ruta principal)
-INSERT INTO "`permisos`"("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(5, 'Órdenes de producción', 'Gestión de órdenes de producción', '/ordenes-produccion', '2025-01-25', 'A');
 
 -- Permiso para las ventas (ruta principal)
-INSERT INTO "`permisos`"("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(6, 'Ventas', 'Gestión de ventas diarias', '/ventas', '2025-01-25', 'A');
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
@@ -31,9 +31,9 @@ INSERT INTO ROLESPERMISOS (idRol, idPermiso) VALUES
 (1, 1),
 (1, 2),
 (1, 3),
-(1, 4);
+(1, 4),
 (1, 5),
-(1, 6)
+(1, 6);
 
 -- Crear usuario administrador
 INSERT INTO USUARIOS (idUsuario, nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, estadoUsuario, fechaCreacion, estado) VALUES
