@@ -40,3 +40,16 @@ export const consultarCantidadUnidadesService = async (idProducto) => {
     throw error;
   }
 };
+
+export const eliminarcantidadUnidadesDao = async (idProducto) => {
+  try {
+    const resDelete = await eliminarcantidadUnidadesDao(idProducto);
+    if (resDelete === 0) {
+      CustomError(getError(4));
+    }
+
+    return resDelete;
+  } catch (error) {
+    throw error;
+  }
+}
