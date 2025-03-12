@@ -22,6 +22,15 @@ VALUES(5, 'Órdenes de producción', 'Gestión de órdenes de producción', '/or
 -- Permiso para las ventas (ruta principal)
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(6, 'Ventas', 'Gestión de ventas diarias', '/ventas', '2025-01-25', 'A');
+
+-- Permiso para las sucursales (ruta principal)
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(7, 'Sucursales', 'Gestión de sucursales existentes', '/sucursales', '2025-01-25', 'A');
+
+-- Permiso para las ventas (ruta principal)
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(8, 'Configuraciones', 'Configuraciones generales, como recetas, montos, etc', '/config/control-panel', '2025-01-25', 'A');
+
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
 (1, 'Admin', 'Administrador de todo el sistema', '2025-01-25', 'A');
