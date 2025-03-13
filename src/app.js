@@ -14,6 +14,7 @@ import { categoriasRoute } from "./modules/categorias/categorias.routes.js";
 import { ordenesRoutes } from "./modules/oredenesproduccion/ordenesproduccion.routes.js";
 import { consumoIngredientesRoute } from "./modules/consumosordenesproduccion/consumosordenes.routes.js";
 import { ventasRoutes } from "./modules/ventas/ventas.routes.js";
+import { stockRoute } from "./modules/StockProductos/stockProductos.routes.js";
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/api", categoriasRoute);
 app.use("/api", ordenesRoutes);
 app.use("/api", consumoIngredientesRoute);
 app.use("/api", ventasRoutes);
+app.use("/api", stockRoute);
 
 // Middleware de manejo de errores
 app.use(errorHandler);

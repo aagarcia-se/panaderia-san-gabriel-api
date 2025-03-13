@@ -104,6 +104,11 @@ const databaseErrorMap = {
     message: "Ya existe una orden con el turno, sucursal y fecha ingresada",
     statusCode: 409,
     code: 409,
+  },
+  20: {
+    message: "La cantidad erronea que has ingresado es incorrecta",
+    statusCode: 409,
+    code: 409,
   }
   // Agregar más errores de base de datos aquí según sea necesario
 };
