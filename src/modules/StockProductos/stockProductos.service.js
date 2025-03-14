@@ -83,43 +83,65 @@ export const registrarStockProductosService = async (dataStockProducto) => {
 };
 
 export const corregirStockProductosService = async (dataStockProducto) => {
-    try {
-        // 1. Consultar si el producto ya existe en el stock
-        const productoExistente = await consultarStockProductoService(dataStockProducto.idProducto);
+  try {
+      // Validar que stockProductos sea un array
+      if (!Array.isArray(dataStockProducto.stockProductos)) {
+          throw new CustomError(getError(3)); // Define un error adecuado para este caso
+      }
 
-        // 2. Si el producto no existe, lanzar un error
-        if (!productoExistente || productoExistente.idStock === 0) {
-            const error = getError(3); // Producto no encontrado
-            throw new CustomError(error);
-        }
+      const stockProductos = dataStockProducto.stockProductos;
 
-        // 3. Calcular el stock corregido
-        const stockCorregido = (productoExistente.stock - dataStockProducto.stockErroneo) + dataStockProducto.stockCorrecto;
+      return Promise.all(
+          stockProductos.map(async (stockProductos) => {
+              try {
+                  // 1. Consultar si el producto ya existe en el stock
+                  const productoExistente = await consultarStockProductoService(stockProductos.idProducto);
 
-        // 4. Validar si la resta da un número negativo
-        if (stockCorregido < 0) {
-            const error = getError(20); // La corrección daría un stock negativo
-            throw new CustomError(error);
-        }
-        // 5. Validar si el stock corregido es negativo
-        if (stockCorregido < 0) {
-            const error = getError(21); // El stock corregido es negativo
-            throw new CustomError(error);
-        }
+                  // 2. Si el producto no existe, lanzar un error
+                  if (!productoExistente || productoExistente.idStock === 0) {
+                      const error = getError(3); // Producto no encontrado
+                      throw new CustomError(error);
+                  }
 
-        // 8. Actualizar el stock en la base de datos
-        const datosActualizados = {
-            idStock: productoExistente.idStock,
-            ...dataStockProducto,
-            stock: stockCorregido
-        };
+                  // 3. Validar que los valores sean números
+                  if (
+                      typeof stockProductos.stockErroneo !== 'number' ||
+                      typeof stockProductos.stockCorrecto !== 'number'
+                  ) {
+                      const error = getError(22); // Valores no válidos
+                      throw new CustomError(error);
+                  }
 
-        const stockActualizado = await actualizarStockProductoDao(datosActualizados);
+                  // 4. Calcular el stock corregido
+                  const stockCorregido = (productoExistente.stock - stockProductos.stockErroneo) + stockProductos.stockCorrecto;
 
-        // 9. Retornar el stock actualizado
-        return stockActualizado;
-    } catch (error) {
-        // 10. Relanzar el error para que sea manejado en un nivel superior
-        throw error;
-    }
+                  // 5. Validar si el stock corregido es negativo
+                  if (stockCorregido < 0) {
+                      const error = getError(20); // La corrección daría un stock negativo
+                      throw new CustomError(error);
+                  }
+
+                  // 6. Actualizar el stock en la base de datos
+                  const datosActualizados = {
+                      idStock: productoExistente.idStock,
+                      ...stockProductos, // Copia todas las propiedades de stockProductos
+                      stock: stockCorregido // Sobrescribe o agrega la propiedad "stock"
+                  };
+
+                  const stockActualizado = await actualizarStockProductoDao(datosActualizados);
+
+                  // 7. Retornar el stock actualizado
+                  return stockActualizado;
+              } catch (error) {
+                  // Manejar errores individuales para cada producto
+                  console.error(`Error corrigiendo el stock del producto ${stockProductos.idProducto}:`, error);
+                  throw error; // Propagar el error si es necesario
+              }
+          })
+      );
+  } catch (error) {
+      // Manejar errores generales
+      console.error('Error en corregirStockProductosService:', error);
+      throw error;
+  }
 };

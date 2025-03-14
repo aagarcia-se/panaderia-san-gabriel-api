@@ -2,9 +2,9 @@ import { Connection } from "../../config/database/databaseSqlite.js";
 import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
-/*----------------------------------------------------------------------
------------------ Gestion de la tabla Historial Stock ------------------
-------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------
+----------------- Gestion de la tabla Historial Stock ----------------
+----------------------------------------------------------------------*/
 export const IngresarHistorialStockDao = async (dataHistorialStock) => {
     try{
         const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, "INGRESO", cantidad, stockAnterior, stockActual, fechaMovimiento, observaciones, tipoReferencia)
@@ -74,9 +74,9 @@ export const eliminarHistorialStockDao = async (idStock) => {
 }
 
 
-/*---------------------------------------------------
-------------- Gestion de la tabla Stock -------------
------------------------------------------------------*/
+/*--------------------------------------------------------------------
+------------- Gestion de la tabla Stock ------------------------------
+----------------------------------------------------------------------*/
 export const consultarStockProductoDao = async (idProducto) => {
   try {
     const query = `select idStock, idProducto, idSucursal, stock from STOCKPRODUCTOS 
@@ -143,6 +143,7 @@ export const actualizarStockProductoDao = async (dataStockProducto) => {
   try {
     const query = `UPDATE STOCKPRODUCTOS SET idProducto = ?, idSucursal = ?,  stock = ?, fechaActualizacion = ?
                    where idProducto = ?`;
+                   
      const resUpdate = await Connection.execute(query, [
         dataStockProducto.idProducto,
         dataStockProducto.idSucursal,
@@ -151,7 +152,12 @@ export const actualizarStockProductoDao = async (dataStockProducto) => {
         dataStockProducto.idProducto
     ]);
 
-    return dataStockProducto
+    const dataStockProductoUpdate = {
+        idStock: parseInt(resUpdate.toJSON().lastInsertRowid),
+        ...dataStockProducto
+    }
+
+    return dataStockProductoUpdate
   } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
