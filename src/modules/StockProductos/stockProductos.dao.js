@@ -73,7 +73,7 @@ export const actualizarStockProductoDao = async (dataStockProducto) => {
         dataStockProducto.fechaActualizacion,
         dataStockProducto.idProducto
     ]);
-    
+
     return dataStockProducto
   } catch (error) {
     const dbError = getDatabaseError(error.message);

@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS DETALLESVENTAS (
 );
 
 
--------- Tablas para control stock -----------------
+-------- Tablas para control stock ------------------
 -----------------------------------------------------
 -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
@@ -261,6 +261,26 @@ CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
     FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE CASCADE,
     UNIQUE(idProducto, idSucursal) -- Evita duplicados de producto-sucursal
+);
+
+-------- Tablas para control stock ------------------
+-----------------------------------------------------
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS HISTORIALSTOCK (
+    idHistorial INTEGER PRIMARY KEY AUTOINCREMENT, -- Identificador único del registro
+    idUsuario INTEGER NOT NULL,                -- Identificador del usuario que realizó la venta
+    idProducto INTEGER NOT NULL, -- ID del producto relacionado
+    idSucursal INTEGER NOT NULL, -- ID de la sucursal relacionada
+    tipoMovimiento TEXT NOT NULL CHECK(tipoMovimiento IN ('INGRESO', 'EGRESO', 'CORRECCION', 'AJUSTE')), -- Tipo de movimiento
+    cantidad INTEGER NOT NULL, -- Cantidad afectada (positiva para ingresos, negativa para egresos)
+    stockAnterior INTEGER NOT NULL, -- Stock antes del movimiento
+    stockNuevo INTEGER NOT NULL, -- Stock después del movimiento
+    fechaMovimiento DATETIME NOT NULL, -- Fecha y hora del movimiento
+    observaciones TEXT, -- Detalles adicionales (opcional)
+    tipoReferencia TEXT, -- Tipo de referencia (opcional, para indicar de dónde proviene el movimiento, como "VENTA", "ORDEN_PRODUCCION", etc.)
+    FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario),  -- Integridad referencial con la tabla de usuarios
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
 );
 
 -------- Tablas para registro de ingresos------------

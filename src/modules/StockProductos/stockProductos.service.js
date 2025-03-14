@@ -67,30 +67,43 @@ export const registrarStockProductosService = async (dataStockProducto) => {
 };
 
 export const corregirStockProductosService = async (dataStockProducto) => {
-    try{
+    try {
+        // 1. Consultar si el producto ya existe en el stock
+        const productoExistente = await consultarStockProductoService(dataStockProducto.idProducto);
 
-       // Consultar si el producto ya existe en el stock
-       const productoExistente = await consultarStockProductoService(dataStockProducto.idProducto);
-       if(!productoExistente || productoExistente.idStock === 0){
-           const error = getError(3);
-           throw new CustomError(error);
-       }
-
-       if(productoExistente.stock < dataStockProducto.stockErroneo){
-        const error = getError(20);
-        throw new CustomError(error);
+        // 2. Si el producto no existe, lanzar un error
+        if (!productoExistente || productoExistente.idStock === 0) {
+            const error = getError(3); // Producto no encontrado
+            throw new CustomError(error);
         }
 
-       const cantidadCorregida = productoExistente.stock - dataStockProducto.stockErroneo;
+        // 3. Calcular el stock corregido
+        const stockCorregido = (productoExistente.stock - dataStockProducto.stockErroneo) + dataStockProducto.stockCorrecto;
 
-       const stockCorregido = cantidadCorregida + dataStockProducto.stockCorrecto;
+        // 4. Validar si la resta da un número negativo
+        if (stockCorregido < 0) {
+            const error = getError(20); // La corrección daría un stock negativo
+            throw new CustomError(error);
+        }
+        // 5. Validar si el stock corregido es negativo
+        if (stockCorregido < 0) {
+            const error = getError(21); // El stock corregido es negativo
+            throw new CustomError(error);
+        }
 
-       const datosActualizados = { idStock: productoExistente.idStock, ...dataStockProducto, stock: stockCorregido }
+        // 8. Actualizar el stock en la base de datos
+        const datosActualizados = {
+            idStock: productoExistente.idStock,
+            ...dataStockProducto,
+            stock: stockCorregido
+        };
 
-       const stockActualizado = await actualizarStockProductoDao(datosActualizados);
+        const stockActualizado = await actualizarStockProductoDao(datosActualizados);
 
-       return stockActualizado;
-    }catch(error){
+        // 9. Retornar el stock actualizado
+        return stockActualizado;
+    } catch (error) {
+        // 10. Relanzar el error para que sea manejado en un nivel superior
         throw error;
     }
-}
+};
