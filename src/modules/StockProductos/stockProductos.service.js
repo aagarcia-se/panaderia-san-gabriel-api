@@ -103,15 +103,6 @@ export const corregirStockProductosService = async (dataStockProducto) => {
                       throw new CustomError(error);
                   }
 
-                  // 3. Validar que los valores sean números
-                  if (
-                      typeof stockProductos.stockErroneo !== 'number' ||
-                      typeof stockProductos.stockCorrecto !== 'number'
-                  ) {
-                      const error = getError(22); // Valores no válidos
-                      throw new CustomError(error);
-                  }
-
                   // 4. Calcular el stock corregido
                   const stockCorregido = (productoExistente.stock - stockProductos.stockErroneo) + stockProductos.stockCorrecto;
 
