@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarStockProductoDao, consultarStockProductoDao, consultarStockProductosDao, registrarStockProductoDao } from "./StockProductos.dao.js";
+import { actualizarStockProductoDao, consultarStockProductoDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao } from "./StockProductos.dao.js";
 
 
 export const consultarStockProductoService = async (idProducto) => {
@@ -51,7 +51,20 @@ export const registrarStockProductosService = async (dataStockProducto) => {
 
           // Si el producto no existe, lo registramos
           if (!productoExistente || productoExistente.idStock === 0) {
-            const stockProductoIngresado = await registrarStockProductoDao(stockProducto);
+
+            const datosActualizados = {
+              ...stockProducto,
+              cantidad: stockProducto.stock,
+              stockAnterior: 0,
+              stockNuevo: stockProducto.stock,
+            };
+
+            const insertHistorialStock = await IngresarHistorialStockDao(datosActualizados);
+            if (insertHistorialStock === 0) {
+              throw new CustomError(getError(2)); // Error al registrar
+            }
+
+            const stockProductoIngresado = await registrarStockProductoDao(datosActualizados);
             if (stockProductoIngresado === 0) {
               throw new CustomError(getError(2)); // Error al registrar
             }
@@ -60,11 +73,21 @@ export const registrarStockProductosService = async (dataStockProducto) => {
 
           // Si el producto existe, actualizamos el stock sumando la nueva cantidad
           const nuevoStock = productoExistente.stock + stockProducto.stock;
+
           const datosActualizados = {
             idStock: productoExistente.idStock,
             ...stockProducto,
             stock: nuevoStock,
+            cantidad: stockProducto.stock,
+            stockAnterior: productoExistente.stock,
+            stockNuevo: nuevoStock,
           };
+          
+          console.log("llkdsjflaskdjfsl")
+          const insertHistorialStock = await IngresarHistorialStockDao(datosActualizados);
+          if (insertHistorialStock === 0) {
+            throw new CustomError(getError(2)); // Error al registrar
+          }
 
           const stockProductoActualizado = await actualizarStockProductoDao(datosActualizados);
           if (stockProductoActualizado === 0) {

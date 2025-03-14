@@ -6,20 +6,19 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 ----------------- Gestion de la tabla Historial Stock ----------------
 ----------------------------------------------------------------------*/
 export const IngresarHistorialStockDao = async (dataHistorialStock) => {
+    console.log(dataHistorialStock)
     try{
-        const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, "INGRESO", cantidad, stockAnterior, stockActual, fechaMovimiento, observaciones, tipoReferencia)
-                        values (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
-        const historialStock = await Connection.execute(insert, [
+        const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, cantidad, stockAnterior, stockNuevo, fechaMovimiento, tipoReferencia)
+        values (?, ?, ?, 'INGRESO', ?, ?, ?, ?, 'CONTROL DE STOCK');`;
+            const historialStock = await Connection.execute(insert, [
             dataHistorialStock.idUsuario,
             dataHistorialStock.idProducto,
             dataHistorialStock.idSucursal,
             dataHistorialStock.cantidad,
             dataHistorialStock.stockAnterior,
-            dataHistorialStock.stockActual,
-            dataHistorialStock.fechaMovimiento,
-            dataHistorialStock.observaciones,
-            dataHistorialStock.tipoReferencia
-        ]);
+            dataHistorialStock.stockNuevo,
+            dataHistorialStock.fechaCreacion,
+            ]);
 
         const historialStockIngresado = {
             idHistorialStock: parseInt(historialStock.toJSON().lastInsertRowid),
@@ -28,6 +27,7 @@ export const IngresarHistorialStockDao = async (dataHistorialStock) => {
         return historialStockIngresado;
 
     }catch(error){
+        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
