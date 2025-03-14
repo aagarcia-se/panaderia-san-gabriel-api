@@ -6,7 +6,6 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 ----------------- Gestion de la tabla Historial Stock ----------------
 ----------------------------------------------------------------------*/
 export const IngresarHistorialStockDao = async (dataHistorialStock) => {
-    console.log(dataHistorialStock)
     try{
         const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, cantidad, stockAnterior, stockNuevo, fechaMovimiento, tipoReferencia)
         values (?, ?, ?, 'INGRESO', ?, ?, ?, ?, 'CONTROL DE STOCK');`;
@@ -27,7 +26,6 @@ export const IngresarHistorialStockDao = async (dataHistorialStock) => {
         return historialStockIngresado;
 
     }catch(error){
-        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }

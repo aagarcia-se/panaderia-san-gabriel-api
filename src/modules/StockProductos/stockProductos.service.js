@@ -1,6 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { actualizarStockProductoDao, consultarStockProductoDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao } from "./StockProductos.dao.js";
+import { calcularStockActualizado, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 
 export const consultarStockProductoService = async (idProducto) => {
@@ -35,6 +36,7 @@ export const consultarStockProductosService = async () => {
 
 export const registrarStockProductosService = async (dataStockProducto) => {
   try {
+
     // Validar que stockProductos sea un array
     if (!Array.isArray(dataStockProducto.stockProductos)) {
       throw new CustomError(getError(3)); // Define un error adecuado para este caso
@@ -47,54 +49,29 @@ export const registrarStockProductosService = async (dataStockProducto) => {
       stockProductos.map(async (stockProducto) => {
         try {
           // Consultar si el producto ya existe en el stock
-          const productoExistente = await consultarStockProductoDao(stockProducto.idProducto);
+          const productoExistente = await consultarStockProductoDao(stockProducto.idProducto);   
 
-          // Si el producto no existe, lo registramos
-          if (!productoExistente || productoExistente.idStock === 0) {
+          // Determinar los datos actualizados según si el producto existe o no
+          const datosActualizados =  productoExistente.idStock !== 0
+            ? payloadStockProductoExistente(productoExistente, stockProducto)
+            : payloadStockProductoInexistente(stockProducto);
 
-            const datosActualizados = {
-              ...stockProducto,
-              cantidad: stockProducto.stock,
-              stockAnterior: 0,
-              stockNuevo: stockProducto.stock,
-            };
-
-            const insertHistorialStock = await IngresarHistorialStockDao(datosActualizados);
-            if (insertHistorialStock === 0) {
-              throw new CustomError(getError(2)); // Error al registrar
-            }
-
-            const stockProductoIngresado = await registrarStockProductoDao(datosActualizados);
-            if (stockProductoIngresado === 0) {
-              throw new CustomError(getError(2)); // Error al registrar
-            }
-            return stockProductoIngresado;
-          }
-
-          // Si el producto existe, actualizamos el stock sumando la nueva cantidad
-          const nuevoStock = productoExistente.stock + stockProducto.stock;
-
-          const datosActualizados = {
-            idStock: productoExistente.idStock,
-            ...stockProducto,
-            stock: nuevoStock,
-            cantidad: stockProducto.stock,
-            stockAnterior: productoExistente.stock,
-            stockNuevo: nuevoStock,
-          };
-          
-          console.log("llkdsjflaskdjfsl")
+          // Registrar el historial de stock
           const insertHistorialStock = await IngresarHistorialStockDao(datosActualizados);
           if (insertHistorialStock === 0) {
             throw new CustomError(getError(2)); // Error al registrar
           }
 
-          const stockProductoActualizado = await actualizarStockProductoDao(datosActualizados);
-          if (stockProductoActualizado === 0) {
-            throw new CustomError(getError(2)); // Error al actualizar
+          // Registrar o actualizar el stock del producto
+          const operacionStock = productoExistente && productoExistente.idStock !== 0
+            ? await actualizarStockProductoDao(datosActualizados)
+            : await registrarStockProductoDao(datosActualizados);
+
+          if (operacionStock === 0) {
+            throw new CustomError(getError(2)); // Error al registrar o actualizar
           }
 
-          return stockProductoActualizado;
+          return operacionStock;
         } catch (error) {
           throw error; // Propagar el error si es necesario
         }
