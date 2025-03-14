@@ -278,9 +278,11 @@ CREATE TABLE IF NOT EXISTS HISTORIALSTOCK (
     fechaMovimiento DATETIME NOT NULL, -- Fecha y hora del movimiento
     observaciones TEXT, -- Detalles adicionales (opcional)
     tipoReferencia TEXT, -- Tipo de referencia (opcional, para indicar de dónde proviene el movimiento, como "VENTA", "ORDEN_PRODUCCION", etc.)
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N', 'P')) DEFAULT 'A', -- Estado del movimiento 
     FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario),  -- Integridad referencial con la tabla de usuarios
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
     FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
+    
 );
 
 -------- Tablas para registro de ingresos------------

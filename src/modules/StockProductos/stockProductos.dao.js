@@ -2,6 +2,81 @@ import { Connection } from "../../config/database/databaseSqlite.js";
 import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
+/*----------------------------------------------------------------------
+----------------- Gestion de la tabla Historial Stock ------------------
+------------------------------------------------------------------------*/
+export const IngresarHistorialStockDao = async (dataHistorialStock) => {
+    try{
+        const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, "INGRESO", cantidad, stockAnterior, stockActual, fechaMovimiento, observaciones, tipoReferencia)
+                        values (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+        const historialStock = await Connection.execute(insert, [
+            dataHistorialStock.idUsuario,
+            dataHistorialStock.idProducto,
+            dataHistorialStock.idSucursal,
+            dataHistorialStock.cantidad,
+            dataHistorialStock.stockAnterior,
+            dataHistorialStock.stockActual,
+            dataHistorialStock.fechaMovimiento,
+            dataHistorialStock.observaciones,
+            dataHistorialStock.tipoReferencia
+        ]);
+
+        const historialStockIngresado = {
+            idHistorialStock: parseInt(historialStock.toJSON().lastInsertRowid),
+            ...dataHistorialStock
+        }
+        return historialStockIngresado;
+
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
+
+export const actualizarHistorialStockDao = async (dataHistorialStock) => {
+    try{
+        const update = `update HISTORIALSTOCK set idProducto = ?, idSucursal = ?, tipoMovimiento = 'CORRECCION', cantidad = ?, stockAnterior = ?, stockActual = ?,
+                        fechaMovimiento = ?, observaciones = ?, tipoReferencia = ? 
+                        where idHistorialStock = ?;`;
+        const historialStock = await Connection.execute(update, [
+            dataHistorialStock.idProducto,
+            dataHistorialStock.idSucursal,
+            dataHistorialStock.cantidad,
+            dataHistorialStock.stockAnterior,
+            dataHistorialStock.stockActual,
+            dataHistorialStock.idHistorialStock,
+            dataHistorialStock.fechaMovimiento,
+            dataHistorialStock.observaciones,
+            dataHistorialStock.tipoReferencia
+        ]);
+
+        const historialStockActualizado = {
+            idHistorialStock: parseInt(historialStock.toJSON().lastInsertRowid),
+            ...dataHistorialStock
+        }
+
+        return historialStockActualizado;
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
+
+export const eliminarHistorialStockDao = async (idStock) => {
+    try {
+      const query = "update HISTORIALSTOCK set estado = 'N' where idHistorial = ?;";
+      const stockProducto = await Connection.execute(query, [idStock]);
+      return stockProducto.toJSON().rowsAffected;
+    } catch (error) {
+      const dbError = getDatabaseError(error.message);
+      throw new CustomError(dbError);
+    }
+}
+
+
+/*---------------------------------------------------
+------------- Gestion de la tabla Stock -------------
+-----------------------------------------------------*/
 export const consultarStockProductoDao = async (idProducto) => {
   try {
     const query = `select idStock, idProducto, idSucursal, stock from STOCKPRODUCTOS 
@@ -66,9 +141,11 @@ export const registrarStockProductoDao = async (dataStockProducto) => {
 
 export const actualizarStockProductoDao = async (dataStockProducto) => {
   try {
-    const query = `UPDATE STOCKPRODUCTOS SET stock = ?, fechaActualizacion = ?
+    const query = `UPDATE STOCKPRODUCTOS SET idProducto = ?, idSucursal = ?,  stock = ?, fechaActualizacion = ?
                    where idProducto = ?`;
      const resUpdate = await Connection.execute(query, [
+        dataStockProducto.idProducto,
+        dataStockProducto.idSucursal,
         dataStockProducto.stock,
         dataStockProducto.fechaActualizacion,
         dataStockProducto.idProducto
@@ -90,4 +167,4 @@ export const eliminarStockProductoDao = async (idStock) => {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
-}   
+}
