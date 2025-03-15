@@ -136,3 +136,5 @@ export const corregirStockProductosService = async (dataStockProducto) => {
       throw error;
   }
 };
+
+/**esta es una preuba de pull para probar las libresrias instaladas */
