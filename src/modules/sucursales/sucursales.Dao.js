@@ -26,17 +26,14 @@ export const consultarSucursalesDao = async () => {
 export const ingresarSucursalDao = async (sucursal) => {
   try {
     const insertQuery = `INSERT INTO SUCURSALES (nombreSucursal, direccionSucursal, municipioSucursal, 
-    departamentoSucursal, latitudSucursal, longitudSucursal, telefonoSucursal, correoSucursal, 
-    fechaCreacion)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    departamentoSucursal, telefonoSucursal, correoSucursal, fechaCreacion)
+    VALUES (?, ?, ?, ?, ?, ?, ?);`;
 
     const result = await db.execute(insertQuery, [
       sucursal.nombreSucursal,
       sucursal.direccionSucursal,
       sucursal.municipioSucursal,
       sucursal.departamentoSucursal,
-      sucursal.latitudSucursal,
-      sucursal.longitudSucursal,
       sucursal.telefonoSucursal,
       sucursal.correoSucursal,
       sucursal.fechaCreacion,

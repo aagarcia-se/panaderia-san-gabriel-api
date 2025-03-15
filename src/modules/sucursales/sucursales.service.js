@@ -24,9 +24,7 @@ export const consultarSucursalesServices = async () => {
 
 export const ingresarSucursalServices = async (sucursal) => {
   try {
-    const sucursalData = new Sucursal(sucursal);
-
-    const result = await ingresarSucursalDao(sucursalData);
+    const result = await ingresarSucursalDao(sucursal);
 
     if (result === 0) {
       const error = getError(2);
