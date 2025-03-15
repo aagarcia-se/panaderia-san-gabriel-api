@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarStockProductoDao, consultarStockProductoDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao } from "./StockProductos.dao.js";
+import { actualizarStockProductoDao, consultarStockProductoDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao } from "./stockProductos.dao.js";
 import { calcularStockActualizado, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 
