@@ -49,19 +49,16 @@ export const ingresarSucursalDao = async (sucursal) => {
 export const actualizarSucursalDao = async (sucursal) => {
   try {
     const updateQuery = `UPDATE SUCURSALES SET nombreSucursal = ?, direccionSucursal = ?, municipioSucursal = ?, 
-    departamentoSucursal = ?, latitudSucursal = ?, longitudSucursal = ?, telefonoSucursal = ?, correoSucursal = ?, 
-    fechaCreacion = ? WHERE idSucursal = ?;`;
+    departamentoSucursal = ?, telefonoSucursal = ?, correoSucursal = ?
+     WHERE idSucursal = ?;`;
 
     const result = await db.execute(updateQuery, [
       sucursal.nombreSucursal,
       sucursal.direccionSucursal,
       sucursal.municipioSucursal,
       sucursal.departamentoSucursal,
-      sucursal.latitudSucursal,
-      sucursal.longitudSucursal,
       sucursal.telefonoSucursal,
       sucursal.correoSucursal,
-      sucursal.fechaCreacion,
       sucursal.idSucursal,
     ]);
 

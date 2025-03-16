@@ -37,10 +37,8 @@ export const ingresarSucursalServices = async (sucursal) => {
   }
 };
 
-export const actualizarSucursalServices = async (sucursalData) => {
+export const actualizarSucursalServices = async (sucursal) => {
   try {
-    const sucursal = new Sucursal(sucursalData);
-
     const result = await actualizarSucursalDao(sucursal);
 
     if (result === 0) {
