@@ -74,8 +74,6 @@ export const eliminarSucursalDao = async (idSucursal) => {
     const deleteQuery = `UPDATE SUCURSALES set estado = 'N' WHERE idSucursal = ?;`;
 
     const result = await db.execute(deleteQuery, [idSucursal]);
-
-    console.log(result)
     return result.toJSON().rowsAffected;
   } catch (error) {
     console.log(error);
