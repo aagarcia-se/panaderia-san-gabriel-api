@@ -71,12 +71,14 @@ export const actualizarSucursalDao = async (sucursal) => {
 
 export const eliminarSucursalDao = async (idSucursal) => {
   try {
-    const deleteQuery = `DELETE FROM SUCURSALES WHERE idSucursal = ?;`;
+    const deleteQuery = `UPDATE SUCURSALES set estado = 'N' WHERE idSucursal = ?;`;
 
     const result = await db.execute(deleteQuery, [idSucursal]);
 
+    console.log(result)
     return result.toJSON().rowsAffected;
   } catch (error) {
+    console.log(error);
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }

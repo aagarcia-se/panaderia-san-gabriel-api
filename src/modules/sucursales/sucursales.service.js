@@ -54,8 +54,7 @@ export const actualizarSucursalServices = async (sucursal) => {
 
 export const eliminarSucursalServices = async (idSucursal) => {
   try {
-    const sucursal = new Sucursal({ idSucursal });
-    const result = await eliminarSucursalDao(sucursal.consultarIdSucursal());
+    const result = await eliminarSucursalDao(idSucursal);
 
     if (result === 0) {
       const error = getError(4);
