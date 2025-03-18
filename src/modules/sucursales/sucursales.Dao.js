@@ -39,7 +39,10 @@ export const ingresarSucursalDao = async (sucursal) => {
       sucursal.fechaCreacion,
     ]);
 
-    return result.toJSON().lastInsertRowid;
+    return {
+      idSucursal: result.toJSON().lastInsertRowid,
+      ...sucursal
+    } 
   } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
