@@ -1,7 +1,20 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarRecetaDao, consultarRecetaDao, elminarRecetaDao, ingresarRecetaDao } from "./recetas.dao.js";
+import { actualizarRecetaDao, consultarRecetaDao, consultarRecetasDao, elminarRecetaDao, ingresarRecetaDao } from "./recetas.dao.js";
 
+export const consultarRecetasService = async () => {
+  try {
+      const receta = await consultarRecetasDao();
+      if(receta === 0){
+          const errorInfo = getError(1);
+          throw new CustomError(errorInfo);
+      }
+
+    return receta;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const consultarRecetaService = async (idProducto) => {
     try {

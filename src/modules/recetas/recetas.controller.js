@@ -1,4 +1,17 @@
-import { actualizarRecetaService, consultarRecetaService, eliminarRecetaService, ingresarRecetaService } from "./recetas.service.js";
+import { actualizarRecetaService, consultarRecetaService, consultarRecetasService, eliminarRecetaService, ingresarRecetaService } from "./recetas.service.js";
+
+export const consultarRecetasController = async (req, res, next) => {
+  try {
+    const recetas = await consultarRecetasService();
+    const responseData = {
+      status: 200,
+      recetas,
+    };
+    res.status(200).json(responseData);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de manejo de errores
+  }
+}
 
 export const consultarRecetaController = async (req, res, next) => {
   try {
