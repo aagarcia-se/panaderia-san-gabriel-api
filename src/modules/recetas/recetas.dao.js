@@ -35,7 +35,9 @@ export const consultarRecetaDao = async (idProducto) => {
         const result = await Connection.execute(query, [idProducto]);
         
         if(result.rows.length === 0){
-            return 0;
+            return {
+              idReceta: 0
+            };
         }
 
         return result.rows;
