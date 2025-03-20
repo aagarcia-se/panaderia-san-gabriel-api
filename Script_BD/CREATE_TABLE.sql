@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS RECETAS (
     idProducto INTEGER NOT NULL,
     idIngrediente INTEGER NOT NULL,
     cantidadNecesaria REAL NOT NULL, -- Cantidad de ingrediente necesaria para producir una unidad del producto
-    unidadMedida TEXT NOT NULL, -- Unidad de medida (kg, gr, litros, etc.)
+    unidadMedida TEXT NOT NULL DEFAULT 'Lb', -- Unidad de medida (kg, gr, litros, etc.)
     fechaCreacion DATE NOT NULL,
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
     FOREIGN KEY (idIngrediente) REFERENCES INGREDIENTES(idIngrediente) ON DELETE CASCADE

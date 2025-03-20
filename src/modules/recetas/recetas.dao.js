@@ -9,7 +9,8 @@ export const consultarRecetasDao = async () => {
                       r.unidadMedida 
                       FROM recetas r
                       INNER JOIN ingredientes i ON r.idIngrediente = i.idIngrediente
-                      INNER JOIN productos p ON r.idProducto = p.idProducto;`;
+                      INNER JOIN productos p ON r.idProducto = p.idProducto
+                      order by r.idReceta desc;`;
       const result = await Connection.execute(query);
       
       if(result.rows.length === 0){
@@ -53,8 +54,8 @@ export const ingresarRecetaDao = async (receta) => {
     try {
       // 1. Preparar el batch de inserciones para los detalles de la receta
       const queryDetalleReceta = `
-        INSERT INTO recetas (idProducto, idIngrediente, cantidadNecesaria, unidadMedida, fechaCreacion)
-        VALUES (?, ?, ?, ?, ?);
+        INSERT INTO recetas (idProducto, idIngrediente, cantidadNecesaria, fechaCreacion)
+        VALUES (?, ?, ?, ?);
       `;
   
       // 2. Crear el batch con los detalles de la receta
@@ -64,7 +65,6 @@ export const ingresarRecetaDao = async (receta) => {
           idProducto, // <- Usamos el idProducto aquí
           detalle.idIngrediente,
           detalle.cantidadNecesaria,
-          detalle.unidadMedida,
           detalle.fechaCreacion
         ]
       }));
@@ -81,7 +81,7 @@ export const ingresarRecetaDao = async (receta) => {
       }
   
       // 6. Retornar la receta completa si se insertaron registros
-      return receta;
+      return parseInt(lastInsertRowids[0]);
   
     } catch (error) {
       const dbError = getDatabaseError(error.message);
@@ -96,18 +96,18 @@ export const actualizarRecetaDao = async (receta) => {
       // 1. Preparar el batch de actualizaciones para los detalles de la receta
       const queryActualizarReceta = `
         UPDATE recetas 
-        SET idIngrediente = ?, cantidadNecesaria = ?, unidadMedida = ?
-        WHERE idProducto = ?;
+        SET  cantidadNecesaria = ?
+        WHERE idProducto = ?
+        and idIngrediente = ?;
       `;
   
       // 2. Crear el batch con los detalles de la receta
       const batch = detallesReceta.map((detalle) => ({
         sql: queryActualizarReceta,
         args: [
-          detalle.idIngrediente,
           detalle.cantidadNecesaria,
-          detalle.unidadMedida,
-          idProducto // <- ID del producto para asegurar que pertenece a la receta correcta
+          idProducto, // <- ID del producto para asegurar que pertenece a la receta correcta
+          detalle.idIngrediente
         ]
       }));
   
