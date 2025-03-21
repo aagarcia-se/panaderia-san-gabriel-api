@@ -61,10 +61,10 @@ export const elminarRectaControler = async (req, res, next) => {
       const {idProducto} = req.params;
       const receta = await eliminarRecetaService(idProducto);
       const responseData = {
-        status: 201,
+        status: 204,
         message: "Eliminacion exitosa",
       };
-      res.status(201).json(responseData);
+      res.status(204).json(responseData);
     } catch (error) {
       next(error); // Pasa el error al middleware de manejo de errores
     }
