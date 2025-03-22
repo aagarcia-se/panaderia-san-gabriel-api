@@ -5,7 +5,7 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 export const iniciarSesionDao = async (usuario) => {
   try {
     // 1. Query para obtener los datos del usuario (incluyendo la contraseña hasheada)
-    const queryUsuario = `SELECT u.idUsuario, u.usuario, u.nombreUsuario, u.apellidoUsuario,
+    const queryUsuario = `SELECT u.idUsuario, u.usuario, u.nombreUsuario, u.apellidoUsuario, u.correoUsuario,
                           u.telefonoUsuario, u.idRol, r.nombreRol, u.contrasena, u.estadoUsuario
                           FROM USUARIOS u
                           INNER JOIN ROLES r ON u.idRol = r.idRol
@@ -60,3 +60,4 @@ export const iniciarSesionDao = async (usuario) => {
     throw new CustomError(getDatabaseError(error.message));
   }
 };
+

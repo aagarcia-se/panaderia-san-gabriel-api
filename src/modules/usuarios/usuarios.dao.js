@@ -45,6 +45,7 @@ export const consultarUsuariosDao = async () => {
 }
 
 export const actualizarUsuarioDao = async (dataUsuario) => {
+  console.log(dataUsuario)
   try {
     const query =
       "UPDATE usuarios SET nombreUsuario = ?, apellidoUsuario = ?, correoUsuario = ?, usuario = ?, idRol = ? WHERE idUsuario = ?";
@@ -63,7 +64,6 @@ export const actualizarUsuarioDao = async (dataUsuario) => {
     throw new CustomError(dbError);
   }
 }
-
 
 export const bloquearUsuarioDao = async (idUsuario) => {
   try {
