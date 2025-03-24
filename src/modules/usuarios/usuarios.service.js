@@ -3,7 +3,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { enviarEmail } from "../emails/enviarcorresos.service.js";
 import generarPlantillaCreacionUsuario from "../emails/plantillasenviarcorreo/notiCreacionUsuario.js";
-import { actualizarUsuarioDao, consultarUsuariosDao, crearUsuarioDao, bloquearUsuarioDao, elminarUsuarioDao, desbloquearUsuarioDao } from "./usuarios.dao.js";
+import { actualizarUsuarioDao, consultarUsuariosDao, crearUsuarioDao, bloquearUsuarioDao, elminarUsuarioDao, desbloquearUsuarioDao, cambiarPasswordDao } from "./usuarios.dao.js";
 import { generaContrasena, generaNombreUsuario } from "./usuarios.utils.js";
 
 export const crearUsuarioService = async (dataUsuario) => {
@@ -40,7 +40,7 @@ export const crearUsuarioService = async (dataUsuario) => {
       throw error;
     }
     
-  };
+};
 
   export const consultarUsuariosService = async () => {
     try {
@@ -107,6 +107,23 @@ export const crearUsuarioService = async (dataUsuario) => {
         throw new CustomError(error);
       }
   
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const cambiarPasswordService = async (newPassData) => {
+    try {
+
+      const hashedPass = await hashPassword.hashPassword(newPassData.contrasena);//Hasear contraseña
+      newPassData.contrasena = hashedPass;
+
+      const result = await cambiarPasswordDao(newPassData);
+      if (result === 0) {
+        const error = getError(3);
+        throw new CustomError(error);
+      }
       return result;
     } catch (error) {
       throw error;

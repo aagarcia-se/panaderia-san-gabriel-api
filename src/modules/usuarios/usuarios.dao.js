@@ -45,16 +45,14 @@ export const consultarUsuariosDao = async () => {
 }
 
 export const actualizarUsuarioDao = async (dataUsuario) => {
-  console.log(dataUsuario)
   try {
     const query =
-      "UPDATE usuarios SET nombreUsuario = ?, apellidoUsuario = ?, correoUsuario = ?, usuario = ?, idRol = ? WHERE idUsuario = ?";
+      "UPDATE usuarios SET nombreUsuario = ?, apellidoUsuario = ?, correoUsuario = ?, usuario = ? WHERE idUsuario = ?";
     const usuario = await Connection.execute(query, [
       dataUsuario.nombreUsuario,
       dataUsuario.apellidoUsuario,
       dataUsuario.correoUsuario,
       dataUsuario.usuario,
-      dataUsuario.idRol,
       dataUsuario.idUsuario
     ]);
 
@@ -99,6 +97,24 @@ export const elminarUsuarioDao = async (idUsuario) => {
 
     return usuario.toJSON().rowsAffected;
   } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const cambiarPasswordDao = async (newPassData) => {
+  try{
+
+    const updataPassScript = `update usuarios set contrasena = ? 
+                              where usuario = ?`;
+  
+    const resUpdate = await Connection.execute(updataPassScript, [
+      newPassData.contrasena,
+      newPassData.usuario,
+    ]);
+
+    return resUpdate.toJSON().rowsAffected;
+  }catch(error){
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
