@@ -107,7 +107,8 @@ CREATE TABLE IF NOT EXISTS PRODUCTOS (
     idProducto INTEGER PRIMARY KEY AUTOINCREMENT,
     nombreProducto TEXT NOT NULL,
     idCategoria INTEGER NOT NULL,
-    controlarStock INTEGER NOT NULL DEFAULT 1 CHECK(controlarStock IN (0, 1)), -- 0 = No controlar, 1 = Controlar
+    controlarStock INTEGER NOT NULL DEFAULT 1 CHECK(controlarStock IN (0, 1)), -- 0 = No controlar, 1 = Controlar,
+    tipoProduccion INTEGER NOT NULL DEFAULT 1 CHECK(tipoProduccion IN (0, 1)), -- 0 = Pedido por bandejas, 1 = peido por cantidad de harina. 
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idCategoria) REFERENCES CATEGORIAS(idCategoria)

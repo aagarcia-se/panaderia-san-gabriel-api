@@ -29,7 +29,7 @@ VALUES(7, 'Sucursales', 'Gestión de sucursales existentes', '/sucursales', '202
 
 -- Permiso para las ventas (ruta principal)
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
-VALUES(8, 'Configuraciones', 'Configuraciones generales, como recetas, montos, etc', '/config', '2025-01-25', 'A');
+VALUES(8, 'Config Materia Prima', 'Configuraciones generales, como recetas, montos, etc', '/config', '2025-01-25', 'A');
 
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
@@ -42,8 +42,8 @@ INSERT INTO ROLESPERMISOS (idRol, idPermiso) VALUES
 (1, 3),
 (1, 4),
 (1, 5),
-(1, 6);
-(1, 7);
+(1, 6),
+(1, 7),
 (1, 8);
 
 -- Crear usuario administrador
