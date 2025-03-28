@@ -13,12 +13,11 @@ export const IngresarPrecioProductoDao = async (dataPrecio) => {
             dataPrecio.precio,
             dataPrecio.precioPorUnidad,
             dataPrecio.fechaInicio,
-            dataPrecio.fechaFin
+            dataPrecio.fechaFin || null
         ]);
     
         return resPrecio.toJSON().lastInsertRowid;
       } catch (error) {
-        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
       }
