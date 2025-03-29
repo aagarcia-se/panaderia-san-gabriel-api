@@ -28,6 +28,8 @@ export const consultarPreciosProductosDao = async () => {
     // Consulta SQL
     const query = `SELECT p.idProducto, p.nombreProducto, 
                         p.controlarStock,
+                        p.controlarStockDiario,
+                        p.tipoProduccion,
   						          conf.unidadesPorBandeja,
                         ca.idCategoria,
                         ca.nombreCategoria, 

@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { ingrearCantidadUnidadesService, modificarCantidaUnidaesService } from "../OrdenesProdConfig/ordenesprodconfig.service.js";
+import { consultarCantidadUnidadesService, ingrearCantidadUnidadesService, modificarCantidaUnidaesService } from "../OrdenesProdConfig/ordenesprodconfig.service.js";
 import { crearProductoDao, actualizarProductoDao, consultarProductosDao, eliminarProductoDao, desactivarProductoDao } from "./productos.dao.js";
 
 
@@ -47,9 +47,14 @@ export const actualizarProductoService = async (dataProducto) => {
       throw new CustomError(error);
     }
 
-    if(dataProducto.idCategoria == 1){
-      console.log("entre aqui");
-      await modificarCantidaUnidaesService(dataProducto);
+    if(dataProducto.idCategoria === 1 && dataProducto.tipoProduccion === "bandejas"){
+
+      const res = await consultarCantidadUnidadesService(dataProducto.idProducto);
+      if(res === 0){
+        await ingrearCantidadUnidadesService(dataProducto);
+      }else{
+        await modificarCantidaUnidaesService(dataProducto);
+      }
     }
 
     return result;
