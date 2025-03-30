@@ -59,7 +59,6 @@ export const eliminarRolDao = async (idRol) => {
     
     return result.toJSON().rowsAffected;
   } catch (error) {
-    console.log(error)
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }

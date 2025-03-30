@@ -79,7 +79,6 @@ export const desactivarProductoDao = async (idProducto) => {
 
     return producto.toJSON().rowsAffected;
   } catch (error) {
-    console.log(error)
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }

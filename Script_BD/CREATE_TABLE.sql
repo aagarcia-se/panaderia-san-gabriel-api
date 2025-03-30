@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS DETALLESORDENESPRODUCCION (
     idProducto INTEGER NOT NULL,
     cantidadBandejas INTEGER NOT NULL,
     cantidadUnidades INTEGER NOT NULL,
+    cantidadHarina INTEGER NOT NULL,
     fechaCreacion DATE NOT NULL,
     FOREIGN KEY (idOrdenProduccion) REFERENCES ORDENESPRODUCCION(idOrdenProduccion) ON DELETE CASCADE,
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE
@@ -254,6 +255,23 @@ CREATE TABLE IF NOT EXISTS DETALLESVENTAS (
 -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
     idStock INTEGER PRIMARY KEY AUTOINCREMENT,
+    idProducto INTEGER NOT NULL, 
+    idSucursal INTEGER NOT NULL,
+    stock INTEGER NOT NULL,
+    fechaActualizacion DATETIME NOT NULL,
+    fechaCreacion DATE NOT NULL,
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE CASCADE,
+    UNIQUE(idProducto, idSucursal) -- Evita duplicados de producto-sucursal
+);
+
+
+-- Tablas para control stock productos de diarios ---
+-----------------------------------------------------
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS STOCKPRODUCTOSDIARIOS (
+    idStockDiario INTEGER PRIMARY KEY AUTOINCREMENT,
     idProducto INTEGER NOT NULL, 
     idSucursal INTEGER NOT NULL,
     stock INTEGER NOT NULL,

@@ -79,7 +79,6 @@ export const eliminarSucursalDao = async (idSucursal) => {
     const result = await db.execute(deleteQuery, [idSucursal]);
     return result.toJSON().rowsAffected;
   } catch (error) {
-    console.log(error);
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }

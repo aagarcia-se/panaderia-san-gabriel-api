@@ -105,8 +105,8 @@ export const ingresarOrdenProduccionDao = async (ordenProduccion) => {
     }
 
     // 2. Insertar detalles usando el ID generado     
-    const queryDetalle = `INSERT INTO detallesordenesproduccion(idOrdenProduccion, idProducto, cantidadBandejas, cantidadUnidades, fechaCreacion )
-                            VALUES (?, ?, ?, ?, ?);
+    const queryDetalle = `INSERT INTO detallesordenesproduccion(idOrdenProduccion, idProducto, cantidadBandejas, cantidadUnidades, cantidadHarina, fechaCreacion )
+                            VALUES (?, ?, ?, ?, ?, ?);
                             `;
 
     const batch = detallesOrden.map((detalle) => ({
@@ -115,7 +115,8 @@ export const ingresarOrdenProduccionDao = async (ordenProduccion) => {
         idOrdenGenerada,  // <- Usamos el ID generado aquí
         detalle.idProducto,
         detalle.cantidadBandejas,
-        detalle.cantidadUnidades,
+        detalle.cantidadUnidades || 0,
+        detalle.cantidadHarina,
         detalle.fechaCreacion
       ]
     }));

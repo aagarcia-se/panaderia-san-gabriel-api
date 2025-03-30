@@ -47,8 +47,6 @@ export const actualizarProductoService = async (dataProducto) => {
       throw new CustomError(error);
     }
 
-    console.log(dataProducto)
-
     if(dataProducto.oldCategoria && dataProducto.oldCategoria === 1 && dataProducto.idCategoria !== 1){
       await eliminarcantidadUnidadeServices(dataProducto.idProducto);
     }
