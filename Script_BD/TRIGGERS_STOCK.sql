@@ -90,3 +90,36 @@ BEGIN
         idProducto = NEW.idProducto 
         AND idSucursal = (SELECT idSucursal FROM VENTAS WHERE idVenta = NEW.idVenta);
 END;
+
+
+-- CREATE TRIGGER IF NOT EXISTS TR_ACTUALIZAR_STOCK_VENTA
+-- AFTER INSERT ON DETALLESVENTAS
+-- FOR EACH ROW
+-- BEGIN
+--     -- Caso 1: Restar de STOCKPRODUCTOSDIARIOS cuando es bandeja con control diario
+--     UPDATE STOCKPRODUCTOSDIARIOS
+--     SET stock = stock - NEW.cantidadVendida,
+--         fechaActualizacion = CURRENT_TIMESTAMP
+--     WHERE idProducto = NEW.idProducto 
+--       AND idSucursal = (SELECT idSucursal FROM VENTAS WHERE idVenta = NEW.idVenta)
+--       AND (SELECT controlarStock FROM PRODUCTOS WHERE idProducto = NEW.idProducto) = 0
+--       AND (SELECT controlarStockDiario FROM PRODUCTOS WHERE idProducto = NEW.idProducto) = 1
+--       AND (SELECT tipoProduccion FROM PRODUCTOS WHERE idProducto = NEW.idProducto) = 'bandejas'
+--       AND (SELECT idCategoria FROM PRODUCTOS WHERE idProducto = NEW.idProducto) = 1;
+    
+--     -- Caso 2: Restar de STOCKPRODUCTOS para otros casos con control de stock
+--     UPDATE STOCKPRODUCTOS
+--     SET stock = stock - NEW.cantidadVendida,
+--         fechaActualizacion = CURRENT_TIMESTAMP
+--     WHERE idProducto = NEW.idProducto 
+--       AND idSucursal = (SELECT idSucursal FROM VENTAS WHERE idVenta = NEW.idVenta)
+--       AND (SELECT controlarStock FROM PRODUCTOS WHERE idProducto = NEW.idProducto) = 1
+--       AND (
+--           (SELECT tipoProduccion FROM PRODUCTOS WHERE idProducto = NEW.idProducto) != 'bandejas'
+--           OR (SELECT idCategoria FROM PRODUCTOS WHERE idProducto = NEW.idProducto) != 1
+--           OR (
+--               (SELECT tipoProduccion FROM PRODUCTOS WHERE idProducto = NEW.idProducto) = 'bandejas'
+--               AND (SELECT controlarStockDiario FROM PRODUCTOS WHERE idProducto = NEW.idProducto) = 0
+--           )
+--       );
+-- END;

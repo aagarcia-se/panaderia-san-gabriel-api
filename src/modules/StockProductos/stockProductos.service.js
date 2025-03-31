@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarStockProductoDao, consultarStockProductoDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao } from "./stockProductos.dao.js";
-import { calcularStockActualizado, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
+import { crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 
 export const consultarStockProductoService = async (idProducto) => {
@@ -136,3 +136,37 @@ export const corregirStockProductosService = async (dataStockProducto) => {
       throw error;
   }
 };
+
+/*------------------------------------------------------------------------------
+---------- Control de stock productos ingreso ordenes de produccion ------------
+--------------------------------------------------------------------------------*/
+export const procesarStockPorOrdenProduccionServices = async (ordenProduccion) => {
+  try{
+    const {orden, detallesOrden} = ordenProduccion;
+    const idSucursal = orden.idSucursal;
+    const fechaValidez = orden.fechaAProducir;
+
+    return Promise.all(
+      detallesOrden.map( async (detalle) => {
+        
+        if (detalle.tipoProduccion === "bandejas" && detalle.controlarStockDiario === 1 && detalle.controlarStock === 0 ) {
+          // Consultar si ya existe el producto en stockDiarios 
+          const StockExistente = await consultarStockProductoDiarioDao(detalle.idProducto, idSucursal, fechaValidez);
+          
+          if (StockExistente.idStockDiario === 0) {
+              const payloadStockDiarioNuevo = crearPayloadStockProductoDiarioInexistente(orden, detalle);
+              await registrarStockProductoDiarioDao(payloadStockDiarioNuevo);
+          } else {
+              const payloadStockDiarioExistente = crearPayloadStockProductoDiarioExistente(orden, detalle, StockExistente);
+              await actualizarStockProductoDiarioDao(payloadStockDiarioExistente);
+          }
+        }else if(detalle.tipoProduccion === "bandejas" && detalle.controlarStock === 1 && detalle.controlarStockDiario === 0){
+
+        }
+
+      })
+    );
+  }catch(error){
+    throw error;
+  }
+}

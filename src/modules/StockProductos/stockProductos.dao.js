@@ -172,3 +172,94 @@ export const eliminarStockProductoDao = async (idStock) => {
     throw new CustomError(dbError);
   }
 }
+
+/*--------------------------------------------------------------------
+--------- Gestion de la tabla Stock Productos Diarios-----------------
+----------------------------------------------------------------------*/
+export const consultarStockProductoDiarioDao = async (idProducto, idSucursal, fechaValidez) => {
+  try {
+    const query = `select idStockDiario, idProducto, idSucursal, stock, fechaValidez from STOCKPRODUCTOSDiarios
+                    where idProducto = ?
+                    and idSucursal = ?
+                    and fechaValidez = ?
+                    and estado = 'A';`;
+    const stockProductoDiario = await Connection.execute(query, 
+      [idProducto,
+       idSucursal,
+       fechaValidez]);
+
+    if(stockProductoDiario.rows.length === 0){
+        return {
+        idStockDiario: 0,
+        }
+    }
+
+    return stockProductoDiario.rows[0];
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const registrarStockProductoDiarioDao = async (dataStockProductoDiario) => {
+  try {
+    const query = `INSERT INTO STOCKPRODUCTOSDIARIOS (idProducto, idSucursal, stock, fechaValidez, fechaActualizacion, fechaCreacion)
+                   VALUES (?, ?, ?, ?, ?, ?);`;
+    const stockProducto = await Connection.execute(query, [
+      dataStockProductoDiario.idProducto,
+      dataStockProductoDiario.idSucursal,
+      dataStockProductoDiario.stock,
+      dataStockProductoDiario.fechaValidez,
+      dataStockProductoDiario.fechaActualizacion,
+      dataStockProductoDiario.fechaCreacion
+    ]);
+
+    const stockProductoDiarioIngresado = {
+        idStock: parseInt(stockProducto.toJSON().lastInsertRowid),
+        ...dataStockProductoDiario
+    }
+
+    return stockProductoDiarioIngresado;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const actualizarStockProductoDiarioDao = async (dataStockProductoDiario) => {
+  try {
+    const query = `UPDATE STOCKPRODUCTOSDIARIOS SET stock = ?, fechaActualizacion = ?
+                   where idProducto = ?
+                   and idSucursal = ?
+                   and fechaValidez = ?`;
+                   
+     const resUpdate = await Connection.execute(query, [
+      dataStockProductoDiario.stock,
+      dataStockProductoDiario.fechaActualizacion,
+      dataStockProductoDiario.idProducto,
+      dataStockProductoDiario.idSucursal,
+      dataStockProductoDiario.fechaValidez,
+    ]);
+
+    const dataStockProductoDiarioUpdate = {
+        idStock: parseInt(resUpdate.toJSON().lastInsertRowid),
+        ...dataStockProductoDiario
+    }
+
+    return dataStockProductoDiarioUpdate
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const eliminarStockProductoDiarioDao = async (idStockDiario) => {
+  try {
+    const query = "update STOCKPRODUCTOSDIARIOS set estado = 'N' where idStockDiario = ?;";
+    const stockProductoDiario = await Connection.execute(query, [idStockDiario]);
+    return stockProductoDiario.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}

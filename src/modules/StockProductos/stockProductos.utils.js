@@ -31,3 +31,36 @@ export const payloadStockProductoExistente = (productoExistente, stockProducto) 
     return payload;
 }
 
+export const crearPayloadStockProductoDiarioInexistente = (orden, detalle) => {
+    const idSucursal = orden.idSucursal;
+    const fechaValidez = orden.fechaAProducir;
+
+    const cotrolarStockDiarioPayload = {
+        idProducto: detalle.idProducto,
+        idSucursal: idSucursal,
+        stock: detalle.cantidadUnidades,
+        fechaValidez: fechaValidez,
+        fechaActualizacion: orden.fechaCreacion,
+        fechaCreacion: orden.fechaCreacion,
+    }
+
+    return cotrolarStockDiarioPayload;
+}
+
+export const crearPayloadStockProductoDiarioExistente = (orden, detalle, StockExistente) => {
+    const idSucursal = orden.idSucursal;
+    const fechaValidez = orden.fechaAProducir;
+
+    const nuevoStock = calcularStockActualizado(detalle.cantidadUnidades, StockExistente.stock);
+
+    const cotrolarStockDiarioPayload = {
+        idProducto: detalle.idProducto,
+        idSucursal: idSucursal,
+        stock: nuevoStock,
+        fechaValidez: fechaValidez,
+        fechaActualizacion: orden.fechaCreacion,
+        fechaCreacion: orden.fechaCreacion,
+    }
+
+    return cotrolarStockDiarioPayload;
+}

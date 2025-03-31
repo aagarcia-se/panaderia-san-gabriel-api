@@ -2,6 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarBatchConsumoOrdenProduccionServices } from "../consumosordenesproduccion/consumosordenes.service.js";
 import { CalcularCantidadIngredientes } from "../consumosordenesproduccion/cosumoordenesproduccion.utils.js";
+import { procesarStockPorOrdenProduccionServices } from "../StockProductos/stockProductos.service.js";
 import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
@@ -69,7 +70,11 @@ export const ingresarOrdenProduccionService = async (ordenProduccion) => {
     };
 
     // Ingresar la orden de produccion
-    const resultado = await ingresarOrdenProduccionDao(ordenParaDAO); 
+    const resultado = await ingresarOrdenProduccionDao(ordenParaDAO);
+    
+    if(resultado !== 0){
+      await procesarStockPorOrdenProduccionServices(ordenParaDAO)
+    }
 
     // Generar payload para consumo de ingredientes
     const OrdenProdNew = {

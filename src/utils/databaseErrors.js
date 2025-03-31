@@ -1,6 +1,6 @@
 const databaseErrorMap = {
   "UNIQUE constraint failed": {
-    message: "Dato Ingresado ya existe",
+    message: "ya existe",
     statusCode: 409,
     code: 401
   },
