@@ -48,7 +48,8 @@ export const consultarDetalleOrdenProduccionDao = async (idOrdenProduccion) => {
     }
 
     const queryDetalle = `select do.idDetalleOrdenProduccion, do.idOrdenProduccion, do.idProducto, p.nombreProducto, 
-                          p.idCategoria, cat.nombrecategoria, do.cantidadBandejas, do.cantidadUnidades, do.fechaCreacion
+                          p.idCategoria, cat.nombrecategoria, p.tipoProduccion, do.cantidadBandejas, do.cantidadUnidades,
+  						            do.cantidadHarina, do.fechaCreacion
                           from DETALLESORDENESPRODUCCION AS do
                           INNER JOIN ORDENESPRODUCCION as op on do.idOrdenProduccion = op.idOrdenProduccion
                           INNER JOIN PRODUCTOS as p on do.idProducto = p.idProducto
