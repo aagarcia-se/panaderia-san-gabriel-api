@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
 import { crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 
@@ -167,6 +167,21 @@ export const procesarStockPorOrdenProduccionServices = async (ordenProduccion) =
       })
     );
   }catch(error){
+    throw error;
+  }
+}
+
+export const consultarStockDiarioPorSucursalService = async (idSucursal, fecha) => {
+  try {
+    const stockDiario = await consultarStockDiarioPorSucursalDao(idSucursal, fecha);
+
+    if (stockDiario.length === 0) {
+      const error = getError(1);
+      throw new CustomError(error);
+    }
+
+    return stockDiario;
+  } catch (error) {
     throw error;
   }
 }

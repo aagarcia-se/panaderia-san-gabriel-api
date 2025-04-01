@@ -178,7 +178,7 @@ export const eliminarStockProductoDao = async (idStock) => {
 ----------------------------------------------------------------------*/
 export const consultarStockProductoDiarioDao = async (idProducto, idSucursal, fechaValidez) => {
   try {
-    const query = `select idStockDiario, idProducto, idSucursal, stock, fechaValidez from STOCKPRODUCTOSDiarios
+    const query = `select idStockDiario, idProducto, idSucursal, stock, fechaValidez from STOCKPRODUCTOSDIARIOS
                     where idProducto = ?
                     and idSucursal = ?
                     and fechaValidez = ?
@@ -258,6 +258,36 @@ export const eliminarStockProductoDiarioDao = async (idStockDiario) => {
     const query = "update STOCKPRODUCTOSDIARIOS set estado = 'N' where idStockDiario = ?;";
     const stockProductoDiario = await Connection.execute(query, [idStockDiario]);
     return stockProductoDiario.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+//Consultar para obtener todos los datos del hisotrial
+export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
+  try {
+    const query = `select std.idStockDiario, std.idProducto, p.nombreProducto, std.idSucursal, s.nombreSucursal,
+                    std.stock as cantidadExistente, std.fechaValidez
+                    from STOCKPRODUCTOSDIARIOS std
+                    inner join PRODUCTOS p ON std.idProducto = p.idProducto
+                    inner join SUCURSALES s ON std.idSucursal = s.idSucursal
+                    where std.idSucursal = ?
+                    and std.fechaValidez = ?
+                    and std.estado = 'A'
+                    order by std.idProducto asc;`;
+    const productosExistentes = await Connection.execute(query, [
+      idSucursal, 
+      fecha
+    ]);
+
+    if(productosExistentes.rows.length === 0){
+        return {
+        idStockDiario: 0,
+        }
+    }
+
+    return productosExistentes.rows;
   } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
