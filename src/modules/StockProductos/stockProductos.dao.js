@@ -75,12 +75,13 @@ export const eliminarHistorialStockDao = async (idStock) => {
 /*--------------------------------------------------------------------
 ------------- Gestion de la tabla Stock ------------------------------
 ----------------------------------------------------------------------*/
-export const consultarStockProductoDao = async (idProducto) => {
+export const consultarStockProductoDao = async (idProducto, idSucursal) => {
   try {
     const query = `select idStock, idProducto, idSucursal, stock from STOCKPRODUCTOS 
                     where idProducto = ?
+                    and idSucursal = ?
                     and estado = 'A';`;
-    const stockProducto = await Connection.execute(query, [idProducto]);
+    const stockProducto = await Connection.execute(query, [idProducto, idSucursal]);
 
     if(stockProducto.rows.length === 0){
         return {
@@ -267,11 +268,13 @@ export const eliminarStockProductoDiarioDao = async (idStockDiario) => {
 //Consultar para obtener todos los datos del hisotrial
 export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
   try {
-    const query = `select std.idStockDiario, std.idProducto, p.nombreProducto, std.idSucursal, s.nombreSucursal,
+    const query = `select std.idStockDiario, std.idProducto, p.nombreProducto, P.idCategoria, c.nombreCategoria,
+                    std.idSucursal, s.nombreSucursal,
                     std.stock as cantidadExistente, std.fechaValidez
                     from STOCKPRODUCTOSDIARIOS std
                     inner join PRODUCTOS p ON std.idProducto = p.idProducto
                     inner join SUCURSALES s ON std.idSucursal = s.idSucursal
+                    inner join CATEGORIAS c ON p.idCategoria = c.idCategoria
                     where std.idSucursal = ?
                     and std.fechaValidez = ?
                     and std.estado = 'A'

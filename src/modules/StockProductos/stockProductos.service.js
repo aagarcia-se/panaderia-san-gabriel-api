@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
-import { crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
+import { crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 
 export const consultarStockProductoService = async (idProducto) => {
@@ -48,30 +48,65 @@ export const registrarStockProductosService = async (dataStockProducto) => {
     return Promise.all(
       stockProductos.map(async (stockProducto) => {
         try {
-          // Consultar si el producto ya existe en el stock
-          const productoExistente = await consultarStockProductoDao(stockProducto.idProducto);   
 
-          // Determinar los datos actualizados según si el producto existe o no
-          const datosActualizados =  productoExistente.idStock !== 0
-            ? payloadStockProductoExistente(productoExistente, stockProducto)
-            : payloadStockProductoInexistente(stockProducto);
+          //control de stock general
+          if(stockProducto.controlarStock === 1 && stockProducto.controlarStockDiario === 0 ){
 
-          // Registrar el historial de stock
-          const insertHistorialStock = await IngresarHistorialStockDao(datosActualizados);
-          if (insertHistorialStock === 0) {
-            throw new CustomError(getError(2)); // Error al registrar
+            // Consultar si el producto ya existe en el stock
+            const productoExistente = await consultarStockProductoDao(stockProducto.idProducto, stockProducto.idSucursal);
+            if(productoExistente.idStock === 0){
+              const datosActualizados = payloadStockProductoInexistente(stockProducto);
+              
+              // Registrar el historial de stock
+              const insertHistorialStock = await IngresarHistorialStockDao(datosActualizados);
+
+              if (insertHistorialStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar
+              }
+
+              const operacionStock =  await registrarStockProductoDao(datosActualizados);
+
+              if (operacionStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar o actualizar
+              }
+
+              return operacionStock;
+
+            }else{
+              const datosActualizados =payloadStockProductoExistente(productoExistente, stockProducto)
+
+              // Registrar el historial de stock
+              const insertHistorialStock = await IngresarHistorialStockDao(datosActualizados);
+              
+              if (insertHistorialStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar
+              }
+
+              const operacionStock = await actualizarStockProductoDao(datosActualizados);
+              
+              if (operacionStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar o actualizar
+              }
+
+              return operacionStock;
+            }
+
           }
 
-          // Registrar o actualizar el stock del producto
-          const operacionStock = productoExistente && productoExistente.idStock !== 0
-            ? await actualizarStockProductoDao(datosActualizados)
-            : await registrarStockProductoDao(datosActualizados);
+          if(stockProducto.controlarStock === 0 && stockProducto.controlarStockDiario === 1 ){
 
-          if (operacionStock === 0) {
-            throw new CustomError(getError(2)); // Error al registrar o actualizar
+            const StockExistente = await consultarStockProductoDiarioDao(stockProducto.idProducto, stockProducto.idSucursal, stockProducto.fechaCreacion);
+            if (StockExistente.idStockDiario === 0) {
+              const payloadStockDiarioNuevo = payloadStockDiarioIngresoManualInexistente(stockProducto);
+              await registrarStockProductoDiarioDao(payloadStockDiarioNuevo);
+          } else {
+              const payloadStockDiarioExistente = payloadStockDiarioIngresoManualExistente(StockExistente, stockProducto);
+              await actualizarStockProductoDiarioDao(payloadStockDiarioExistente);
           }
 
-          return operacionStock;
+
+          }
+
         } catch (error) {
           throw error; // Propagar el error si es necesario
         }

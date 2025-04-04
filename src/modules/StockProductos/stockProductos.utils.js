@@ -31,6 +31,37 @@ export const payloadStockProductoExistente = (productoExistente, stockProducto) 
     return payload;
 }
 
+export const payloadStockDiarioIngresoManualInexistente = (stockProducto) => {
+    const payload = {
+        idProducto: stockProducto.idProducto,
+        idSucursal: stockProducto.idSucursal,
+        stock: stockProducto.stock,
+        fechaValidez: stockProducto.fechaCreacion,
+        fechaActualizacion: stockProducto.fechaActualizacion,
+        fechaCreacion: stockProducto.fechaCreacion,
+    
+    }
+
+    return payload;
+}
+
+export const payloadStockDiarioIngresoManualExistente = (StockExistente, stockProducto) => {
+
+    const nuevoStock = calcularStockActualizado(StockExistente.stock, stockProducto.stock);
+
+    const payload = {
+        idProducto: stockProducto.idProducto,
+        idSucursal: stockProducto.idSucursal,
+        stock: nuevoStock,
+        fechaActualizacion: stockProducto.fechaActualizacion,
+        fechaValidez: stockProducto.fechaCreacion
+
+
+    }
+
+    return payload;
+}
+
 export const crearPayloadStockProductoDiarioInexistente = (orden, detalle) => {
     const idSucursal = orden.idSucursal;
     const fechaValidez = orden.fechaAProducir;

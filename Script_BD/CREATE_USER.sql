@@ -50,7 +50,7 @@ INSERT INTO ROLESPERMISOS (idRol, idPermiso) VALUES
 (1, 6),
 (1, 7),
 (1, 8),
-(1, 8);
+(1, 9);
 
 -- Crear usuario administrador
 INSERT INTO USUARIOS (idUsuario, nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, estadoUsuario, fechaCreacion, estado) VALUES
