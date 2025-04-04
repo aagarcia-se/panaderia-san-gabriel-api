@@ -33,12 +33,16 @@ export const payloadStockProductoExistente = (productoExistente, stockProducto) 
 
 export const payloadStockDiarioIngresoManualInexistente = (stockProducto) => {
     const payload = {
+        idUsuario: stockProducto.idUsuario,
         idProducto: stockProducto.idProducto,
         idSucursal: stockProducto.idSucursal,
         stock: stockProducto.stock,
         fechaValidez: stockProducto.fechaCreacion,
         fechaActualizacion: stockProducto.fechaActualizacion,
         fechaCreacion: stockProducto.fechaCreacion,
+        cantidad: stockProducto.stock,
+        stockAnterior: 0,
+        stockNuevo: stockProducto.stock,
     
     }
 
@@ -50,13 +54,16 @@ export const payloadStockDiarioIngresoManualExistente = (StockExistente, stockPr
     const nuevoStock = calcularStockActualizado(StockExistente.stock, stockProducto.stock);
 
     const payload = {
+        idUsuario: stockProducto.idUsuario,
         idProducto: stockProducto.idProducto,
         idSucursal: stockProducto.idSucursal,
         stock: nuevoStock,
+        cantidad: nuevoStock,
+        stockAnterior: StockExistente.stock,
+        stockNuevo: stockProducto.stock,
         fechaActualizacion: stockProducto.fechaActualizacion,
-        fechaValidez: stockProducto.fechaCreacion
-
-
+        fechaValidez: stockProducto.fechaCreacion,
+        fechaCreacion: stockProducto.fechaCreacion,
     }
 
     return payload;

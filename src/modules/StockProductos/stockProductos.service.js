@@ -73,7 +73,6 @@ export const registrarStockProductosService = async (dataStockProducto) => {
               return operacionStock;
 
             }else{
-              console.log(stockProducto.idProducto)
               const datosActualizados =payloadStockProductoExistente(productoExistente, stockProducto)
 
               // Registrar el historial de stock
@@ -98,13 +97,29 @@ export const registrarStockProductosService = async (dataStockProducto) => {
 
             const StockExistente = await consultarStockProductoDiarioDao(stockProducto.idProducto, stockProducto.idSucursal, stockProducto.fechaCreacion);
             if (StockExistente.idStockDiario === 0) {
+        
               const payloadStockDiarioNuevo = payloadStockDiarioIngresoManualInexistente(stockProducto);
+
+              // Registrar el historial de stock
+              const insertHistorialStock = await IngresarHistorialStockDao(payloadStockDiarioNuevo);
+
+              if (insertHistorialStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar
+              }
+
               await registrarStockProductoDiarioDao(payloadStockDiarioNuevo);
-          } else {
+            } else {
               const payloadStockDiarioExistente = payloadStockDiarioIngresoManualExistente(StockExistente, stockProducto);
+             
+              // Registrar el historial de stock
+              const insertHistorialStock = await IngresarHistorialStockDao(payloadStockDiarioExistente);
+
+              if (insertHistorialStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar
+              }
+             
               await actualizarStockProductoDiarioDao(payloadStockDiarioExistente);
           }
-
 
           }
 
@@ -160,15 +175,11 @@ export const corregirStockProductosService = async (dataStockProducto) => {
                   // 7. Retornar el stock actualizado
                   return stockActualizado;
               } catch (error) {
-                  // Manejar errores individuales para cada producto
-                  console.error(`Error corrigiendo el stock del producto ${stockProductos.idProducto}:`, error);
                   throw error; // Propagar el error si es necesario
               }
           })
       );
   } catch (error) {
-      // Manejar errores generales
-      console.error('Error en corregirStockProductosService:', error);
       throw error;
   }
 };
