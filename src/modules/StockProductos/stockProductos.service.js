@@ -4,7 +4,7 @@ import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultar
 import { crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 
-export const consultarStockProductoService = async (idProducto) => {
+export const consultarStockProductoService = async (idProducto, idSucursal) => {
   try {
     const stockProducto = await consultarStockProductoDao(idProducto, idSucursal);
 

@@ -2,7 +2,7 @@ import { consultarStockDiarioPorSucursalService, consultarStockProductoService, 
 
 export const consultarStockProductoController = async (req, res, next) => {
   try {
-    const { idProducto, idSucursal } = req.query
+    const { idProducto, idSucursal } = req.query;
     const stockProducto = await consultarStockProductoService(idProducto, idSucursal);
     const responseData = {
       status: 200,
