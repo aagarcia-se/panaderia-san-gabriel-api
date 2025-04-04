@@ -6,7 +6,7 @@ import { crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiar
 
 export const consultarStockProductoService = async (idProducto) => {
   try {
-    const stockProducto = await consultarStockProductoDao(idProducto);
+    const stockProducto = await consultarStockProductoDao(idProducto, idSucursal);
 
     if (!stockProducto) {
       const error = getError(1);
@@ -19,9 +19,9 @@ export const consultarStockProductoService = async (idProducto) => {
   }
 }
 
-export const consultarStockProductosService = async () => {
+export const consultarStockProductosService = async (idSucursal) => {
   try {
-    const stockProductos = await consultarStockProductosDao();
+    const stockProductos = await consultarStockProductosDao(idSucursal);
 
     if (stockProductos.length === 0) {
       const error = getError(1);
@@ -73,6 +73,7 @@ export const registrarStockProductosService = async (dataStockProducto) => {
               return operacionStock;
 
             }else{
+              console.log(stockProducto.idProducto)
               const datosActualizados =payloadStockProductoExistente(productoExistente, stockProducto)
 
               // Registrar el historial de stock

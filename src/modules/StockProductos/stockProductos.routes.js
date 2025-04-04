@@ -4,8 +4,8 @@ import { consultarStockDiarioPorSucursalController, consultarStockProductoContro
 
 export const stockRoute = Router();
 
-stockRoute.get("/consultar-stock-producto/:idProducto", authMiddleware, consultarStockProductoController);
-stockRoute.get("/consultar-stock-productos", authMiddleware, consultarStockProductosController);
+stockRoute.get("/consultar-stock-producto?idProducto&idsucursal", authMiddleware, consultarStockProductoController);
+stockRoute.get("/consultar-stock-productos/:idSucursal", authMiddleware, consultarStockProductosController);
 stockRoute.get("/consultar-stock-sucursal", authMiddleware, consultarStockDiarioPorSucursalController);
 stockRoute.post("/ingresar-stock-productos", authMiddleware, registrarStockProductoController);
 stockRoute.put("/corregir-stock-productos", authMiddleware, corregirStockProductosController);

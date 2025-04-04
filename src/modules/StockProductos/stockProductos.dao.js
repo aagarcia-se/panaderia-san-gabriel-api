@@ -96,17 +96,18 @@ export const consultarStockProductoDao = async (idProducto, idSucursal) => {
   }
 } 
 
-export const consultarStockProductosDao = async () => {
+export const consultarStockProductosDao = async (idSucursal) => {
     try{
         const query = `select sp.idStock, sp.idProducto, p.nombreProducto, p.idCategoria, cat.nombreCategoria,
-                        sp.idSucursal, su.nombreSucursal, sp.stock, sp.fechaActualizacion
+                        sp.idSucursal, su.nombreSucursal, sp.stock as cantidadExistente, sp.fechaActualizacion
                         from STOCKPRODUCTOS sp
                         INNER JOIN PRODUCTOS p ON sp.idProducto = p.idProducto
                         INNER JOIN CATEGORIAS cat ON p.idCategoria = cat.idCategoria
                         INNER JOIN SUCURSALES su ON sp.idSucursal = su.idSucursal
-                        where sp.estado = 'A'
-                        order by idStock asc;`;
-    const stockProductos = await Connection.execute(query);
+                        where sp.idSucursal = ?
+                        and sp.estado = 'A'
+                        order by sp.idStock asc;`;
+    const stockProductos = await Connection.execute(query, [idSucursal]);
     return stockProductos.rows;
     }catch(error){
       const dbError = getDatabaseError(error.message);
@@ -140,12 +141,10 @@ export const registrarStockProductoDao = async (dataStockProducto) => {
 
 export const actualizarStockProductoDao = async (dataStockProducto) => {
   try {
-    const query = `UPDATE STOCKPRODUCTOS SET idProducto = ?, idSucursal = ?,  stock = ?, fechaActualizacion = ?
+    const query = `UPDATE STOCKPRODUCTOS SET stock = ?, fechaActualizacion = ?
                    where idProducto = ?`;
                    
      const resUpdate = await Connection.execute(query, [
-        dataStockProducto.idProducto,
-        dataStockProducto.idSucursal,
         dataStockProducto.stock,
         dataStockProducto.fechaActualizacion,
         dataStockProducto.idProducto
