@@ -6,10 +6,9 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 ----------------- Gestion de la tabla Historial Stock ----------------
 ----------------------------------------------------------------------*/
 export const IngresarHistorialStockDao = async (dataHistorialStock) => {
-  console.log( dataHistorialStock);
     try{
-        const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, cantidad, stockAnterior, stockNuevo, fechaMovimiento, tipoReferencia)
-        values (?, ?, ?, 'INGRESO', ?, ?, ?, ?, 'CONTROL DE STOCK');`;
+        const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, cantidad, stockAnterior, stockNuevo, fechaMovimiento, observaciones, tipoReferencia)
+        values (?, ?, ?, 'INGRESO', ?, ?, ?, ?, ?, 'CONTROL DE STOCK');`;
             const historialStock = await Connection.execute(insert, [
             dataHistorialStock.idUsuario,
             dataHistorialStock.idProducto,
@@ -18,6 +17,7 @@ export const IngresarHistorialStockDao = async (dataHistorialStock) => {
             dataHistorialStock.stockAnterior,
             dataHistorialStock.stockNuevo,
             dataHistorialStock.fechaCreacion,
+            dataHistorialStock.observaciones || "Control de stock general",
             ]);
 
         const historialStockIngresado = {

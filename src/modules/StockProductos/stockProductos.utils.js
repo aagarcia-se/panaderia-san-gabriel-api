@@ -10,6 +10,7 @@ export const payloadStockProductoInexistente = (stockProducto) => {
         cantidad: stockProducto.stock,
         stockAnterior: 0,
         stockNuevo: stockProducto.stock,
+        observaciones: "Control de stock general",
     };
     
     return payload;
@@ -26,6 +27,7 @@ export const payloadStockProductoExistente = (productoExistente, stockProducto) 
         cantidad: stockProducto.stock,
         stockAnterior: productoExistente.stock,
         stockNuevo: nuevoStock,
+        observaciones: "Control de stock general",
     };
     
     return payload;
@@ -43,6 +45,7 @@ export const payloadStockDiarioIngresoManualInexistente = (stockProducto) => {
         cantidad: stockProducto.stock,
         stockAnterior: 0,
         stockNuevo: stockProducto.stock,
+        observaciones: "Control de stock diario",
     
     }
 
@@ -64,6 +67,7 @@ export const payloadStockDiarioIngresoManualExistente = (StockExistente, stockPr
         fechaActualizacion: stockProducto.fechaActualizacion,
         fechaValidez: stockProducto.fechaCreacion,
         fechaCreacion: stockProducto.fechaCreacion,
+        observaciones: "Control de stock diario",
     }
 
     return payload;
@@ -80,6 +84,7 @@ export const crearPayloadStockProductoDiarioInexistente = (orden, detalle) => {
         fechaValidez: fechaValidez,
         fechaActualizacion: orden.fechaCreacion,
         fechaCreacion: orden.fechaCreacion,
+        observaciones: "Control de stock diario",
     }
 
     return cotrolarStockDiarioPayload;
@@ -98,6 +103,7 @@ export const crearPayloadStockProductoDiarioExistente = (orden, detalle, StockEx
         fechaValidez: fechaValidez,
         fechaActualizacion: orden.fechaCreacion,
         fechaCreacion: orden.fechaCreacion,
+        observaciones: "Control de stock diario",
     }
 
     return cotrolarStockDiarioPayload;
