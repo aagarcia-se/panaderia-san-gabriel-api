@@ -16,7 +16,7 @@ export const IngresarHistorialStockDao = async (dataHistorialStock) => {
             dataHistorialStock.cantidad,
             dataHistorialStock.stockAnterior,
             dataHistorialStock.stockNuevo,
-            dataHistorialStock.fechaCreacion,
+            dataHistorialStock.fechaActualizacion,
             dataHistorialStock.observaciones || "Control de stock general",
             ]);
 
