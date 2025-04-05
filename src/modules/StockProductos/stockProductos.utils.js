@@ -155,10 +155,10 @@ export const crearPayloadHistorial = (dataNueva, dataExistente, tipoMovimiento, 
             referencia = "Control de stock";
             break;
         case 2:
-            referencia = `Orden - ${dataNueva.idOrden}`;
+            referencia = `Orden-${dataNueva.idOrden}`;
             break;
         case 3:
-            referencia = `venta - ${dataNueva.idVenta}`;
+            referencia = `venta-${dataNueva.idVenta}`;
             break;
     }
 

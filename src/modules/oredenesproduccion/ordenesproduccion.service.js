@@ -73,7 +73,8 @@ export const ingresarOrdenProduccionService = async (ordenProduccion) => {
     const resultado = await ingresarOrdenProduccionDao(ordenParaDAO);
     
     if(resultado !== 0){
-      await procesarStockPorOrdenProduccionServices(ordenParaDAO)
+      ordenParaDAO.orden.idOrden = resultado.idOrdenGenerada;
+      await procesarStockPorOrdenProduccionServices(ordenParaDAO);
     }
 
     // Generar payload para consumo de ingredientes
