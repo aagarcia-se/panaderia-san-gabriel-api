@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
-import { crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
+import { crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 
 export const consultarStockProductoService = async (idProducto, idSucursal) => {
@@ -202,9 +202,24 @@ export const procesarStockPorOrdenProduccionServices = async (ordenProduccion) =
           
           if (StockExistente.idStockDiario === 0) {
               const payloadStockDiarioNuevo = crearPayloadStockProductoDiarioInexistente(orden, detalle);
+              const payloadHistorial = crearPayloadHistorial(payloadStockDiarioNuevo, null, 1, 2, 2);
+
+              // Registrar el historial de stock
+              const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
+              if (insertHistorialStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar
+              }
+
               await registrarStockProductoDiarioDao(payloadStockDiarioNuevo);
           } else {
               const payloadStockDiarioExistente = crearPayloadStockProductoDiarioExistente(orden, detalle, StockExistente);
+              const payloadHistorial = crearPayloadHistorial(payloadStockDiarioExistente, StockExistente, 1, 2, 2);
+              // Registrar el historial de stock
+              const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
+              if (insertHistorialStock === 0) {
+                throw new CustomError(getError(2)); // Error al registrar
+              }
+
               await actualizarStockProductoDiarioDao(payloadStockDiarioExistente);
           }
         }else if(detalle.tipoProduccion === "bandejas" && detalle.controlarStock === 1 && detalle.controlarStockDiario === 0){
