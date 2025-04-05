@@ -115,8 +115,6 @@ export const crearPayloadStockProductoDiarioExistente = (orden, detalle, StockEx
 
 export const crearPayloadHistorial = (dataNueva, dataExistente, tipoMovimiento, observaciones, ref) => {
 
-    console.log(dataNueva);
-
     let tipoMov = "";
     let observ = "";
     let referencia = "";
@@ -176,8 +174,5 @@ export const crearPayloadHistorial = (dataNueva, dataExistente, tipoMovimiento, 
         observaciones: observ,
         tipoReferencia: referencia,
     }
-
-    console.log(payload);
-
     return payload;
 }
