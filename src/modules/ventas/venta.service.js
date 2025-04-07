@@ -3,12 +3,8 @@ import { getError } from "../../utils/generalErrors.js";
 import { registrarIngresoDiarioPorTurnoService } from "../ingresos/ingresos.service.js";
 import { crearPayloadingresos } from "../ingresos/ingresos.utils.js";
 import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/ordenesproduccion.service.js";
-import {
-  consultarDetalleVentaDao,
-  consultarVentasPorUsuarioDao,
-  eliminarVentaDao,
-  ingresarVentaDao,
-} from "./ventas.dao.js";
+import { descontarStockPorVentas } from "../StockProductos/stockProductos.service.js";
+import { consultarDetalleVentaDao, consultarVentasPorUsuarioDao, eliminarVentaDao, ingresarVentaDao, } from "./ventas.dao.js";
 import { procesarVentaService } from "./ventas.utils.js";
 
 export const ingresarVentaService = async (venta) => {
@@ -22,6 +18,8 @@ export const ingresarVentaService = async (venta) => {
     if (resVenta === 0) {
       throw new CustomError(getError(2));
     }
+
+    await descontarStockPorVentas(ventaDetalleProcesado);//debitar stock de las ventas ingresadas
 
     const detalleingreso = crearPayloadingresos(
       resVenta.idVenta,

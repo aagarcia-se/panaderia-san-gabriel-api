@@ -143,12 +143,15 @@ export const registrarStockProductoDao = async (dataStockProducto) => {
 export const actualizarStockProductoDao = async (dataStockProducto) => {
   try {
     const query = `UPDATE STOCKPRODUCTOS SET stock = ?, fechaActualizacion = ?
-                   where idProducto = ?`;
+                   where idProducto = ?
+                   and idSucursal = ?`
+                   ;
                    
      const resUpdate = await Connection.execute(query, [
         dataStockProducto.stock,
         dataStockProducto.fechaActualizacion,
-        dataStockProducto.idProducto
+        dataStockProducto.idProducto,
+        dataStockProducto.idSucursal,
     ]);
 
     const dataStockProductoUpdate = {

@@ -4,6 +4,11 @@ export const calcularStockActualizado = (existencias, nuevoIngreso) => {
     return nuevoStock;
 }
 
+export const calcularDebitoStock = (existencias, nuevoEgreso) => {
+    const nuevoStock = existencias - nuevoEgreso;
+    return nuevoStock;
+}
+
 export const payloadStockProductoInexistente = (stockProducto) => {
     const payload = {
         ...stockProducto,
@@ -174,5 +179,31 @@ export const crearPayloadHistorial = (dataNueva, dataExistente, tipoMovimiento, 
         observaciones: observ,
         tipoReferencia: referencia,
     }
+    return payload;
+}
+
+export const crearPayloadActualizarDebitoStockGeneral = (stockExistente, detalleVenta, idSucursal) => {
+
+    const stockActualizado = stockExistente.stock > 0 ? calcularDebitoStock(stockExistente.stock, detalleVenta.cantidadVendida) : 
+    calcularDebitoStock(0, detalleVenta.cantidadVendida) ;
+
+    const payload = {
+        idProducto: detalleVenta.idProducto,
+        idSucursal: idSucursal,
+        stock: stockActualizado,
+        fechaActualizacion: detalleVenta.fechaCreacion,
+    }
+    return payload;
+}
+
+export const crearPayloadIngresarDebitoStockGeneral = (idSucursal, detalleVenta) => {
+    const payload = {
+        idProducto: detalleVenta.idProducto,
+        idSucursal: idSucursal,
+        stock: calcularDebitoStock(0, detalleVenta.cantidadVendida),
+        fechaActualizacion: detalleVenta.fechaCreacion,
+        fechaCreacion: detalleVenta.fechaCreacion,
+    }
+
     return payload;
 }

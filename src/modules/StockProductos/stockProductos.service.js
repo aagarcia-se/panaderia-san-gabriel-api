@@ -1,9 +1,11 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
-import { crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
+import { crearPayloadActualizarDebitoStockGeneral, crearPayloadHistorial, crearPayloadIngresarDebitoStockGeneral, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
-
+/*------------------------------------------------------------------------------
+--------------------- Control de stock suma de productos -----------------------
+--------------------------------------------------------------------------------*/
 export const consultarStockProductoService = async (idProducto, idSucursal) => {
   try {
     const stockProducto = await consultarStockProductoDao(idProducto, idSucursal);
@@ -91,9 +93,8 @@ export const registrarStockProductosService = async (dataStockProducto) => {
               return operacionStock;
             }
 
-          }
-
-          if(stockProducto.controlarStock === 0 && stockProducto.controlarStockDiario === 1 ){
+          }else if(stockProducto.controlarStock === 0 && stockProducto.controlarStockDiario === 1 ){
+            
 
             const StockExistente = await consultarStockProductoDiarioDao(stockProducto.idProducto, stockProducto.idSucursal, stockProducto.fechaCreacion);
             if (StockExistente.idStockDiario === 0) {
@@ -186,7 +187,7 @@ export const corregirStockProductosService = async (dataStockProducto) => {
 
 /*------------------------------------------------------------------------------
 ---------- Control de stock productos ingreso ordenes de produccion ------------
---------------------------------------------------------------------------------*/
+-------------------------- (Suma de productos) ---------------------------------*/
 export const procesarStockPorOrdenProduccionServices = async (ordenProduccion) => {
   try{
     const {orden, detallesOrden} = ordenProduccion;
@@ -243,6 +244,55 @@ export const consultarStockDiarioPorSucursalService = async (idSucursal, fecha) 
     }
 
     return stockDiario;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+/*------------------------------------------------------------------------------
+--------------------- Control de stock ventas de productos ---------------------
+------------------------------ (Resta de stock) -------------------------------*/
+export const descontarStockPorVentas = async (venta) => {
+  try {
+    const {encabezadoVenta, detallesVenta} = venta;
+
+    Promise.all(
+      detallesVenta.map(async (detalle) => {
+        try{
+
+          if(detalle.controlarStock === 1 && detalle.controlarStockDiario === 0){
+            const StockExistente = await consultarStockProductoDao(detalle.idProducto, encabezadoVenta.idSucursal);
+            
+            if(StockExistente.idStock !== 0){
+              const paylodDescStockGeneral = crearPayloadActualizarDebitoStockGeneral(StockExistente, detalle, encabezadoVenta.idSucursal);
+              const resUpdateStockGeneral = await actualizarStockProductoDao(paylodDescStockGeneral);
+            
+            }else{
+
+              if(detalle.cantidadVendida !== 0){
+                const paylodDescStockGeneral = crearPayloadIngresarDebitoStockGeneral(encabezadoVenta.idSucursal, detalle);
+                const resInsertStockGeneral = await registrarStockProductoDao(paylodDescStockGeneral);
+              }
+
+              
+
+            }
+
+
+
+
+
+            
+            
+          }
+
+
+        }catch(error){
+          throw error; // Propagar el error si es necesario
+        }
+      })
+    );
   } catch (error) {
     throw error;
   }
