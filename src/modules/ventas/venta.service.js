@@ -11,7 +11,7 @@ export const ingresarVentaService = async (venta) => {
   try {
     // Procesar detalles de la venta antes de ingresarla
     const ventaDetalleProcesado = await procesarVentaService(venta);
-
+    
     // Guardar la venta en la base de datos
     const resVenta = await ingresarVentaDao(ventaDetalleProcesado);
 

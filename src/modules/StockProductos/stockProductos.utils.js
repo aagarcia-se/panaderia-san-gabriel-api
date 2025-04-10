@@ -196,13 +196,26 @@ export const crearPayloadActualizarDebitoStockGeneral = (stockExistente, detalle
     return payload;
 }
 
-export const crearPayloadIngresarDebitoStockGeneral = (idSucursal, detalleVenta) => {
+/*export const crearPayloadIngresarDebitoStockGeneral = (idSucursal, detalleVenta) => {
     const payload = {
         idProducto: detalleVenta.idProducto,
         idSucursal: idSucursal,
         stock: calcularDebitoStock(0, detalleVenta.cantidadVendida),
         fechaActualizacion: detalleVenta.fechaCreacion,
         fechaCreacion: detalleVenta.fechaCreacion,
+    }
+
+    return payload;
+}*/
+
+export const crearPayloadActualizarDebitoStockDiario = (stockDiarioExistente, detalleVenta, idSucursal) => {
+
+    const payload = {
+        idProducto: detalleVenta.idProducto,
+        idSucursal: idSucursal,
+        stock: calcularDebitoStock(stockDiarioExistente.stock, detalleVenta.cantidadVendida),
+        fechaActualizacion: detalleVenta.fechaCreacion,
+        fechaValidez: stockDiarioExistente.fechaValidez,
     }
 
     return payload;
