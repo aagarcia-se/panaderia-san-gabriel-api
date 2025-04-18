@@ -35,6 +35,10 @@ VALUES(8, 'Config Materia Prima', 'Configuraciones generales, como recetas, mont
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(9, 'Stock de productos', 'Visuzalizar y gestionar el stock de productos', '/stock-productos', '2025-01-25', 'A');
 
+-- Permiso ingreso de ordenes especiales
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(10, 'Ordenes especiales', 'VIngreso y gestion de ordenes especiales', '/pedido-especial', '2025-01-25', 'A');
+
 
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
@@ -51,6 +55,7 @@ INSERT INTO ROLESPERMISOS (idRol, idPermiso) VALUES
 (1, 7),
 (1, 8),
 (1, 9);
+(1, 10);
 
 -- Crear usuario administrador
 INSERT INTO USUARIOS (idUsuario, nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, estadoUsuario, fechaCreacion, estado) VALUES
