@@ -64,7 +64,8 @@ export const consultarOrdenesEspecialesDao = async () => {
                         oe.fechaEntrega, oe.FechaAproducir, oe.idUsuario, us.usuario ordenIngresadaPor,
                         oe.estado  from ORDENESESPECIALES oe
                         inner join SUCURSALES su ON oe.idSucursal = su.idSucursal
-                        inner join USUARIOS us ON oe.idUsuario = us.idUsuario;`;
+                        inner join USUARIOS us ON oe.idUsuario = us.idUsuario
+                        order by oe.idOrdenEspecial desc;`;
 
         const OrdenesEspeciales = await Connection.execute(query);
 
