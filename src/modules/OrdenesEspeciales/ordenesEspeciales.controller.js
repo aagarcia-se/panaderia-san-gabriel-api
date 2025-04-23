@@ -1,4 +1,4 @@
-import { consultarOrdenesEspecialesServices, consultarOrdenEspecialByIdServices, ingresarOrdenEspecialServices } from "./ordenesEspeciales.service.js";
+import { consultarOrdenesEspecialesServices, consultarOrdenEspecialByIdServices, elminarOrdenEspecialByIdServices, ingresarOrdenEspecialServices } from "./ordenesEspeciales.service.js";
 
 
 export const ingresarOrdenEspecialController = async (req, res, next) => {
@@ -37,6 +37,22 @@ export const consultarOrdenEspecialByIdController = async (req, res, next) => {
         const responseData = {
             status: 200,
             message: "Constulta exitosa",
+            ordenEspecial,
+        }
+
+        res.status(200).json(responseData);
+    }catch(error){
+        next(error); // Pasa el error al middleware de manejo de errores
+    }
+}
+
+export const eliminarOrdenEspecialByIdController = async (req, res, next) => {
+    try{
+        const {idOrdenEspecial} = req.params;
+        const ordenEspecial = await elminarOrdenEspecialByIdServices(idOrdenEspecial);
+        const responseData = {
+            status: 200,
+            message: "Orden Especial Eliminada con exitosa",
             ordenEspecial,
         }
 

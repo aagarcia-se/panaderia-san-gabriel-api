@@ -74,7 +74,7 @@ export const consultarOrdenesEspecialesDao = async () => {
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
-}
+};
 
 export const consultarOrdeEspecialByIdDao = async (idOrdenEspecial) => {
     try{
@@ -105,8 +105,20 @@ export const consultarOrdeEspecialByIdDao = async (idOrdenEspecial) => {
         ordenDetalle: detalle.rows
       };
     }catch(error){
-        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
+};
+
+export const elminarOrdenEspecialByIdDao = async (idOrdenEspecial) => {
+  try{
+    const script = `delete from ORDENESESPECIALES where idOrdenEspecial = ?;`;
+
+    const resDelete = await Connection.execute(script, [idOrdenEspecial]);
+
+    return resDelete.rowsAffected;
+  }catch(error){
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
