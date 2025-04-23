@@ -122,3 +122,45 @@ export const elminarOrdenEspecialByIdDao = async (idOrdenEspecial) => {
     throw new CustomError(dbError);
   }
 }
+
+export const actualizarOrdenEspecialByIdDao = async (ordenesEspeciales) => {
+  try{
+    const { ordenEncabezado, ordenDetalle } = ordenesEspeciales;
+
+    const scriptUpdateHeader = `update ORDENESESPECIALES SET idSucursal = ? , idUsuario = ?, nombreCliente = ?, 
+                                telefonoCliente = ?, fechaEntrega = ?, fechaAProducir = ?
+                                where idOrdenEspecial = ?`;
+
+    const resUpdateHader = await Connection.execute(scriptUpdateHeader, [
+      ordenEncabezado.idSucursal,
+      ordenEncabezado.idUsuario,
+      ordenEncabezado.nombreCliente,
+      ordenEncabezado.telefonoCliente,
+      ordenEncabezado.fechaEntrega,
+      ordenEncabezado.fechaAProducir,
+      ordenEncabezado.idOrdenEspecial
+    ]);
+
+    if(resUpdateHader.rowsAffected === 0){
+      return 0
+    }
+
+    const scriptUpdateDetalle = `update DETALLESORDENESESPECIALES set cantidadUnidades = ?
+                                 where idOrdenEspecial = ?`;
+
+    const batch = ordenDetalle.map((detalle) => ({
+      sql: scriptUpdateDetalle,
+      args: [
+        detalle.cantidadUnidades,
+        ordenEncabezado.idOrdenEspecial
+      ]
+    }));
+
+    const resBatchDetallet = await Connection.batch(batch);
+
+    return ordenesEspeciales;
+  }catch(error){
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}

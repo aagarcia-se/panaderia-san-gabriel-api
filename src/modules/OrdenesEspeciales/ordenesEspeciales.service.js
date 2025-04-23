@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { consultarOrdeEspecialByIdDao, consultarOrdenesEspecialesDao, elminarOrdenEspecialByIdDao, ingresarOrdenEspecialDao } from "./ordenesEspeciales.dao.js";
+import { actualizarOrdenEspecialByIdDao, consultarOrdeEspecialByIdDao, consultarOrdenesEspecialesDao, elminarOrdenEspecialByIdDao, ingresarOrdenEspecialDao } from "./ordenesEspeciales.dao.js";
 
 export const ingresarOrdenEspecialServices = async (ordenEspecial) => {
     try{
@@ -60,3 +60,15 @@ export const elminarOrdenEspecialByIdServices = async (idOrdenEspecial) =>{
     }
 }
 
+export const actualizarOrdenEspecialByIdServices = async (ordenesEspeciales) => {
+    try{
+        const resUpdate = await actualizarOrdenEspecialByIdDao(ordenesEspeciales);
+        if(resUpdate === 0){
+            const error = getError(3);
+            throw new CustomError(error);
+        }
+        return resUpdate;
+    }catch(error){
+        throw error;
+    }
+}
