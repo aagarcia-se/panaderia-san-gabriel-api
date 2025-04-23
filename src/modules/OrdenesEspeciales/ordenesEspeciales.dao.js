@@ -146,13 +146,13 @@ export const actualizarOrdenEspecialByIdDao = async (ordenesEspeciales) => {
     }
 
     const scriptUpdateDetalle = `update DETALLESORDENESESPECIALES set cantidadUnidades = ?
-                                 where idOrdenEspecial = ?`;
+                                 where idDetalleOrdenEspecial = ?`;
 
     const batch = ordenDetalle.map((detalle) => ({
       sql: scriptUpdateDetalle,
       args: [
         detalle.cantidadUnidades,
-        ordenEncabezado.idOrdenEspecial
+        detalle.idDetalleOrdenEspecial
       ]
     }));
 
