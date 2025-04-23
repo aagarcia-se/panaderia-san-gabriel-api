@@ -24,9 +24,7 @@ export const consultarSucursalesServices = async () => {
 
 export const ingresarSucursalServices = async (sucursal) => {
   try {
-    const sucursalData = new Sucursal(sucursal);
-
-    const result = await ingresarSucursalDao(sucursalData);
+    const result = await ingresarSucursalDao(sucursal);
 
     if (result === 0) {
       const error = getError(2);
@@ -39,10 +37,8 @@ export const ingresarSucursalServices = async (sucursal) => {
   }
 };
 
-export const actualizarSucursalServices = async (sucursalData) => {
+export const actualizarSucursalServices = async (sucursal) => {
   try {
-    const sucursal = new Sucursal(sucursalData);
-
     const result = await actualizarSucursalDao(sucursal);
 
     if (result === 0) {
@@ -58,8 +54,7 @@ export const actualizarSucursalServices = async (sucursalData) => {
 
 export const eliminarSucursalServices = async (idSucursal) => {
   try {
-    const sucursal = new Sucursal({ idSucursal });
-    const result = await eliminarSucursalDao(sucursal.consultarIdSucursal());
+    const result = await eliminarSucursalDao(idSucursal);
 
     if (result === 0) {
       const error = getError(4);

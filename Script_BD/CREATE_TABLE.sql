@@ -11,19 +11,25 @@ DROP TABLE IF EXISTS RECETAS;
 DROP TABLE IF EXISTS INGREDIENTES;
 DROP TABLE IF EXISTS DETALLESVENTAS;
 DROP TABLE IF EXISTS VENTAS;
-DROP TABLE IF EXISTS SUCURSALES;
-DROP TABLE IF EXISTS USUARIOS;
-DROP TABLE IF EXISTS ROLES;
 DROP TABLE IF EXISTS STOCKPRODUCTOS;
+DROP TABLE IF EXISTS STOCKPRODUCTOSDIARIOS;
+DROP TABLE IF EXISTS HISTORIALSTOCK;
+DROP TABLE IF EXISTS INGRESOSDIARIOS;
+DROP TABLE IF EXISTS INGRESOSDIARIOS;
 DROP TABLE IF EXISTS PRODUCTOS;
 DROP TABLE IF EXISTS CATEGORIAS;
+DROP TABLE IF EXISTS USUARIOS;
+DROP TABLE IF EXISTS ROLES;
+DROP TABLE IF EXISTS SUCURSALES;
+DROP TABLE IF EXISTS ORDENESESPECIALES;
+DROP TABLE IF EXISTS DETALLESORDENESESPECIALES;
 
 
 
 -- Tabla SUCURSALES
 CREATE TABLE IF NOT EXISTS SUCURSALES (
     idSucursal INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombreSucursal TEXT NOT NULL UNIQUE,
+    nombreSucursal TEXT NOT NULL,
     direccionSucursal TEXT,
     municipioSucursal TEXT,
     departamentoSucursal TEXT,
@@ -107,7 +113,9 @@ CREATE TABLE IF NOT EXISTS PRODUCTOS (
     idProducto INTEGER PRIMARY KEY AUTOINCREMENT,
     nombreProducto TEXT NOT NULL,
     idCategoria INTEGER NOT NULL,
-    controlarStock INTEGER NOT NULL DEFAULT 1 CHECK(controlarStock IN (0, 1)), -- 0 = No controlar, 1 = Controlar
+    controlarStock INTEGER NOT NULL DEFAULT 1 CHECK(controlarStock IN (0, 1)), -- 0 = No controlar, 1 = Controlar,
+    controlarStockDiario INTEGER NOT NULL DEFAULT 0 CHECK(controlarStockDiario IN (0, 1)), -- 0 = No controlar, 1 = Controlar,
+    tipoProduccion TEXT NOT NULL DEFAULT "otros",  
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idCategoria) REFERENCES CATEGORIAS(idCategoria)
@@ -165,6 +173,7 @@ CREATE TABLE IF NOT EXISTS DETALLESORDENESPRODUCCION (
     idProducto INTEGER NOT NULL,
     cantidadBandejas INTEGER NOT NULL,
     cantidadUnidades INTEGER NOT NULL,
+    cantidadHarina INTEGER NOT NULL,
     fechaCreacion DATE NOT NULL,
     FOREIGN KEY (idOrdenProduccion) REFERENCES ORDENESPRODUCCION(idOrdenProduccion) ON DELETE CASCADE,
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE
@@ -196,7 +205,7 @@ CREATE TABLE IF NOT EXISTS RECETAS (
     idProducto INTEGER NOT NULL,
     idIngrediente INTEGER NOT NULL,
     cantidadNecesaria REAL NOT NULL, -- Cantidad de ingrediente necesaria para producir una unidad del producto
-    unidadMedida TEXT NOT NULL, -- Unidad de medida (kg, gr, litros, etc.)
+    unidadMedida TEXT NOT NULL DEFAULT 'Lb', -- Unidad de medida (kg, gr, litros, etc.)
     fechaCreacion DATE NOT NULL,
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
     FOREIGN KEY (idIngrediente) REFERENCES INGREDIENTES(idIngrediente) ON DELETE CASCADE
@@ -247,7 +256,7 @@ CREATE TABLE IF NOT EXISTS DETALLESVENTAS (
 );
 
 
--------- Tablas para control stock -----------------
+-------- Tablas para control stock ------------------
 -----------------------------------------------------
 -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
@@ -256,11 +265,51 @@ CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
     idSucursal INTEGER NOT NULL,
     stock INTEGER NOT NULL,
     fechaActualizacion DATETIME NOT NULL,
-    fechaCreacion DATE NOT NULL,
+    fechaCreacion DATETIME NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
-    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE CASCADE,
-    UNIQUE(idProducto, idSucursal) -- Evita duplicados de producto-sucursal
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE CASCADE
+);
+
+
+-- Tablas para control stock productos de diarios ---
+-----------------------------------------------------
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS STOCKPRODUCTOSDIARIOS (
+    idStockDiario INTEGER PRIMARY KEY AUTOINCREMENT,
+    idOrdenProduccion INTEGER NOT NULL,
+    idProducto INTEGER NOT NULL, 
+    idSucursal INTEGER NOT NULL,
+    stock INTEGER NOT NULL,
+    fechaValidez DATETIME NOT NULL DEFAULT CURRENT_DATE,
+    fechaActualizacion DATETIME NOT NULL,
+    fechaCreacion DATETIME NOT NULL,
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
+    FOREIGN KEY (idOrdenProduccion) REFERENCES ORDENESPRODUCCION(idOrdenProduccion) ON DELETE CASCADE,
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE CASCADE
+);
+
+-------- Tablas para control stock ------------------
+-----------------------------------------------------
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS HISTORIALSTOCK (
+    idHistorial INTEGER PRIMARY KEY AUTOINCREMENT, -- Identificador único del registro
+    idUsuario INTEGER NOT NULL,                -- Identificador del usuario que realizó la venta
+    idProducto INTEGER NOT NULL, -- ID del producto relacionado
+    idSucursal INTEGER NOT NULL, -- ID de la sucursal relacionada
+    tipoMovimiento TEXT NOT NULL CHECK(tipoMovimiento IN ('INGRESO', 'EGRESO', 'CORRECCION', 'AJUSTE')), -- Tipo de movimiento
+    stockAnterior INTEGER NOT NULL, -- Stock antes del movimiento
+    stockNuevo INTEGER NOT NULL, -- Stock después del movimiento
+    cantidad INTEGER NOT NULL, -- Cantidad afectada (positiva para ingresos, negativa para egresos)
+    fechaMovimiento DATETIME NOT NULL, -- Fecha y hora del movimiento
+    observaciones TEXT, -- Detalles adicionales (opcional)
+    tipoReferencia TEXT, -- Tipo de referencia (opcional, para indicar de dónde proviene el movimiento, como "VENTA", "ORDEN_PRODUCCION", etc.)
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N', 'P')) DEFAULT 'A', -- Estado del movimiento 
+    FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario),  -- Integridad referencial con la tabla de usuarios
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
+    
 );
 
 -------- Tablas para registro de ingresos------------
@@ -275,4 +324,33 @@ CREATE TABLE IF NOT EXISTS INGRESOSDIARIOS (
     fechaIngreso DATE,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta) ON DELETE CASCADE
+);
+
+
+-------- Tablas para registro de ORDENES ESPECIALES------------
+-----------------------------------------------------
+-----------------------------------------------------
+-- Tabla ORDENESESPECIALES
+CREATE TABLE IF NOT EXISTS ORDENESESPECIALES (
+    idOrdenEspecial INTEGER PRIMARY KEY AUTOINCREMENT,
+    idSucursal INTEGER,
+    idUsuario INTEGER,
+    nombreCliente TEXT NOT NULL,
+    telefonoCliente TEXT NOT NULL,
+    fechaEntrega DATE NOT NULL,
+    fechaAProducir DATE NOT NULL,
+    fechaCreacion DATE NOT NULL,
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE SET NULL
+);
+
+-- Tabla DETALLESORDENESESPECIALES
+CREATE TABLE IF NOT EXISTS DETALLESORDENESESPECIALES (
+    idDetalleOrdenEspecial INTEGER PRIMARY KEY AUTOINCREMENT,
+    idOrdenEspecial INTEGER NOT NULL,
+    idProducto INTEGER NOT NULL,
+    cantidadUnidades INTEGER NOT NULL,
+    fechaCreacion DATE NOT NULL,
+    FOREIGN KEY (idOrdenEspecial) REFERENCES ORDENESESPECIALES(idOrdenEspecial) ON DELETE CASCADE,
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE
 );

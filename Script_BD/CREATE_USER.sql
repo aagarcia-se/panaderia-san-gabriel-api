@@ -22,6 +22,28 @@ VALUES(5, 'Órdenes de producción', 'Gestión de órdenes de producción', '/or
 -- Permiso para las ventas (ruta principal)
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(6, 'Ventas', 'Gestión de ventas diarias', '/ventas', '2025-01-25', 'A');
+
+-- Permiso para las sucursales (ruta principal)
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(7, 'Sucursales', 'Gestión de sucursales existentes', '/sucursales', '2025-01-25', 'A');
+
+-- Permiso para las configuraciones de materia prima (ruta principal)
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(8, 'Config Materia Prima', 'Configuraciones generales, como recetas, montos, etc', '/config', '2025-01-25', 'A');
+
+-- Permiso para las ventas (ruta principal)
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(9, 'Stock de productos', 'Visuzalizar y gestionar el stock de productos', '/stock-productos', '2025-01-25', 'A');
+
+-- Permiso ingreso de ordenes especiales
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(10, 'Ordenes especiales', 'VIngreso y gestion de ordenes especiales', '/pedido-especial', '2025-01-25', 'A');
+
+-- Permiso ingreso de ordenes especiales
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(11, 'Traslados', 'Realizar traslados de productos entre sucursales', '/traslados-productos', '2025-01-25', 'A');
+
+
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
 (1, 'Admin', 'Administrador de todo el sistema', '2025-01-25', 'A');
@@ -33,7 +55,12 @@ INSERT INTO ROLESPERMISOS (idRol, idPermiso) VALUES
 (1, 3),
 (1, 4),
 (1, 5),
-(1, 6);
+(1, 6),
+(1, 7),
+(1, 8),
+(1, 9);
+(1, 10);
+(1, 11);
 
 -- Crear usuario administrador
 INSERT INTO USUARIOS (idUsuario, nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, estadoUsuario, fechaCreacion, estado) VALUES

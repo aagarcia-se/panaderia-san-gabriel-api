@@ -21,12 +21,11 @@ export const consultarSucursalesController = async (req, res, next) => {
 
 export const ingresarSucursalController = async (req, res, next) => {
   try {
-    const sucursal = req.body;
-    const idInsert = await ingresarSucursalServices(sucursal);
+    const sucursal = await ingresarSucursalServices(req.body);
     const responseData = {
       status: 201,
       message: "Ingreso exitoso",
-      idInsert,
+      sucursal,
     };
     res.status(responseData.status).json(responseData);
   } catch (error) {

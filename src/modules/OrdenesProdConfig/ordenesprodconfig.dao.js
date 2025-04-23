@@ -53,3 +53,13 @@ export const consultarCantidadUnidadesDao = async (idProducto) => {
     }
 }
 
+export const eliminarcantidadUnidadesDao = async (idProducto) => {
+    try{
+        const deleteConfig = `delete from CONFIGORDEN where idProducto = ?;`;
+        const resDelete = await Connection.execute(deleteConfig, [idProducto]);
+        return resDelete.toJSON().rowsAffected;
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}

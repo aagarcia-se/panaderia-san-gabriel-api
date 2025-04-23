@@ -13,12 +13,11 @@ export const IngresarPrecioProductoDao = async (dataPrecio) => {
             dataPrecio.precio,
             dataPrecio.precioPorUnidad,
             dataPrecio.fechaInicio,
-            dataPrecio.fechaFin
+            dataPrecio.fechaFin || null
         ]);
     
         return resPrecio.toJSON().lastInsertRowid;
       } catch (error) {
-        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
       }
@@ -29,6 +28,8 @@ export const consultarPreciosProductosDao = async () => {
     // Consulta SQL
     const query = `SELECT p.idProducto, p.nombreProducto, 
                         p.controlarStock,
+                        p.controlarStockDiario,
+                        p.tipoProduccion,
   						          conf.unidadesPorBandeja,
                         ca.idCategoria,
                         ca.nombreCategoria, 

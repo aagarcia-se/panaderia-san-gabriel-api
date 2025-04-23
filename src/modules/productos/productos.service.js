@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { ingrearCantidadUnidadesService, modificarCantidaUnidaesService } from "../OrdenesProdConfig/ordenesprodconfig.service.js";
+import { consultarCantidadUnidadesService, eliminarcantidadUnidadeServices, ingrearCantidadUnidadesService, modificarCantidaUnidaesService } from "../OrdenesProdConfig/ordenesprodconfig.service.js";
 import { crearProductoDao, actualizarProductoDao, consultarProductosDao, eliminarProductoDao, desactivarProductoDao } from "./productos.dao.js";
 
 
@@ -13,7 +13,7 @@ export const crearProductoService = async (dataProducto) => {
       throw new CustomError(error);
     }
 
-    if(dataProducto.idCategoria == 1){
+    if(dataProducto.idCategoria == 1 && dataProducto.tipoProduccion === "bandejas"){
       dataProducto.idProducto = productoCreado;
       await ingrearCantidadUnidadesService(dataProducto);
     }
@@ -47,9 +47,18 @@ export const actualizarProductoService = async (dataProducto) => {
       throw new CustomError(error);
     }
 
-    if(dataProducto.idCategoria == 1){
-      console.log("entre aqui");
-      await modificarCantidaUnidaesService(dataProducto);
+    if(dataProducto.oldCategoria && dataProducto.oldCategoria === 1 && dataProducto.idCategoria !== 1){
+      await eliminarcantidadUnidadeServices(dataProducto.idProducto);
+    }
+
+    if(dataProducto.idCategoria === 1 && dataProducto.tipoProduccion === "bandejas"){
+
+      const res = await consultarCantidadUnidadesService(dataProducto.idProducto);
+      if(res === 0){
+        await ingrearCantidadUnidadesService(dataProducto);
+      }else{
+        await modificarCantidaUnidaesService(dataProducto);
+      }
     }
 
     return result;

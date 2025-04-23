@@ -26,23 +26,23 @@ export const consultarSucursalesDao = async () => {
 export const ingresarSucursalDao = async (sucursal) => {
   try {
     const insertQuery = `INSERT INTO SUCURSALES (nombreSucursal, direccionSucursal, municipioSucursal, 
-    departamentoSucursal, latitudSucursal, longitudSucursal, telefonoSucursal, correoSucursal, 
-    fechaCreacion)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    departamentoSucursal, telefonoSucursal, correoSucursal, fechaCreacion)
+    VALUES (?, ?, ?, ?, ?, ?, ?);`;
 
     const result = await db.execute(insertQuery, [
       sucursal.nombreSucursal,
       sucursal.direccionSucursal,
       sucursal.municipioSucursal,
       sucursal.departamentoSucursal,
-      sucursal.latitudSucursal,
-      sucursal.longitudSucursal,
       sucursal.telefonoSucursal,
       sucursal.correoSucursal,
       sucursal.fechaCreacion,
     ]);
 
-    return result.toJSON().lastInsertRowid;
+    return {
+      idSucursal: result.toJSON().lastInsertRowid,
+      ...sucursal
+    } 
   } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
@@ -52,19 +52,16 @@ export const ingresarSucursalDao = async (sucursal) => {
 export const actualizarSucursalDao = async (sucursal) => {
   try {
     const updateQuery = `UPDATE SUCURSALES SET nombreSucursal = ?, direccionSucursal = ?, municipioSucursal = ?, 
-    departamentoSucursal = ?, latitudSucursal = ?, longitudSucursal = ?, telefonoSucursal = ?, correoSucursal = ?, 
-    fechaCreacion = ? WHERE idSucursal = ?;`;
+    departamentoSucursal = ?, telefonoSucursal = ?, correoSucursal = ?
+     WHERE idSucursal = ?;`;
 
     const result = await db.execute(updateQuery, [
       sucursal.nombreSucursal,
       sucursal.direccionSucursal,
       sucursal.municipioSucursal,
       sucursal.departamentoSucursal,
-      sucursal.latitudSucursal,
-      sucursal.longitudSucursal,
       sucursal.telefonoSucursal,
       sucursal.correoSucursal,
-      sucursal.fechaCreacion,
       sucursal.idSucursal,
     ]);
 
@@ -77,10 +74,9 @@ export const actualizarSucursalDao = async (sucursal) => {
 
 export const eliminarSucursalDao = async (idSucursal) => {
   try {
-    const deleteQuery = `DELETE FROM SUCURSALES WHERE idSucursal = ?;`;
+    const deleteQuery = `UPDATE SUCURSALES set estado = 'N' WHERE idSucursal = ?;`;
 
     const result = await db.execute(deleteQuery, [idSucursal]);
-
     return result.toJSON().rowsAffected;
   } catch (error) {
     const dbError = getDatabaseError(error.message);

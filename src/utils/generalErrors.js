@@ -101,7 +101,12 @@ const databaseErrorMap = {
     code: 422,
   },
   19: {
-    message: "Ya existe una orden con el turno, sucursal y fecha ingresada",
+    message: "Ya existe una orden con el turno, sucursal y fecha ingresada.",
+    statusCode: 409,
+    code: 409,
+  },
+  20: {
+    message: "El stock actual es menor que el stock erróneo ingresado. Verifica los datos.",
     statusCode: 409,
     code: 409,
   }

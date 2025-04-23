@@ -4,16 +4,18 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const crearProductoDao = async (dataProductos) => {
     try {
-        const query =`insert into productos (nombreProducto, idCategoria, controlarStock, fechaCreacion) values 
-                      (?, ?, ?, ?);`;
+        const query =`insert into productos (nombreProducto, idCategoria, controlarStock, controlarStockDiario, tipoProduccion, fechaCreacion) 
+                      values (?, ?, ?, ?, ?, ?);`;
 
         const resProdcutosInsert = await Connection.execute(query, [
             dataProductos.nombreProducto,
             dataProductos.idCategoria,
             dataProductos.controlarStock,
+            dataProductos.controlarStockDiario,
+            dataProductos.tipoProduccion,
             dataProductos.fechaCreacion
         ]);
-    
+        
         return Number(resProdcutosInsert.toJSON().lastInsertRowid);
       } catch (error) {
         const dbError = getDatabaseError(error.message);
@@ -39,12 +41,15 @@ export const consultarProductosDao = async () => {
 
 export const actualizarProductoDao = async (dataProducto) => {
   try {
-    const query = `UPDATE PRODUCTOS SET nombreProducto = ?, idCategoria = ?, controlarStock = ?
+    const query = `UPDATE PRODUCTOS SET nombreProducto = ?, idCategoria = ?, controlarStock = ?,
+                   controlarStockDiario = ?, tipoProduccion = ?
                    where idProducto = ?`;
     const productos = await Connection.execute(query, [
         dataProducto.nombreProducto,
         dataProducto.idCategoria,
         dataProducto.controlarStock,
+        dataProducto.controlarStockDiario,
+        dataProducto.tipoProduccion,
         dataProducto.idProducto
     ]);
 
@@ -74,7 +79,6 @@ export const desactivarProductoDao = async (idProducto) => {
 
     return producto.toJSON().rowsAffected;
   } catch (error) {
-    console.log(error)
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }

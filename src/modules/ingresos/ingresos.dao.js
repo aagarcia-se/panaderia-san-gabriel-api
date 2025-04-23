@@ -19,7 +19,6 @@ export const registrarIngresosDiariosPorTurnoDao = async (dataIngesos) =>{
 
        return idIngreso;
     }catch(error){
-        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }

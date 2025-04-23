@@ -26,7 +26,8 @@
     "mysql2": "^3.12.0",
     "nodemailer": "^6.10.0",
     "pdfkit": "^0.16.0",
-    "twilio": "^5.4.2"
+    "twilio": "^5.4.2",
+    "ws": "^7.5.9"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

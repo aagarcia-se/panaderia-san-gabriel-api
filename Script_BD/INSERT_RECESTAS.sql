@@ -9,9 +9,6 @@ insert into recetas (idProducto, idIngrediente, cantidadNecesaria, unidadMedida,
 values (3, 1, 0.0278, 'Lb', '20225-02-2025');
 
 insert into recetas (idProducto, idIngrediente, cantidadNecesaria, unidadMedida, fechaCreacion) 
-values (38, 1, 0.025, 'Lb', '20225-02-2025');
-
-insert into recetas (idProducto, idIngrediente, cantidadNecesaria, unidadMedida, fechaCreacion) 
 values (5, 1, 0.1, 'Lb', '20225-02-2025');
 
 insert into recetas (idProducto, idIngrediente, cantidadNecesaria, unidadMedida, fechaCreacion) 

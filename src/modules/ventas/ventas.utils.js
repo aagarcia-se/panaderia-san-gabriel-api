@@ -2,6 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarUnidadesDeProductoPorOrdenService } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { consultarPrecioProductoPorIdService } from "../precios/precios.service.js";
+import { consultarStockProductoDao, consultarStockProductoDiarioDao } from "../StockProductos/stockProductos.dao.js";
 
 /**
  * Filtra los productos por categoría.
@@ -48,26 +49,59 @@ const calcularSubtotalVenta = (unidadesVendidas, precioUnidad) => {
  * @param {Array} ventaDetalle - Detalle de la venta.
  * @returns {Promise<Array>} - Detalle de la venta con las unidades vendidas calculadas.
  */
-export const obtenerProductosPanaderiaVendidos = async (idOrdenProduccion, ventaDetalle) => {
+export const obtenerProductosPanaderiaVendidos = async (idOrdenProduccion, ventaDetalle, idSucursal) => {
     try {
+        //console.log(ventaDetalle);
         // Filtrar y procesar solo los detalles que están en la orden
         const detallesEnOrden = await Promise.all(
             ventaDetalle.map(async (detalle) => {
-                // Consultar unidades producidas
-                const productoProducido = await consultarUnidadesDeProductoPorOrdenService(idOrdenProduccion, detalle.idProducto);
 
-                // Si el producto está en la orden, calcular la cantidad vendida
-                if (productoProducido.detalleOrden.idDetalleOrdenProduccion !== 0) {
-                    const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoProducido.detalleOrden.cantidadUnidades, detalle.unidadesNoVendidas);
+                if(detalle.tipoProduccion === "bandejas"){
+                    // Consultar unidades producidas
+                    const productoProducido = await consultarUnidadesDeProductoPorOrdenService(idOrdenProduccion, detalle.idProducto);
 
-                    // Retornar el detalle con la información adicional
-                    return {
-                        ...detalle,
-                        cantidadProducida: productoProducido.detalleOrden.cantidadUnidades,
-                        cantidadVendida: cantidadVendida,
-                    };
+                    // Si el producto está en la orden, calcular la cantidad vendida
+                    if (productoProducido.detalleOrden.idDetalleOrdenProduccion !== 0) {
+                        const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoProducido.detalleOrden.cantidadUnidades, detalle.unidadesNoVendidas);
+
+                        // Retornar el detalle con la información adicional
+                        return {
+                            ...detalle,
+                            cantidadProducida: productoProducido.detalleOrden.cantidadUnidades,
+                            cantidadVendida: cantidadVendida,
+                        };
+                    }
+
+                }else{
+
+                    if(detalle.controlarStock === 1 && detalle.controlarStockDiario === 0){
+                        const productoEnStock = await consultarStockProductoDao(detalle.idProducto, idSucursal);
+                        if(productoEnStock.idStock !== 0 && productoEnStock.stock > 0){
+                            return{
+                                ...detalle,
+                                cantidadVendida: calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas)
+                                
+                            }
+
+                        }else{
+                            //aqui va el caso de uso si el producto no tiene stock general
+
+                        }
+
+                    }else{
+                        const productoEnStockDiario = await consultarStockProductoDiarioDao(detalle.idProducto, idSucursal, detalle.fechaCreacion);
+                        if(productoEnStockDiario.idStockDiario !== 0 && productoEnStockDiario.stock > 0){
+                            return{
+                                ...detalle,
+                                cantidadVendida: calcularUnidadesDePanaderiaVendidas(productoEnStockDiario.stock, detalle.unidadesNoVendidas)
+                            }
+                        }else{
+                            //aqui va el caso de uso si el producto no tiene stock diario
+                        }
+
+                    }
                 }
-
+                
                 // Si no está en la orden, no retornar nada (será filtrado)
                 return null;
             })
@@ -152,37 +186,38 @@ export const procesarVentaService = async (venta) => {
         let productosPanaderiaReposteria;
         let productosNoPanaderia;
         let productosPanaderiaProcesados;
+        let productosProcesados;
         let todosLosProductos;
+        let idSucursal = encabezadoVenta.idSucursal;
 
         if(encabezadoVenta.idOrdenProduccion !== null){
             // 1. Filtrar productos de panadería o repostería (categorías 1 y 2)
-            productosPanaderiaReposteria = filtrarProductosPorCategoria(detalleVenta, [1]);
+              //productosPanaderiaReposteria = filtrarProductosPorCategoria(detalleVenta, [1]);
 
             // 2. Filtrar productos que no son de panadería
-            productosNoPanaderia = detalleVenta.filter(detalle => ![1].includes(detalle.idCategoria));
+            //productosNoPanaderia = detalleVenta.filter(detalle => ![1].includes(detalle.idCategoria));
 
             // 3. Procesar productos de panadería o repostería (si existen)
-            productosPanaderiaProcesados = productosPanaderiaReposteria.length > 0
-            ? await obtenerProductosPanaderiaVendidos(encabezadoVenta.idOrdenProduccion, productosPanaderiaReposteria)
-            : [];
+            productosProcesados = await obtenerProductosPanaderiaVendidos(encabezadoVenta.idOrdenProduccion, detalleVenta, idSucursal)
+          
 
             // 4. Combinar productos procesados y no procesados
-            todosLosProductos = [
+            /*todosLosProductos = [
                 ...productosPanaderiaProcesados, // Productos de panadería procesados
                 ...productosNoPanaderia, // Productos que no son de panadería
-            ];
+            ];*/
 
         }
 
-        if(encabezadoVenta.idOrdenProduccion === null){
+       /* if(encabezadoVenta.idOrdenProduccion === null){
             todosLosProductos = detalleVenta;
-        }
+        }*/
 
-        // 5. Agregar precios unitarios a todos los productos
-        const productosConPrecios = await agregarPreciosAProductosVenta(todosLosProductos);
+        //5. Agregar precios unitarios a todos los productos
+        const productosConPrecios = await agregarPreciosAProductosVenta(productosProcesados);
 
         // 6. Calcular subtotales por producto
-        const detallesConSubtotal = calcularSubtotalVentaPorProductos(productosConPrecios);
+       const detallesConSubtotal = calcularSubtotalVentaPorProductos(productosConPrecios);
 
         // 7. Calcular el total de la venta
         const ventaTotal = calcularVentaTotal(detallesConSubtotal);
