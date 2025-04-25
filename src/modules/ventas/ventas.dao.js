@@ -91,7 +91,7 @@ export const eliminarVentaDao = async (idVenta) => {
 
 export const consultarDetalleVentaDao = async (idVenta) => {
   try{
-    const scriptVenta = `select v.idVenta, v.idUsuario, v.idVenta, u.usuario, v.idSucursal, v.ventaTurno, s.nombreSucursal,
+    const scriptVenta = `select v.idVenta, v.idUsuario, v.idVenta, u.usuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario)nombreUsuario, v.idSucursal, v.ventaTurno, s.nombreSucursal,
                           v.fechaVenta, v.totalVenta, v.estadoVenta 
                           from ventas v
                           INNER JOIN usuarios u on v.idUsuario = u.idUsuario
