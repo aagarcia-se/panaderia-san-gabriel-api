@@ -1,5 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
+import { consultarDetalleOrdenProduccionService } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
 import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
@@ -203,23 +204,24 @@ export const procesarStockPorOrdenProduccionServices = async (ordenProduccion) =
           
           if (StockExistente.idStockDiario === 0) {
               const payloadStockDiarioNuevo = crearPayloadStockProductoDiarioInexistente(orden, detalle);
-              const payloadHistorial = crearPayloadHistorial(payloadStockDiarioNuevo, null, 1, 2, 2);
 
+              //const payloadHistorial = crearPayloadHistorial(payloadStockDiarioNuevo, null, 1, 2, 2);
               // Registrar el historial de stock
-              const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
-              if (insertHistorialStock === 0) {
-                throw new CustomError(getError(2)); // Error al registrar
-              }
+              //const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
+              //if (insertHistorialStock === 0) {
+              //  throw new CustomError(getError(2)); // Error al registrar
+              //}
 
               await registrarStockProductoDiarioDao(payloadStockDiarioNuevo);
           } else {
               const payloadStockDiarioExistente = crearPayloadStockProductoDiarioExistente(orden, detalle, StockExistente);
-              const payloadHistorial = crearPayloadHistorial(payloadStockDiarioExistente, StockExistente, 1, 2, 2);
+              
+              //const payloadHistorial = crearPayloadHistorial(payloadStockDiarioExistente, StockExistente, 1, 2, 2);
               // Registrar el historial de stock
-              const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
-              if (insertHistorialStock === 0) {
-                throw new CustomError(getError(2)); // Error al registrar
-              }
+              //const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
+              //if (insertHistorialStock === 0) {
+              //  throw new CustomError(getError(2)); // Error al registrar
+              //}
 
               await actualizarStockProductoDiarioDao(payloadStockDiarioExistente);
           }
@@ -295,6 +297,42 @@ export const descontarStockPorVentas = async (venta) => {
       })
     );
   } catch (error) {
+    throw error;
+  }
+}
+
+export const elminarStockDiarioService = async (idOrdenProduccion) => {
+  try{
+
+    const orden = await consultarDetalleOrdenProduccionService(idOrdenProduccion)
+    const {encabezadoOrden} = orden;
+    const productosOrden = orden.detalleOrden;
+
+    return Promise.all(
+      productosOrden.map( async (productoOrden) => {
+        try{
+
+          const productoStock = await consultarStockProductoDiarioDao(productoOrden.idProducto, encabezadoOrden.idSucursal, encabezadoOrden.fechaAProducir);
+          
+          const payloadElminar = {
+            idProducto: productoOrden.idProducto,
+            idSucursal: encabezadoOrden.idSucursal,
+            stock: productoStock.stock - productoOrden.cantidadUnidades,
+            fechaActualizacion: encabezadoOrden.fechaCreacion,
+            fechaValidez: encabezadoOrden.fechaAProducir,
+          }
+
+          const stockElinado = await actualizarStockProductoDiarioDao(payloadElminar);
+          
+          return stockElinado;
+        }catch(error){
+          throw error
+        }
+      })
+    );
+
+
+  }catch(error){
     throw error;
   }
 }

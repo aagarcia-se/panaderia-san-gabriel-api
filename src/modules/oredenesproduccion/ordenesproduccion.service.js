@@ -2,7 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarBatchConsumoOrdenProduccionServices } from "../consumosordenesproduccion/consumosordenes.service.js";
 import { CalcularCantidadIngredientes } from "../consumosordenesproduccion/cosumoordenesproduccion.utils.js";
-import { procesarStockPorOrdenProduccionServices } from "../StockProductos/stockProductos.service.js";
+import { elminarStockDiarioService, procesarStockPorOrdenProduccionServices } from "../StockProductos/stockProductos.service.js";
 import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
@@ -38,6 +38,9 @@ export const consultarDetalleOrdenProduccionService = async (idOrdenProduccion) 
 
 export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
   try {
+
+    await elminarStockDiarioService(idOrdenProduccion);
+
     const result = await eliminarOrdenProduccionDao(idOrdenProduccion);
     if (result === 0) {
       const error = getError(4);
