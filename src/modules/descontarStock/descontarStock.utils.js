@@ -12,5 +12,5 @@ export const crearPayloadDescontarStock = (stockExistente, stockADesontar) => {
         idSucursal: stockADesontar.idSucursal
     }
 
-    return payload;
+    return payload;  
 }

@@ -41,6 +41,8 @@ export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
 
     await elminarStockDiarioService(idOrdenProduccion);
 
+    console.log(idOrdenProduccion);
+
     const result = await eliminarOrdenProduccionDao(idOrdenProduccion);
     if (result === 0) {
       const error = getError(4);

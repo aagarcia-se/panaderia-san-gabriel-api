@@ -314,17 +314,21 @@ export const elminarStockDiarioService = async (idOrdenProduccion) => {
 
           const productoStock = await consultarStockProductoDiarioDao(productoOrden.idProducto, encabezadoOrden.idSucursal, encabezadoOrden.fechaAProducir);
           
-          const payloadElminar = {
-            idProducto: productoOrden.idProducto,
-            idSucursal: encabezadoOrden.idSucursal,
-            stock: productoStock.stock - productoOrden.cantidadUnidades,
-            fechaActualizacion: encabezadoOrden.fechaCreacion,
-            fechaValidez: encabezadoOrden.fechaAProducir,
-          }
+          if(productoStock.idStockDiario !== 0 && productoStock.stock > 0){
+            const payloadElminar = {
+              idProducto: productoOrden.idProducto,
+              idSucursal: encabezadoOrden.idSucursal,
+              stock: productoStock.stock - productoOrden.cantidadUnidades || 0,
+              fechaActualizacion: encabezadoOrden.fechaCreacion,
+              fechaValidez: encabezadoOrden.fechaAProducir,
+            }
+  
+            const stockElinado = await actualizarStockProductoDiarioDao(payloadElminar);
 
-          const stockElinado = await actualizarStockProductoDiarioDao(payloadElminar);
+            return stockElinado;
+          }
           
-          return stockElinado;
+
         }catch(error){
           throw error
         }
