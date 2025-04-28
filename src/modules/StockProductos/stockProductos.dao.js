@@ -8,16 +8,18 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 export const IngresarHistorialStockDao = async (dataHistorialStock) => {
     try{
         const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, stockAnterior, stockNuevo, cantidad, fechaMovimiento, observaciones, tipoReferencia)
-        values (?, ?, ?, 'INGRESO', ?, ?, ?, ?, ?, 'CONTROL DE STOCK');`;
+        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
             const historialStock = await Connection.execute(insert, [
             dataHistorialStock.idUsuario,
             dataHistorialStock.idProducto,
             dataHistorialStock.idSucursal,
+            dataHistorialStock.tipoMovimiento || 'INGRESO',
             dataHistorialStock.stockAnterior,
             dataHistorialStock.stockNuevo,
             dataHistorialStock.cantidad,
             dataHistorialStock.fechaActualizacion,
             dataHistorialStock.observaciones || "Ingreso Manual",
+            dataHistorialStock.tipoReferencia || "CONTROL DE STOCK"
             ]);
 
         const historialStockIngresado = {

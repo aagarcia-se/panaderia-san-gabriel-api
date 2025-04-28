@@ -2,7 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarDetalleOrdenProduccionService } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
-import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
+import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadEgresoPorVenta, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 /*------------------------------------------------------------------------------
 --------------------- Control de stock suma de productos -----------------------
@@ -268,10 +268,12 @@ export const descontarStockPorVentas = async (venta) => {
             
             if(StockExistente.idStock !== 0){
               const paylodDescStockGeneral = crearPayloadActualizarDebitoStockGeneral(StockExistente, detalle, encabezadoVenta.idSucursal);
-              const resUpdateStockGeneral = await actualizarStockProductoDao(paylodDescStockGeneral);
+              await actualizarStockProductoDao(paylodDescStockGeneral);
+
+              const payloadHisotorialDescount = crearPayloadEgresoPorVenta(detalle, encabezadoVenta, StockExistente);
+              await IngresarHistorialStockDao(payloadHisotorialDescount);
             
             }else{
-
               // se espera otra logica para el debito de stock general
 
             }
@@ -281,7 +283,7 @@ export const descontarStockPorVentas = async (venta) => {
             
             if(stockDiarioExistente.idStockDiario !== 0){
               const payloadDescStockDiario = crearPayloadActualizarDebitoStockDiario(stockDiarioExistente, detalle, encabezadoVenta.idSucursal);
-              const resUpdateStockDiario = await actualizarStockProductoDiarioDao(payloadDescStockDiario);
+              await actualizarStockProductoDiarioDao(payloadDescStockDiario);
            
             }else{
 
