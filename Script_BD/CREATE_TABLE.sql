@@ -298,8 +298,8 @@ CREATE TABLE IF NOT EXISTS HISTORIALSTOCK (
     idSucursal INTEGER NOT NULL, -- ID de la sucursal relacionada
     tipoMovimiento TEXT NOT NULL CHECK(tipoMovimiento IN ('INGRESO', 'EGRESO', 'CORRECCION', 'AJUSTE')), -- Tipo de movimiento
     stockAnterior INTEGER NOT NULL, -- Stock antes del movimiento
-    stockNuevo INTEGER NOT NULL, -- Stock después del movimiento
     cantidad INTEGER NOT NULL, -- Cantidad afectada (positiva para ingresos, negativa para egresos)
+    stockNuevo INTEGER NOT NULL, -- Stock después del movimiento
     fechaMovimiento DATETIME NOT NULL, -- Fecha y hora del movimiento
     observaciones TEXT, -- Detalles adicionales (opcional)
     tipoReferencia TEXT, -- Tipo de referencia (opcional, para indicar de dónde proviene el movimiento, como "VENTA", "ORDEN_PRODUCCION", etc.)

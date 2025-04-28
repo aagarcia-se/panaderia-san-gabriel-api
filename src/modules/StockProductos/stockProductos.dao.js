@@ -109,7 +109,7 @@ export const consultarStockProductosDao = async (idSucursal) => {
                         INNER JOIN SUCURSALES su ON sp.idSucursal = su.idSucursal
                         where sp.idSucursal = ?
                         and sp.estado = 'A'
-                        order by sp.idStock asc;`;
+                        order by sp.stock asc;`;
     const stockProductos = await Connection.execute(query, [idSucursal]);
     return stockProductos.rows;
     }catch(error){
