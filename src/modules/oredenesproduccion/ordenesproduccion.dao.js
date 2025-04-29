@@ -191,6 +191,7 @@ export const consultarDetalleOrdenPorCriteriosDao = async (ordenTurno, fechaApro
                           WHERE op.ordenTurno = ?
 						              AND op.fechaAProducir = ?
                           AND op.idSucursal =  ?
+                          AND op.estadoOrden != 'C'
                           AND op.estado = 'A'
                           ORDER BY op.idOrdenProduccion DESC;
                           `;
