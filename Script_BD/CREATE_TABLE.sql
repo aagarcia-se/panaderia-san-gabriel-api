@@ -277,7 +277,6 @@ CREATE TABLE IF NOT EXISTS STOCKPRODUCTOS (
 -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS STOCKPRODUCTOSDIARIOS (
     idStockDiario INTEGER PRIMARY KEY AUTOINCREMENT,
-    idOrdenProduccion INTEGER NOT NULL,
     idProducto INTEGER NOT NULL, 
     idSucursal INTEGER NOT NULL,
     stock INTEGER NOT NULL,
@@ -285,7 +284,6 @@ CREATE TABLE IF NOT EXISTS STOCKPRODUCTOSDIARIOS (
     fechaActualizacion DATETIME NOT NULL,
     fechaCreacion DATETIME NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
-    FOREIGN KEY (idOrdenProduccion) REFERENCES ORDENESPRODUCCION(idOrdenProduccion) ON DELETE CASCADE,
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto) ON DELETE CASCADE,
     FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal) ON DELETE CASCADE
 );
@@ -300,8 +298,8 @@ CREATE TABLE IF NOT EXISTS HISTORIALSTOCK (
     idSucursal INTEGER NOT NULL, -- ID de la sucursal relacionada
     tipoMovimiento TEXT NOT NULL CHECK(tipoMovimiento IN ('INGRESO', 'EGRESO', 'CORRECCION', 'AJUSTE')), -- Tipo de movimiento
     stockAnterior INTEGER NOT NULL, -- Stock antes del movimiento
-    stockNuevo INTEGER NOT NULL, -- Stock después del movimiento
     cantidad INTEGER NOT NULL, -- Cantidad afectada (positiva para ingresos, negativa para egresos)
+    stockNuevo INTEGER NOT NULL, -- Stock después del movimiento
     fechaMovimiento DATETIME NOT NULL, -- Fecha y hora del movimiento
     observaciones TEXT, -- Detalles adicionales (opcional)
     tipoReferencia TEXT, -- Tipo de referencia (opcional, para indicar de dónde proviene el movimiento, como "VENTA", "ORDEN_PRODUCCION", etc.)

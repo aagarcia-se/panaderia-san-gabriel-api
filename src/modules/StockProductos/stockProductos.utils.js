@@ -163,7 +163,7 @@ export const crearPayloadHistorial = (dataNueva, dataExistente, tipoMovimiento, 
             referencia = `Orden-${dataNueva.idOrden}`;
             break;
         case 3:
-            referencia = `venta-${dataNueva.idVenta}`;
+            referencia = `venta-`;
             break;
     }
 
@@ -219,4 +219,21 @@ export const crearPayloadActualizarDebitoStockDiario = (stockDiarioExistente, de
     }
 
     return payload;
+}
+
+
+export const crearPayloadEgresoPorVenta = (detalle, encabezadoVenta, stockExistente) => {
+    const payloadHisotorialDescount = {
+        idUsuario: encabezadoVenta.idUsuario,
+        idProducto: detalle.idProducto,
+        idSucursal: encabezadoVenta.idSucursal,
+        stockAnterior: stockExistente.stock,
+        stockNuevo: stockExistente.stock - detalle.cantidadVendida,
+        cantidad: detalle.cantidadVendida,
+        fechaActualizacion: encabezadoVenta.fechaYHoraVenta,
+        tipoMovimiento: 'EGRESO',
+        observaciones: 'Egreso por ventas',
+        tipoReferencia: `VENTA-`
+        }
+    return payloadHisotorialDescount;
 }

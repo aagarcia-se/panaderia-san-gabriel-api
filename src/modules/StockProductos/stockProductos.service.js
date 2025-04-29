@@ -1,7 +1,8 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
+import { consultarDetalleOrdenProduccionService } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
-import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
+import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadEgresoPorVenta, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 /*------------------------------------------------------------------------------
 --------------------- Control de stock suma de productos -----------------------
@@ -203,23 +204,24 @@ export const procesarStockPorOrdenProduccionServices = async (ordenProduccion) =
           
           if (StockExistente.idStockDiario === 0) {
               const payloadStockDiarioNuevo = crearPayloadStockProductoDiarioInexistente(orden, detalle);
-              const payloadHistorial = crearPayloadHistorial(payloadStockDiarioNuevo, null, 1, 2, 2);
 
+              //const payloadHistorial = crearPayloadHistorial(payloadStockDiarioNuevo, null, 1, 2, 2);
               // Registrar el historial de stock
-              const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
-              if (insertHistorialStock === 0) {
-                throw new CustomError(getError(2)); // Error al registrar
-              }
+              //const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
+              //if (insertHistorialStock === 0) {
+              //  throw new CustomError(getError(2)); // Error al registrar
+              //}
 
               await registrarStockProductoDiarioDao(payloadStockDiarioNuevo);
           } else {
               const payloadStockDiarioExistente = crearPayloadStockProductoDiarioExistente(orden, detalle, StockExistente);
-              const payloadHistorial = crearPayloadHistorial(payloadStockDiarioExistente, StockExistente, 1, 2, 2);
+              
+              //const payloadHistorial = crearPayloadHistorial(payloadStockDiarioExistente, StockExistente, 1, 2, 2);
               // Registrar el historial de stock
-              const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
-              if (insertHistorialStock === 0) {
-                throw new CustomError(getError(2)); // Error al registrar
-              }
+              //const insertHistorialStock = await IngresarHistorialStockDao(payloadHistorial);
+              //if (insertHistorialStock === 0) {
+              //  throw new CustomError(getError(2)); // Error al registrar
+              //}
 
               await actualizarStockProductoDiarioDao(payloadStockDiarioExistente);
           }
@@ -266,10 +268,12 @@ export const descontarStockPorVentas = async (venta) => {
             
             if(StockExistente.idStock !== 0){
               const paylodDescStockGeneral = crearPayloadActualizarDebitoStockGeneral(StockExistente, detalle, encabezadoVenta.idSucursal);
-              const resUpdateStockGeneral = await actualizarStockProductoDao(paylodDescStockGeneral);
+              await actualizarStockProductoDao(paylodDescStockGeneral);
+
+              const payloadHisotorialDescount = crearPayloadEgresoPorVenta(detalle, encabezadoVenta, StockExistente);
+              await IngresarHistorialStockDao(payloadHisotorialDescount);
             
             }else{
-
               // se espera otra logica para el debito de stock general
 
             }
@@ -279,7 +283,7 @@ export const descontarStockPorVentas = async (venta) => {
             
             if(stockDiarioExistente.idStockDiario !== 0){
               const payloadDescStockDiario = crearPayloadActualizarDebitoStockDiario(stockDiarioExistente, detalle, encabezadoVenta.idSucursal);
-              const resUpdateStockDiario = await actualizarStockProductoDiarioDao(payloadDescStockDiario);
+              await actualizarStockProductoDiarioDao(payloadDescStockDiario);
            
             }else{
 
@@ -295,6 +299,46 @@ export const descontarStockPorVentas = async (venta) => {
       })
     );
   } catch (error) {
+    throw error;
+  }
+}
+
+export const elminarStockDiarioService = async (idOrdenProduccion) => {
+  try{
+
+    const orden = await consultarDetalleOrdenProduccionService(idOrdenProduccion)
+    const {encabezadoOrden} = orden;
+    const productosOrden = orden.detalleOrden;
+
+    return Promise.all(
+      productosOrden.map( async (productoOrden) => {
+        try{
+
+          const productoStock = await consultarStockProductoDiarioDao(productoOrden.idProducto, encabezadoOrden.idSucursal, encabezadoOrden.fechaAProducir);
+          
+          if(productoStock.idStockDiario !== 0 && productoStock.stock > 0){
+            const payloadElminar = {
+              idProducto: productoOrden.idProducto,
+              idSucursal: encabezadoOrden.idSucursal,
+              stock: productoStock.stock - productoOrden.cantidadUnidades || 0,
+              fechaActualizacion: encabezadoOrden.fechaCreacion,
+              fechaValidez: encabezadoOrden.fechaAProducir,
+            }
+  
+            const stockElinado = await actualizarStockProductoDiarioDao(payloadElminar);
+
+            return stockElinado;
+          }
+          
+
+        }catch(error){
+          throw error
+        }
+      })
+    );
+
+
+  }catch(error){
     throw error;
   }
 }
