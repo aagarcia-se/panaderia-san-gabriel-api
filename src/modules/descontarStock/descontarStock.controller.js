@@ -1,9 +1,9 @@
-import { descontarStockServices } from "./descontarStock.service.js";
+import { IngresarDescuentoServices } from "./descontarStock.service.js";
 
 
 export const descontarStockController = async (req, res, next) => {
     try {
-      const stockADescontar = await descontarStockServices(req.body);
+      const stockADescontar = await IngresarDescuentoServices(req.body);
       const responseData = {
         status: 200,
         message: "Consulta exitosa",

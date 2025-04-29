@@ -1,23 +1,60 @@
-import { consultarStockProductoDao } from "../StockProductos/stockProductos.dao.js";
+import CustomError from "../../utils/CustomError.js";
+import { getError } from "../../utils/generalErrors.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockProductoDao, consultarStockProductoDiarioDao, IngresarHistorialStockDao } from "../StockProductos/stockProductos.dao.js";
+import { ingresarDescuentoDao } from "./descontarStock.dao.js";
+import { crearPayloadDescontarStockDiario, crearPayloadDescontarStockGeneral, crearPayloadHistorialStock } from "./descontarStock.utils.js";
 
+export const IngresarDescuentoServices = async (stockADescontarData) => {
+    try {
+
+        await descontarStockServices(stockADescontarData);
+
+        const res = await ingresarDescuentoDao(stockADescontarData);
+        if (res === 0) {
+            throw new CustomError(getError(2));
+        }
+
+        return res;
+    } catch (error) {
+        throw error;
+    }
+}
 
 export const descontarStockServices = async (stockADescontarData) => {
     try{
-        const {stockADescontar} = stockADescontarData;
+        const {descuentoInfo, detalleDescuento} = stockADescontarData;
         
         return Promise.all(
-            stockADescontar.map(async (producto) => {
+            detalleDescuento.map(async (producto) => {
                 try{
 
-                    const produtoExist = await consultarStockProductoDao(producto.idProducto, producto.idSucursal);
-                    if(produtoExist.idStock !== 0){
+                    if(producto.controlarStock === 0 && producto.controlarStockDiario === 1){
+                        const productoDiarioExist = await consultarStockProductoDiarioDao( producto.idProducto, descuentoInfo.idSucursal, descuentoInfo.fechaCreacion );
                         
+                        if(productoDiarioExist.idStock !== 0 ){
+
+                            const payloadDescont = crearPayloadDescontarStockDiario(descuentoInfo, producto, productoDiarioExist);
+
+                            await actualizarStockProductoDiarioDao(payloadDescont);
+                        }
+                    }else{
+
+                        const produtoExist = await consultarStockProductoDao(producto.idProducto, descuentoInfo.idSucursal);
+                        if(produtoExist.idStock !== 0){
+
+                            const payloadDescuentoG = crearPayloadDescontarStockGeneral(descuentoInfo, producto, produtoExist);
+
+                            const payloadHistorial = crearPayloadHistorialStock(descuentoInfo, producto, produtoExist);
+
+                            await actualizarStockProductoDao(payloadDescuentoG);
+                            await IngresarHistorialStockDao(payloadHistorial);
+                        }
                     }
+
                 }catch(error){
                     throw error;
                 }
             })
-
         );
 
     }catch(error){
