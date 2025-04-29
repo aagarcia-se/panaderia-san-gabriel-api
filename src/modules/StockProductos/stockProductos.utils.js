@@ -230,7 +230,7 @@ export const crearPayloadEgresoPorVenta = (detalle, encabezadoVenta, stockExiste
         stockAnterior: stockExistente.stock,
         stockNuevo: stockExistente.stock - detalle.cantidadVendida,
         cantidad: detalle.cantidadVendida,
-        fechaActualizacion: encabezadoVenta.fechaCreacion,
+        fechaActualizacion: encabezadoVenta.fechaYHoraVenta,
         tipoMovimiento: 'EGRESO',
         observaciones: 'Egreso por ventas',
         tipoReferencia: `VENTA-`
