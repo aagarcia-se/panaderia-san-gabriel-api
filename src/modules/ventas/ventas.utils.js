@@ -49,15 +49,15 @@ const calcularSubtotalVenta = (unidadesVendidas, precioUnidad) => {
  * @param {Array} ventaDetalle - Detalle de la venta.
  * @returns {Promise<Array>} - Detalle de la venta con las unidades vendidas calculadas.
  */
-export const obtenerProductosPanaderiaVendidos = async (idOrdenProduccion, ventaDetalle, idSucursal) => {
+export const obtenerProductosPanaderiaVendidos = async (encabezadoVenta, ventaDetalle, idSucursal) => {
     try {
         // Filtrar y procesar solo los detalles que están en la orden
         const detallesEnOrden = await Promise.all(
             ventaDetalle.map(async (detalle) => {
 
-                if(detalle.tipoProduccion === "bandejas"){
+                if(detalle.tipoProduccion === "bandejas" && encabezadoVenta.ventaTurno === "AM"){
                     // Consultar unidades producidas
-                    const productoProducido = await consultarUnidadesDeProductoPorOrdenService(idOrdenProduccion, detalle.idProducto);
+                    const productoProducido = await consultarUnidadesDeProductoPorOrdenService(encabezadoVenta.idOrdenProduccion, detalle.idProducto);
 
                     // Si el producto está en la orden, calcular la cantidad vendida
                     if (productoProducido.detalleOrden.idDetalleOrdenProduccion !== 0) {
@@ -187,7 +187,7 @@ export const procesarVentaService = async (venta) => {
 
         if(encabezadoVenta.idOrdenProduccion !== null){
             // 1. Procesar productos de panadería o repostería (si existen)
-            productosProcesados = await obtenerProductosPanaderiaVendidos(encabezadoVenta.idOrdenProduccion, detalleVenta, idSucursal);
+            productosProcesados = await obtenerProductosPanaderiaVendidos(encabezadoVenta, detalleVenta, idSucursal);
         }
 
         //2. Agregar precios unitarios a todos los productos
