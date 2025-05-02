@@ -46,6 +46,20 @@ export const ingresarDescuentoDao = async (stockADescontarData) => {
     }
 
 }
+
+export const consultarDescuentoStockPorSucursalDato = async (idSucursal) => {
+    try{
+        const consulta = `SELECT * FROM DESCUENTODESTOCK WHERE idSucursal = ?;`;
+        
+        const descuentos = await Connection.execute(consulta, [idSucursal]);
+
+        return descuentos.rows;
+
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
     
 
 
