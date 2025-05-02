@@ -43,6 +43,9 @@ VALUES(10, 'Ordenes especiales', 'VIngreso y gestion de ordenes especiales', '/p
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(11, 'Traslados', 'Realizar traslados de productos entre sucursales', '/traslados-productos', '2025-01-25', 'A');
 
+-- Permiso ingreso de ordenes especiales
+INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES(12, 'Descuento de stock', 'Ingreso y gestion de descuentos', '/descuento-stock', '2025-01-25', 'A');
 
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
@@ -60,7 +63,8 @@ INSERT INTO ROLESPERMISOS (idRol, idPermiso) VALUES
 (1, 8),
 (1, 9),
 (1, 10),
-(1, 11);
+(1, 11),
+(1, 12);
 
 -- Crear usuario administrador
 INSERT INTO USUARIOS (idUsuario, nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, estadoUsuario, fechaCreacion, estado) VALUES
