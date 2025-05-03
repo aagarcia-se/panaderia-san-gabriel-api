@@ -66,6 +66,23 @@ export const consultarDescuentoStockPorSucursalDato = async (idSucursal) => {
         throw new CustomError(dbError);
     }
 }
-    
+  
+export const consultarDescuentoStockPrdocutosDetalle = async (idDescuento) => {
+    try{
+        const consulta = `SELECT dd.idDescuento, dd.idProducto, p.nombreProducto, dd.cantidadUnidades, dd.fechaDescuento
+                          FROM DETALLEDESCUENTODESTOCK dd 
+                          INNER JOIN PRODUCTOS p ON dd.idProducto = p.idProducto
+                          where dd.idDescuento = ?;`;
+        
+        const descuentos = await Connection.execute(consulta, [idDescuento]);
+
+        return descuentos.rows;
+
+    }catch(error){
+        console.log(error);
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
 
 
