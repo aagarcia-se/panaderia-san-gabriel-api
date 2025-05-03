@@ -49,17 +49,40 @@ export const ingresarDescuentoDao = async (stockADescontarData) => {
 
 export const consultarDescuentoStockPorSucursalDato = async (idSucursal) => {
     try{
-        const consulta = `SELECT * FROM DESCUENTODESTOCK WHERE idSucursal = ?;`;
+        const consulta = `SELECT des.idDescuento, des.idSucursal, s.nombreSucursal, des.idUsuario, concat(u.nombreUsuario ,' ' , u.apellidoUsuario) nombreUsuario,
+                          des.tipoDescuento, des.fechaDescuento, des.fechaCreacion,  des.estado
+                          FROM DESCUENTODESTOCK des 
+                          INNER JOIN SUCURSALES s ON des.idSucursal = s.idSucursal 
+                          INNER JOIN USUARIOS u ON des.idUsuario = u.idUsuario
+                          where des.idSucursal = ?;`;
         
         const descuentos = await Connection.execute(consulta, [idSucursal]);
 
         return descuentos.rows;
 
     }catch(error){
+        console.log(error);
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
 }
-    
+  
+export const consultarDescuentoStockPrdocutosDetalle = async (idDescuento) => {
+    try{
+        const consulta = `SELECT dd.idDescuento, dd.idProducto, p.nombreProducto, dd.cantidadUnidades, dd.fechaDescuento
+                          FROM DETALLEDESCUENTODESTOCK dd 
+                          INNER JOIN PRODUCTOS p ON dd.idProducto = p.idProducto
+                          where dd.idDescuento = ?;`;
+        
+        const descuentos = await Connection.execute(consulta, [idDescuento]);
+
+        return descuentos.rows;
+
+    }catch(error){
+        console.log(error);
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
 
 
