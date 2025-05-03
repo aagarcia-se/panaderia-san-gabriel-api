@@ -54,7 +54,8 @@ export const consultarDescuentoStockPorSucursalDato = async (idSucursal) => {
                           FROM DESCUENTODESTOCK des 
                           INNER JOIN SUCURSALES s ON des.idSucursal = s.idSucursal 
                           INNER JOIN USUARIOS u ON des.idUsuario = u.idUsuario
-                          where des.idSucursal = ?;`;
+                          where des.idSucursal = ?
+                          order by des.idDescuento desc;`;
         
         const descuentos = await Connection.execute(consulta, [idSucursal]);
 
@@ -80,6 +81,20 @@ export const consultarDescuentoStockPrdocutosDetalle = async (idDescuento) => {
 
     }catch(error){
         console.log(error);
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
+
+export const cancelarDescuentoStockDao = async (idDescuento) => {
+    try{
+        const consulta = `delete from DESCUENTODESTOCK WHERE idDescuento = ?;`;
+        
+        const descuentos = await Connection.execute(consulta, [idDescuento]);
+
+        return descuentos.rows;
+
+    }catch(error){
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
