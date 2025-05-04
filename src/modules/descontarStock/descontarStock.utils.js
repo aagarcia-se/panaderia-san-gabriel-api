@@ -27,7 +27,22 @@ export const crearPayloadDescontarStockGeneral = (descuentoInfo, productoIngresa
     return payloadDescontarGeneral;  
 }
 
+const crearMensajeObservaciones = (tipoDescuento) => {
+    let message = '';
+
+    if(tipoDescuento === "MAYOREO"){
+        message = 'Descuento por venta al mayoreo';
+    }else if(tipoDescuento === "MAL ESTADO"){
+        message = "Descuento por producto en mal estado";
+    }else if(tipoDescuento === "CORRECCION"){
+        message = "Correccion de stock";
+    }
+
+    return message;
+}
+
 export const crearPayloadHistorialStock = (descuentoInfo, productoIngresado, productoEnStock) => {
+
     const payloadHistorial = {
         idUsuario: descuentoInfo.idUsuario,
         idProducto: productoIngresado.idProducto,
@@ -37,7 +52,7 @@ export const crearPayloadHistorialStock = (descuentoInfo, productoIngresado, pro
         stockNuevo: productoEnStock.stock - productoIngresado.stockADescontar,
         cantidad: productoIngresado.stockADescontar,
         fechaActualizacion: descuentoInfo.fechaDescuento,
-        observaciones: descuentoInfo.tipoDescuento === "MAYOREO" ? 'Descuento por venta al mayoreo' : "Descuento por producto en mal estado",
+        observaciones: crearMensajeObservaciones(descuentoInfo.tipoDescuento),
         tipoReferencia: 'DESCUENTO-'
     }
 
