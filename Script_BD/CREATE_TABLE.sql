@@ -358,7 +358,7 @@ CREATE TABLE IF NOT EXISTS DESCUENTODESTOCK (
     idDescuento INTEGER PRIMARY KEY AUTOINCREMENT,
     idSucursal INTEGER NOT NULL,
     idUsuario INTEGER NOT NULL,
-    tipoDescuento TEXT NOT NULL CHECK(tipoDescuento IN ('MAYOREO', 'MAL ESTADO')),
+    tipoDescuento TEXT NOT NULL CHECK(tipoDescuento IN ('MAYOREO', 'MAL ESTADO', 'CORRECCON')),
     fechaDescuento DATETIME NOT NULL,
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
