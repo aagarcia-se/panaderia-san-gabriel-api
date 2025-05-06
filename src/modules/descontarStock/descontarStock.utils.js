@@ -58,3 +58,5 @@ export const crearPayloadHistorialStock = (descuentoInfo, productoIngresado, pro
 
     return payloadHistorial;
 }
+
+

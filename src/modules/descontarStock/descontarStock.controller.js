@@ -56,3 +56,17 @@ export const consultarDetalleDescuentosController = async (req, res, next) => {
       next(error); // Pasa el error al middleware de manejo de errores
     }
 };
+
+export const cancelarDescuentoDeStockController = async (req, res, next) => {
+    try {
+      const gestionEliminada = await cancelarDescuentoStockService(req.params.idDescuento);
+      const responseData = {
+        status: 200,
+        message: "Eliminacion exitosa",
+        gestionEliminada,
+      };
+      res.status(200).json(responseData);
+    } catch (error) {
+      next(error); // Pasa el error al middleware de manejo de errores
+    }
+};

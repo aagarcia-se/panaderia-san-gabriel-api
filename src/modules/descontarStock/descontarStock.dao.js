@@ -84,20 +84,6 @@ export const consultarDescuentoStockPrdocutosDetalle = async (idDescuento) => {
     }
 }
 
-export const cancelarDescuentoStockDao = async (idDescuento) => {
-    try{
-        const consulta = `delete from DESCUENTODESTOCK WHERE idDescuento = ?;`;
-        
-        const descuentos = await Connection.execute(consulta, [idDescuento]);
-
-        return descuentos.rows;
-
-    }catch(error){
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
-}
-
 export const consultarDescuentoporProductoDao = async (idProducto, idSucursal, idFecha) => {
     try{
         const consulta = `SELECT 
@@ -148,7 +134,7 @@ export const consultarDetalleDescuentosDao = async (idDescuento) => {
               return 0;
             }
         
-            const ScriptDetalle = `select dds.idDetalleDescuento, dds.idProducto, p.nombreProducto, dds.cantidadUnidades unidadesDescontadas 
+            const ScriptDetalle = `select dds.idDetalleDescuento, dds.idProducto, p.nombreProducto, p.controlarStock, p.controlarStockDiario, dds.cantidadUnidades unidadesDescontadas 
                                         from DETALLEDESCUENTODESTOCK dds
                                         inner join PRODUCTOS p ON dds.idProducto = p.idProducto
                                         where idDescuento = ?;`;
@@ -168,3 +154,15 @@ export const consultarDetalleDescuentosDao = async (idDescuento) => {
     }
 }
 
+export const cancelarDescuentoDeStockDao = async (idDescuento) => {
+    try{
+        const consulta = `delete from DESCUENTODESTOCK WHERE idDescuento = ?;`;
+        
+        const descuentos = await Connection.execute(consulta, [idDescuento]);
+
+        return descuentos.rowsAffected === 1 ? Number(idDescuento) : 0 ;
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
