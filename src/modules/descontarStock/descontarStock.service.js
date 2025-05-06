@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockProductoDao, consultarStockProductoDiarioDao, IngresarHistorialStockDao } from "../StockProductos/stockProductos.dao.js";
-import { cancelarDescuentoStockDao, consultarDescuentoStockPorSucursalDato, ingresarDescuentoDao } from "./descontarStock.dao.js";
+import { cancelarDescuentoStockDao, consultarDescuentoStockPorSucursalDato, consultarDetalleDescuentosDao, ingresarDescuentoDao } from "./descontarStock.dao.js";
 import { crearPayloadDescontarStockDiario, crearPayloadDescontarStockGeneral, crearPayloadHistorialStock } from "./descontarStock.utils.js";
 
 
@@ -81,3 +81,13 @@ export const cancelarDescuentoStockService = async (idDescuento) => {
         throw error;
     }
 }
+
+export const consultarDetalleDescuentosService = async (idDescuento) => {
+    try{
+        const res = await consultarDetalleDescuentosDao(idDescuento);
+        return res;
+    }catch(error){
+        throw error;
+    }
+}
+
