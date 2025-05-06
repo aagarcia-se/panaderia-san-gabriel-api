@@ -1,4 +1,4 @@
-import { cancelarDescuentoStockService, IngresarDescuentoServices } from "./descontarStock.service.js";
+import { cancelarDescuentoStockService, consultarDetalleDescuentosService, IngresarDescuentoServices } from "./descontarStock.service.js";
 import { consultarDescuentoStockPorSucursalService } from "./descontarStock.service.js";
 
 export const consultarDescuentoStockPorSucursalController = async (req, res, next) => {
@@ -36,6 +36,20 @@ export const cancelarDescuentoStockController = async (req, res, next) => {
         status: 200,
         message: "Eliminacion exitosa",
         gestionEliminada,
+      };
+      res.status(200).json(responseData);
+    } catch (error) {
+      next(error); // Pasa el error al middleware de manejo de errores
+    }
+};
+
+export const consultarDetalleDescuentosController = async (req, res, next) => {
+    try {
+      const descuentoStock = await consultarDetalleDescuentosService(req.params.idDescuento);
+      const responseData = {
+        status: 200,
+        message: "Consulta exitosa",
+        descuentoStock,
       };
       res.status(200).json(responseData);
     } catch (error) {

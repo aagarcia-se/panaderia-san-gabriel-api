@@ -133,5 +133,38 @@ export const consultarDescuentoporProductoDao = async (idProducto, idSucursal, i
     }
 }
 
+export const consultarDetalleDescuentosDao = async (idDescuento) => {
+    try{
 
+        const scriptHeader = `select des.idDescuento, des.idSucursal, s.nombreSucursal, des.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario) nombreUsuario, des.tipoDescuento,
+                                des.fechaDescuento, des.estado from DESCUENTODESTOCK des
+                                inner join SUCURSALES s ON des.idSucursal = s.idSucursal
+                                inner join USUARIOS u ON des.idUsuario = u.idUsuario
+                                where des.idDescuento = ?;`;
+                                  
+            const descuentoHeader = await Connection.execute(scriptHeader, [idDescuento]);
+        
+            if( descuentoHeader.rows.length === 0){
+              return 0;
+            }
+        
+            const ScriptDetalle = `select dds.idDetalleDescuento, dds.idProducto, p.nombreProducto, dds.cantidadUnidades unidadesDescontadas 
+                                        from DETALLEDESCUENTODESTOCK dds
+                                        inner join PRODUCTOS p ON dds.idProducto = p.idProducto
+                                        where idDescuento = ?;`;
+        
+            const detalleDescuento = await Connection.execute(ScriptDetalle, [idDescuento]);
+        
+        
+            return {
+              encabezadoDescuento: descuentoHeader.rows[0],
+              detalleDescuento: detalleDescuento.rows
+            }
+
+        
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
 
