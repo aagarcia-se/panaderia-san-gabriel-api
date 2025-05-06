@@ -62,7 +62,6 @@ export const consultarDescuentoStockPorSucursalDato = async (idSucursal) => {
         return descuentos.rows;
 
     }catch(error){
-        console.log(error);
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
@@ -80,7 +79,6 @@ export const consultarDescuentoStockPrdocutosDetalle = async (idDescuento) => {
         return descuentos.rows;
 
     }catch(error){
-        console.log(error);
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
@@ -99,5 +97,41 @@ export const cancelarDescuentoStockDao = async (idDescuento) => {
         throw new CustomError(dbError);
     }
 }
+
+export const consultarDescuentoporProductoDao = async (idProducto, idSucursal, idFecha) => {
+    try{
+        const consulta = `SELECT 
+                                MIN(dd.idDetalleDescuento) AS idDetalleDescuento, 
+                                des.idSucursal, 
+                                dd.idProducto,
+                                SUM(dd.cantidadUnidades) AS unidadesDescontadas, 
+                                DATE(dd.fechaDescuento) AS fechaDescuento
+                            FROM DESCUENTODESTOCK des
+                            INNER JOIN DETALLEDESCUENTODESTOCK dd ON des.idDescuento = dd.idDescuento
+                            WHERE dd.idProducto = ?
+                            AND des.idSucursal = ?
+                            AND DATE(dd.fechaDescuento) = ?
+                            GROUP BY des.idSucursal, dd.idProducto, DATE(dd.fechaDescuento);`;
+        
+        const descuentos = await Connection.execute(consulta, [
+            idProducto,
+            idSucursal,
+            idFecha
+        ]);
+
+        if(descuentos.rows.length === 0){
+            return {
+            idDescuento: 0
+            }
+        }
+
+        return descuentos.rows[0];
+
+    }catch(error){
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
+
 
 

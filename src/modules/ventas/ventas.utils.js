@@ -1,5 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
+import { consultarDescuentoporProductoDao } from "../descontarStock/descontarStock.dao.js";
 import { consultarUnidadesDeProductoPorOrdenService } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { consultarPrecioProductoPorIdService } from "../precios/precios.service.js";
 import { consultarStockProductoDao, consultarStockProductoDiarioDao } from "../StockProductos/stockProductos.dao.js";
@@ -56,32 +57,59 @@ export const obtenerProductosPanaderiaVendidos = async (encabezadoVenta, ventaDe
             ventaDetalle.map(async (detalle) => {
 
                 if(detalle.tipoProduccion === "bandejas" && encabezadoVenta.ventaTurno === "AM"){
+
+                    //consulta si el producto tuvo algun descuento por mal estado o por venta al mayoreo
+                    const productoDescontado = await consultarDescuentoporProductoDao(detalle.idProducto, idSucursal, encabezadoVenta.fechaVenta);
+                    
                     // Consultar unidades producidas
                     const productoProducido = await consultarUnidadesDeProductoPorOrdenService(encabezadoVenta.idOrdenProduccion, detalle.idProducto);
 
-                    // Si el producto está en la orden, calcular la cantidad vendida
-                    if (productoProducido.detalleOrden.idDetalleOrdenProduccion !== 0) {
+    
+                    if(productoDescontado.idDescuento !== 0 && productoProducido.detalleOrden.idDetalleOrdenProduccion !== 0){
+                        
+                        const cantidadRestante = productoProducido.detalleOrden.cantidadUnidades - productoDescontado.unidadesDescontadas;
+                        if(cantidadRestante > 0){ 
+                            const cantidadVendida = calcularUnidadesDePanaderiaVendidas(cantidadRestante, detalle.unidadesNoVendidas);
+                            
+                            // Retornar el detalle con la información adicional
+                            return {
+                                ...detalle,
+                                cantidadProducida: productoProducido.detalleOrden.cantidadUnidades,
+                                cantidadVendida: cantidadVendida,
+                            };
+
+                        }
+                        
+                    }else if(productoDescontado.idDescuento === 0 && productoProducido.detalleOrden.idDetalleOrdenProduccion !== 0){
+
                         const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoProducido.detalleOrden.cantidadUnidades, detalle.unidadesNoVendidas);
 
-                        // Retornar el detalle con la información adicional
-                        return {
-                            ...detalle,
-                            cantidadProducida: productoProducido.detalleOrden.cantidadUnidades,
-                            cantidadVendida: cantidadVendida,
-                        };
+                        if(cantidadVendida > 0){
+                            // Retornar el detalle con la información adicional
+                            return {
+                                ...detalle,
+                                cantidadProducida: productoProducido.detalleOrden.cantidadUnidades,
+                                cantidadVendida: cantidadVendida,
+                            };
+
+                        }
+
                     }
 
                 }else{
 
                     if(detalle.controlarStock === 1 && detalle.controlarStockDiario === 0){
+
                         const productoEnStock = await consultarStockProductoDao(detalle.idProducto, idSucursal);
                         if(productoEnStock.idStock !== 0 && productoEnStock.stock > 0){
-                            return{
-                                ...detalle,
-                                cantidadVendida: calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas)
-                                
+                            const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas);
+                            
+                            if(cantidadVendida > 0){
+                                return{
+                                    ...detalle,
+                                    cantidadVendida: cantidadVendida,
+                                }
                             }
-
                         }else{
                             //aqui va el caso de uso si el producto no tiene stock general
 
@@ -90,9 +118,13 @@ export const obtenerProductosPanaderiaVendidos = async (encabezadoVenta, ventaDe
                     }else{
                         const productoEnStockDiario = await consultarStockProductoDiarioDao(detalle.idProducto, idSucursal, detalle.fechaCreacion);
                         if(productoEnStockDiario.idStockDiario !== 0 && productoEnStockDiario.stock > 0){
-                            return{
-                                ...detalle,
-                                cantidadVendida: calcularUnidadesDePanaderiaVendidas(productoEnStockDiario.stock, detalle.unidadesNoVendidas)
+                            const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas);
+
+                            if(cantidadVendida > 0){
+                                return{
+                                    ...detalle,
+                                    cantidadVendida: cantidadVendida,
+                                }
                             }
                         }else{
                             //aqui va el caso de uso si el producto no tiene stock diario
