@@ -1,8 +1,11 @@
 import CustomError from "../../utils/CustomError.js";
+import { obtenerSoloFecha } from "../../utils/date.utils.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarIngresoDiarioPorTurnoService } from "../ingresos/ingresos.service.js";
 import { crearPayloadingresos } from "../ingresos/ingresos.utils.js";
+import { actuailizarEstadoOrdenProd } from "../oredenesproduccion/ordenesproduccion.dao.js";
 import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/ordenesproduccion.service.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockProductoDao, consultarStockProductoDiarioDao, IngresarHistorialStockDao } from "../StockProductos/stockProductos.dao.js";
 import { descontarStockPorVentas } from "../StockProductos/stockProductos.service.js";
 import { consultarDetalleVentaDao, consultarVentasPorUsuarioDao, eliminarVentaDao, ingresarVentaDao, } from "./ventas.dao.js";
 import { procesarVentaService } from "./ventas.utils.js";
@@ -29,9 +32,7 @@ export const ingresarVentaService = async (venta) => {
     await registrarIngresoDiarioPorTurnoService(detalleingreso);
 
     if (venta.encabezadoVenta.idOrdenProduccion) {
-      await actualizarEstadoOrdenProduccionServices(
-        resVenta.encabezadoVenta.idOrdenProduccion
-      );
+      await actualizarEstadoOrdenProduccionServices(resVenta.encabezadoVenta.idOrdenProduccion);
     }
 
     return resVenta;
@@ -55,20 +56,6 @@ export const consultarVentasPorUsuarioService = async (idUsuariol) => {
   }
 };
 
-export const eliminarVentaService = async (idVenta) => {
-  try {
-    const resElminacion = await eliminarVentaDao(idVenta);
-    if (resElminacion === 0) {
-      const error = getError(4);
-      throw new CustomError(error);
-    }
-
-    return resElminacion;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const consultarDetalleVentaService = async (idVenta) => {
   try{
 
@@ -82,4 +69,86 @@ export const consultarDetalleVentaService = async (idVenta) => {
   }catch(error){
     throw error;
   }
+}
+
+export const eliminarVentaService = async (idVenta) => {
+  try {
+
+    await revertirVentaServices(idVenta);
+
+    const resElminacion = await eliminarVentaDao(idVenta);
+    if (resElminacion === 0) {
+      const error = getError(4);
+      throw new CustomError(error);
+    }
+
+    return resElminacion;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const revertirVentaServices = async (idVenta) => {
+    try{
+        const detalleProductosVenta = await consultarDetalleVentaDao(idVenta)
+        const {encabezadoVenta, detalleVenta} = detalleProductosVenta;
+
+        await actuailizarEstadoOrdenProd( encabezadoVenta.fechaVenta, encabezadoVenta.ventaTurno );
+
+        return Promise.all(
+            detalleVenta.map( async (producto) => {
+                try{
+
+                  if(producto.controlarStock === 1 && producto.controlarStockDiario === 0){
+                    const productoEnStock = await consultarStockProductoDao(producto.idProducto, encabezadoVenta.idSucursal);
+
+                    const payloadRevertir = {
+                        idSucursal: encabezadoVenta.idSucursal,
+                        idProducto: producto.idProducto,
+                        stock: productoEnStock.stock + producto.cantidadVendida,
+                        fechaActualizacion: encabezadoVenta.fechaVenta
+                    }
+
+                    await actualizarStockProductoDao(payloadRevertir);
+
+                    const payloadHistorial = {
+                        idUsuario: encabezadoVenta.idUsuario,
+                        idProducto: producto.idProducto,
+                        idSucursal: encabezadoVenta.idSucursal,
+                        tipoMovimiento: 'INGRESO',
+                        stockAnterior: productoEnStock.stock,
+                        cantidad: producto.cantidadVendida,
+                        stockNuevo: productoEnStock.stock + producto.cantidadVendida,
+                        fechaActualizacion: encabezadoVenta.fechaVenta,
+                        observaciones: 'Revertir venta por eliminacion',
+                        tipoReferencia: 'VENTA'
+                    }
+
+                    await IngresarHistorialStockDao(payloadHistorial);
+
+                    
+                  }else{
+
+                    const productoEnStockDiario = await consultarStockProductoDiarioDao(producto.idProducto, encabezadoVenta.idSucursal, obtenerSoloFecha(encabezadoVenta.fechaVenta));
+
+                    const payloadRevertir = {
+                        idSucursal: encabezadoVenta.idSucursal,
+                        idProducto: producto.idProducto,
+                        stock: productoEnStockDiario.stock + producto.cantidadVendida,
+                        fechaActualizacion: encabezadoVenta.fechaVenta,
+                        fechaValidez: obtenerSoloFecha(encabezadoVenta.fechaVenta)
+                    }
+
+                    await actualizarStockProductoDiarioDao(payloadRevertir);
+                  }
+
+                }catch(error){
+                    throw error;
+                }
+            })
+        );
+        
+    }catch(error){
+        throw error;
+    }   
 }
