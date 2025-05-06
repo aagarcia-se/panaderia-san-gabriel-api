@@ -118,7 +118,7 @@ export const obtenerProductosPanaderiaVendidos = async (encabezadoVenta, ventaDe
                     }else{
                         const productoEnStockDiario = await consultarStockProductoDiarioDao(detalle.idProducto, idSucursal, detalle.fechaCreacion);
                         if(productoEnStockDiario.idStockDiario !== 0 && productoEnStockDiario.stock > 0){
-                            const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas);
+                            const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStockDiario.stock, detalle.unidadesNoVendidas);
 
                             if(cantidadVendida > 0){
                                 return{
