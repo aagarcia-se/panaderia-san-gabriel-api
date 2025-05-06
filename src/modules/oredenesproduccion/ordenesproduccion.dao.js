@@ -228,3 +228,19 @@ export const consultarDetalleOrdenPorCriteriosDao = async (ordenTurno, fechaApro
     throw new CustomError(dbError);
   }
 }
+
+export const actuailizarEstadoOrdenProd = async (fechaAProducir, ordenTurno) => {
+  try {
+    const updateEstado = `update ORDENESPRODUCCION set estadoOrden = 'P'
+                          where fechaAProducir = ?
+                          and ordenTurno = ?;`;
+
+    const resultadoEncabezado = await Connection.execute(updateEstado, [fechaAProducir, ordenTurno]);
+
+    return resultadoEncabezado.toJSON().rowsAffected;
+
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}

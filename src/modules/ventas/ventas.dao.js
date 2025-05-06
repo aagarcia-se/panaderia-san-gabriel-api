@@ -104,8 +104,8 @@ export const consultarDetalleVentaDao = async (idVenta) => {
       return 0;
     }
 
-    const scriptDetalleVenta = `select dv.idDetalleVenta, dv.idVenta, dv.IdProducto, p.nombreProducto,
-                                  dv.cantidadVendida, dv.precioUnitario, dv.descuento,
+    const scriptDetalleVenta = `select dv.idDetalleVenta, dv.idVenta, dv.IdProducto, p.nombreProducto, p.controlarStock,
+                                  p.controlarStockDiario, dv.cantidadVendida, dv.precioUnitario, dv.descuento,
                                   dv.subTotal from detallesventas dv
                                   INNER JOIN ventas v on dv.idVenta = v.idVenta
                                   INNER JOIN productos p on dv.idProducto = p.idProducto
