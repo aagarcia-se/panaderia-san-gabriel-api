@@ -7,12 +7,12 @@ export const crearPayloadingresos = (idVenta, venta) => {
         idVenta: Number(idVenta),
         ...detalleIngreso,
         montoEsperado: encabezadoVenta.totalVenta,
-        montoTotalGasto:gastosDiarios.encabezadoGastosDiarios.montoTotalGasto
+        montoTotalGasto: gastosDiarios && gastosDiarios.encabezadoGastosDiarios ? gastosDiarios.encabezadoGastosDiarios.montoTotalGasto : 0
     }
 }
 
 export const calcularDiferencia = (montoEsperado, montoTotalIngresado, montoTotalGasto) => {
 
-    return montoTotalIngresado - (montoEsperado + montoTotalGasto);
+    return (montoTotalIngresado + montoTotalGasto ) - montoEsperado;
 
 }

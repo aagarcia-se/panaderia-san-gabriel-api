@@ -10,7 +10,7 @@ export const registrarIngresosDiariosPorTurnoDao = async (dataIngesos) =>{
        const resInsert = await Connection.execute(insertIngreso, [
         dataIngesos.idVenta,
         dataIngesos.montoTotalIngresado,
-        dataIngesos.montoTotalGastos,
+        dataIngesos.montoTotalGastos || 0,
         dataIngesos.montoEsperado,
         dataIngesos.diferencia,
         dataIngesos.fechaIngreso,
