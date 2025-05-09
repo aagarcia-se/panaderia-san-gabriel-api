@@ -7,11 +7,12 @@ import { calcularDiferencia } from "./ingresos.utils.js";
 export const registrarIngresoDiarioPorTurnoService = async (detalleingreso) =>{
     try{
 
-        const diferencia =  calcularDiferencia(detalleingreso.montoEsperado, detalleingreso.montoTotalIngresado);
+        const diferencia =  calcularDiferencia(detalleingreso.montoEsperado, detalleingreso.montoTotalIngresado, detalleingreso.montoTotalGasto);
 
         const detalleIngresoConDiferencia = {
             ...detalleingreso, // Copiar todas las propiedades existentes
             diferencia: diferencia, // Agregar la diferencia calculada
+            montoTotalGastos: detalleingreso.montoTotalGasto
         };
 
         const idIngreso = await registrarIngresosDiariosPorTurnoDao(detalleIngresoConDiferencia);

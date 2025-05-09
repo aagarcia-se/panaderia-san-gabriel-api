@@ -213,7 +213,7 @@ export const actualizarEncabezadoVenta = (encabezadoVenta, totalVenta) => {
 
 export const procesarVentaService = async (venta) => {
     try {
-        const { encabezadoVenta, detalleVenta, detalleIngreso } = venta;
+        const { encabezadoVenta, detalleVenta, detalleIngreso, gastosDiarios } = venta;
         let productosProcesados;     
         let idSucursal = encabezadoVenta.idSucursal;
 
@@ -242,6 +242,7 @@ export const procesarVentaService = async (venta) => {
             encabezadoVenta: encabezadoActualizado,
             detallesVenta: detallesConSubtotal,
             detalleIngreso: detalleIngreso, // Agregar detalleIngreso a ventaProcesada
+            gastosDiarios: gastosDiarios
         };
 
         return ventaProcesada;
