@@ -4,12 +4,13 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const registrarIngresosDiariosPorTurnoDao = async (dataIngesos) =>{
     try{
-        const insertIngreso = `INSERT INTO INGRESOSDIARIOS (idVenta, montoTotalIngresado, montoEsperado, diferencia, fechaIngreso)
-                            VALUES (?, ?, ?, ?, ?);`
+        const insertIngreso = `INSERT INTO INGRESOSDIARIOS (idVenta, montoTotalIngresado, montoTotalGastos, montoEsperado, diferencia, fechaIngreso)
+                            VALUES (?, ?, ?, ?, ?, ?);`
 
        const resInsert = await Connection.execute(insertIngreso, [
         dataIngesos.idVenta,
         dataIngesos.montoTotalIngresado,
+        dataIngesos.montoTotalGastos || 0,
         dataIngesos.montoEsperado,
         dataIngesos.diferencia,
         dataIngesos.fechaIngreso,

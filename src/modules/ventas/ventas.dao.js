@@ -114,7 +114,7 @@ export const consultarDetalleVentaDao = async (idVenta) => {
     const detalleVenta = await Connection.execute(scriptDetalleVenta, [idVenta]);
 
 
-    const scriptIngresos = `select i.idIngreso, i.idVenta, i.montoTotalIngresado, i.montoEsperado, i.diferencia, i.fechaIngreso
+    const scriptIngresos = `select i.idIngreso, i.idVenta, i.montoTotalIngresado, i.montoTotalGastos, i.montoEsperado, i.diferencia, i.fechaIngreso
                             from ingresosdiarios i
                             INNER JOIN ventas v on i.idVenta = v.idVenta
                             where i.idVenta = ?;`;

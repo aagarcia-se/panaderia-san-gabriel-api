@@ -1,6 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { obtenerSoloFecha } from "../../utils/date.utils.js";
 import { getError } from "../../utils/generalErrors.js";
+import { ingresarGastosDiariosService } from "../GastosDiarios/gastosDiarios.service.js";
 import { registrarIngresoDiarioPorTurnoService } from "../ingresos/ingresos.service.js";
 import { crearPayloadingresos } from "../ingresos/ingresos.utils.js";
 import { actuailizarEstadoOrdenProd } from "../oredenesproduccion/ordenesproduccion.dao.js";
@@ -24,12 +25,13 @@ export const ingresarVentaService = async (venta) => {
 
     await descontarStockPorVentas(ventaDetalleProcesado);//debitar stock de las ventas ingresadas
 
-    const detalleingreso = crearPayloadingresos(
-      resVenta.idVenta,
-      ventaDetalleProcesado
-    );
+    const detalleingreso = crearPayloadingresos(resVenta.idVenta, ventaDetalleProcesado);
 
     await registrarIngresoDiarioPorTurnoService(detalleingreso);
+
+    if(venta.gastosDiarios && venta.gastosDiarios.detalleGastosDiarios){
+      await ingresarGastosDiariosService(resVenta.idVenta, venta.gastosDiarios);
+    }
 
     if (venta.encabezadoVenta.idOrdenProduccion) {
       await actualizarEstadoOrdenProduccionServices(resVenta.encabezadoVenta.idOrdenProduccion);
