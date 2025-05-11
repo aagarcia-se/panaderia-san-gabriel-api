@@ -119,3 +119,22 @@ export const cambiarPasswordDao = async (newPassData) => {
     throw new CustomError(dbError);
   }
 }
+
+export const actualizarDatosUsuarioDao = async (dataUsuario) => {
+  try {
+    const query =
+      "UPDATE usuarios SET nombreUsuario = ?, apellidoUsuario = ?, correoUsuario = ?, idRol = ? WHERE idUsuario = ?";
+    const usuario = await Connection.execute(query, [
+      dataUsuario.nombreUsuario,
+      dataUsuario.apellidoUsuario,
+      dataUsuario.correoUsuario,
+      dataUsuario.idRol,
+      dataUsuario.idUsuario
+    ]);
+
+    return usuario.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
