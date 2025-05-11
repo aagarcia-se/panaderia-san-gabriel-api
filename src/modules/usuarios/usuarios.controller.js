@@ -1,4 +1,4 @@
-import { actualizarUsuarioService, consultarUsuariosService, crearUsuarioService, bloquearUsuarioService, elminarUsuarioService, desbloquearUsuarioService, cambiarPasswordService } from "./usuarios.service.js";
+import { actualizarUsuarioService, consultarUsuariosService, crearUsuarioService, bloquearUsuarioService, elminarUsuarioService, desbloquearUsuarioService, cambiarPasswordService, actualizarDatosUsuarioService } from "./usuarios.service.js";
 
 
 export const crearUsuarioController = async (req, res, next) => {
@@ -95,6 +95,20 @@ export const cambiarPasswordController = async (req, res, next) => {
       status: 200,
       message: "Actualización exitosa",
       passActualizado
+    };
+    res.status(200).json(responseData);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de manejo de errores
+  }
+};
+
+export const actualizarDatosUsuarioController = async (req, res, next) => {
+  try {
+    const usuarioActualizado = await actualizarDatosUsuarioService(req.body);
+    const responseData = {
+      status: 200,
+      message: "Actualización exitosa",
+      usuarioActualizado: usuarioActualizado,
     };
     res.status(200).json(responseData);
   } catch (error) {
