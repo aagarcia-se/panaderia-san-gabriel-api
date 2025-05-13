@@ -121,10 +121,18 @@ export const consultarDetalleVentaDao = async (idVenta) => {
     
     const detalleIngresos = await Connection.execute(scriptIngresos, [idVenta]);
 
+    const scriptGastos = `select dg.idGastoDiarioDetalle, dg.idGastoDiario, dg.DetalleGasto, dg.subtotal
+                            from GASTOSDIARIOSDETALLES dg 
+                            inner join GASTOSDIARIOS g on dg.idGastoDiario = g.idGastoDiario
+                            where g.idVenta = ?;`;
+    
+    const detalleGastos = await Connection.execute(scriptGastos, [idVenta]);
+
     return {
       encabezadoVenta: venta.rows[0],
       detalleVenta: detalleVenta.rows,
-      detalleIngresos: detalleIngresos.rows[0]
+      detalleIngresos: detalleIngresos.rows[0],
+      detalleGastos: detalleGastos.rows
     }
 
   }catch(error){
