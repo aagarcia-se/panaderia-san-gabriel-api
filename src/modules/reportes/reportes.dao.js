@@ -11,7 +11,7 @@ export const generarReporteHistorialStockDao = async (idProducto, idSucursal) =>
                         inner join USUARIOS u ON h.idUsuario = u.idUsuario
                         where h.idProducto = ?
                         and h.idSucursal = ?
-                        order by h.idHistorial desc;`;
+                        order by h.idHistorial asc;`;
 
         const params = [
             idProducto,
