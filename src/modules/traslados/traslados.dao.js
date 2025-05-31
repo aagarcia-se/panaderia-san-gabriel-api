@@ -57,7 +57,7 @@ export const consultarTrasladosDao = async () => {
                         FROM TRASLADOSPRODUCTOS tp INNER JOIN SUCURSALES so ON tp.idSucursalOrigen = so.idSucursal
                         INNER JOIN SUCURSALES sd ON tp.idSucursalDestino = sd.idSucursal INNER JOIN USUARIOS u ON tp.idUsuario = u.idUsuario
                         AND tp.estado = 'A'
-                        ORDER BY tp.fechaTraslado DESC;`;
+                        ORDER BY tp.idTraslado DESC;`;
 
         const result = await Connection.execute(query);
 
@@ -99,7 +99,7 @@ export const consultarDetalleDeTraladoDao = async (idTraslado) => {
 
         return {
             encabezadoTraslado: result.rows[0],
-            detalleTraslado: resultDetalle.rows
+            detalle: resultDetalle.rows
         };
     } catch (error) {
         const dbError = getDatabaseError(error.message);

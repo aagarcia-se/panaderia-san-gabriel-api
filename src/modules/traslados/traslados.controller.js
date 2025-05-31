@@ -30,11 +30,11 @@ export const consultarTrasladosController = async (req, res, next) => {
 
 export const consultarDetalleDeTraladoController = async (req, res, next) => {
     try {
-        const resTraslados = await consultarDetalleDeTraladoService(req.params.idTraslado);
+        const traslado = await consultarDetalleDeTraladoService(req.params.idTraslado);
         const responseData = {
             status: 200,
             message: "Consulta exitosa",
-            resTraslados,
+            traslado,
         };
         res.status(200).json(responseData);
     } catch (error) {
