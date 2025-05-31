@@ -18,6 +18,7 @@ import { recetasRoute } from "./modules/recetas/recetas.routes.js";
 import { ordenEspecialRoutes } from "./modules/OrdenesEspeciales/ordenesEspeciales.routes.js";
 import { descontarStockRoute } from "./modules/descontarStock/descontarStock.routes.js";
 import { reportesRoute } from "./modules/reportes/reportes.routes.js";
+import { trasladosRoute } from "./modules/traslados/traslados.routes.js";
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use("/api", recetasRoute);
 app.use("/api", ordenEspecialRoutes);
 app.use("/api", descontarStockRoute);
 app.use("/api", reportesRoute);
+app.use("/api", trasladosRoute);
 
 // Middleware de manejo de errores
 app.use(errorHandler);
