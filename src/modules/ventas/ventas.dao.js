@@ -55,7 +55,7 @@ export const ingresarVentaDao = async (venta) => {
 export const consultarVentasPorUsuarioDao = async (idUsuario) => {
   try{
 
-    const consulta = `select v.idVenta, v.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario)nombreUsuario, v.idSucursal, s.nombreSucursal, 
+    const consulta = `select v.idVenta, v.ventaTurno, v.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario)nombreUsuario, v.idSucursal, s.nombreSucursal, 
                       v.fechaVenta, v.totalVenta, v.estadoVenta from ventas v
                       INNER JOIN usuarios u ON v.idUsuario = u.idUsuario
                       INNER JOIN SUCURSALES s ON v.idSucursal = s.idSucursal
@@ -139,4 +139,26 @@ export const consultarDetalleVentaDao = async (idVenta) => {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
+}
+
+export const consultarVentaporId = async (idVenta) => {
+  try{
+
+    const consulta = `select idVenta, idUsuario, idSucursal, ventaTurno,
+                      fechaVenta, totalVenta, estadoVenta, fechaCreacion
+                      from VENTAS
+                      where idVenta = ?;`
+  
+      // Ejecutar la consulta
+      const ventaPorId = await Connection.execute(consulta, [idVenta]);
+
+      // Devolver los registros encontrados
+      return ventaPorId.rows[0];
+
+  }catch(error){
+    console.log(error);
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+
 }

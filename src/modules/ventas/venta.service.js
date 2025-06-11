@@ -1,6 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { obtenerSoloFecha } from "../../utils/date.utils.js";
 import { getError } from "../../utils/generalErrors.js";
+import { registrarEliminacionPorDia } from "../eliminacionesTracking/eliminacionesdiarias.dao.js";
 import { ingresarGastosDiariosService } from "../GastosDiarios/gastosDiarios.service.js";
 import { registrarIngresoDiarioPorTurnoService } from "../ingresos/ingresos.service.js";
 import { crearPayloadingresos } from "../ingresos/ingresos.utils.js";
@@ -8,7 +9,7 @@ import { actuailizarEstadoOrdenProd } from "../oredenesproduccion/ordenesproducc
 import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockProductoDao, consultarStockProductoDiarioDao, IngresarHistorialStockDao } from "../StockProductos/stockProductos.dao.js";
 import { descontarStockPorVentas } from "../StockProductos/stockProductos.service.js";
-import { consultarDetalleVentaDao, consultarVentasPorUsuarioDao, eliminarVentaDao, ingresarVentaDao, } from "./ventas.dao.js";
+import { consultarDetalleVentaDao, consultarVentaporId, consultarVentasPorUsuarioDao, eliminarVentaDao, ingresarVentaDao, } from "./ventas.dao.js";
 import { procesarVentaService } from "./ventas.utils.js";
 
 export const ingresarVentaService = async (venta) => {
@@ -78,11 +79,24 @@ export const eliminarVentaService = async (idVenta) => {
 
     await revertirVentaServices(idVenta);
 
+    const ventaPorId = await consultarVentaporId(idVenta);
+
     const resElminacion = await eliminarVentaDao(idVenta);
     if (resElminacion === 0) {
       const error = getError(4);
       throw new CustomError(error);
     }
+
+   const eliminacionTracking = {
+    procesoEliminado: 'VENTA',
+    idReferencia: idVenta,
+    idUsuario: ventaPorId.idUsuario,
+    idSucursal: ventaPorId.idSucursal,
+    turno: ventaPorId.ventaTurno,
+    fechaEliminacion: ventaPorId.fechaVenta
+   }
+
+   await registrarEliminacionPorDia(eliminacionTracking);
 
     return resElminacion;
   } catch (error) {
