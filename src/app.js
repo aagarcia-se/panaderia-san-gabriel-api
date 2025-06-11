@@ -19,6 +19,7 @@ import { ordenEspecialRoutes } from "./modules/OrdenesEspeciales/ordenesEspecial
 import { descontarStockRoute } from "./modules/descontarStock/descontarStock.routes.js";
 import { reportesRoute } from "./modules/reportes/reportes.routes.js";
 import { trasladosRoute } from "./modules/traslados/traslados.routes.js";
+import { eliminacionesRoute } from "./modules/eliminacionesTracking/eliminaciones.routes.js";
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use("/api", ordenEspecialRoutes);
 app.use("/api", descontarStockRoute);
 app.use("/api", reportesRoute);
 app.use("/api", trasladosRoute);
+app.use("/api", eliminacionesRoute);
 
 // Middleware de manejo de errores
 app.use(errorHandler);
