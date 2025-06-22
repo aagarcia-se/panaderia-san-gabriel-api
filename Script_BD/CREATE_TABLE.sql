@@ -60,10 +60,12 @@ CREATE TABLE IF NOT EXISTS USUARIOS (
     correoUsuario TEXT,
     telefonoUsuario TEXT,
     idRol INTEGER NOT NULL,
+    idSucursal INTEGER NOT NULL,
     estadoUsuario TEXT NOT NULL CHECK(estadoUsuario IN ('A', 'B')) DEFAULT 'A',
     fechaCreacion DATE NOT NULL,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idRol) REFERENCES ROLES(idRol)
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
 );
 
 -- Tabla ACCESOSUSUARIOS (Información de acceso y seguridad)
