@@ -17,9 +17,9 @@ export const ingresarOrdenEspecialServices = async (ordenEspecial) => {
     }
 }
 
-export const consultarOrdenesEspecialesServices = async () => {
+export const consultarOrdenesEspecialesServices = async (idRol, idSucursal) => {
     try{
-        const ordenesEspeciales = await consultarOrdenesEspecialesDao();
+        const ordenesEspeciales = await consultarOrdenesEspecialesDao(idRol, idSucursal);
         if (ordenesEspeciales.length === 0) {
             const error = getError(1);
             throw new CustomError(error);

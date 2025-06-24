@@ -2,22 +2,27 @@ import { Connection } from "../../config/database/databaseSqlite.js";
 import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
-export const consultarOrdenProduccionDao = async () => {
+export const consultarOrdenProduccionDao = async (idRol, idSucursal) => {
     try {
       // Consulta SQL
-      const query = `SELECT op.idOrdenProduccion, op.idSucursal, op.ordenTurno, s.nombresucursal, op.nombrepanadero, 
-                        op.fechaAProducir, op.estadoOrden,
-                        (
-                            SELECT COUNT(*) 
-                            FROM DETALLESORDENESPRODUCCION AS dp 
-                            WHERE dp.idOrdenProduccion = op.idOrdenProduccion
-                        ) AS cantidadProductos
-                    FROM ORDENESPRODUCCION AS op
-                    INNER JOIN SUCURSALES AS s ON op.idSucursal = s.idSucursal
-                    ORDER BY op.idOrdenProduccion DESC;`;
+      const query = `SELECT op.idOrdenProduccion, op.idSucursal, op.ordenTurno, s.nombresucursal, op.nombrepanadero, op.fechaAProducir, 
+                      op.estadoOrden,
+                      (
+                          SELECT COUNT(*) 
+                          FROM DETALLESORDENESPRODUCCION AS dp 
+                          WHERE dp.idOrdenProduccion = op.idOrdenProduccion
+                      ) AS cantidadProductos
+                  FROM 
+                      ORDENESPRODUCCION AS op
+                      INNER JOIN SUCURSALES AS s ON op.idSucursal = s.idSucursal
+                      INNER JOIN USUARIOS AS u ON op.idUsuario = u.idUsuario
+                  WHERE
+                      (u.idRol = ? OR op.idSucursal = ?)
+                  ORDER BY 
+                      op.idOrdenProduccion DESC;`;
 
       // Ejecutar la consulta
-      const ordenesProduccion = await Connection.execute(query);
+      const ordenesProduccion = await Connection.execute(query, [idRol, idSucursal]);
 
       // Devolver los registros encontrados
       return ordenesProduccion.rows;

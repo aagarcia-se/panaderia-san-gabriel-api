@@ -6,9 +6,9 @@ import { elminarStockDiarioService, procesarStockPorOrdenProduccionServices } fr
 import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
-export const consultarOrdenProduccionService = async () => {
+export const consultarOrdenProduccionService = async (idRol, idSucursal) => {
     try {
-      const ordenesProduccion = await consultarOrdenProduccionDao();
+      const ordenesProduccion = await consultarOrdenProduccionDao(idRol, idSucursal);
 
       if (ordenesProduccion.length === 0) {
         const error = getError(1);
