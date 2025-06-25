@@ -17,7 +17,8 @@ export const ingresarOrdenEspecialController = async (req, res, next) => {
 
 export const consultarOrdenesEspecialesController = async (req, res, next) => {
     try{
-        const ordenesEspeciales = await consultarOrdenesEspecialesServices();
+        const {idRol, idSucursal} = req.query;
+        const ordenesEspeciales = await consultarOrdenesEspecialesServices(idRol, idSucursal);
         const responseData = {
             status: 200,
             message: "Constulta exitosa",

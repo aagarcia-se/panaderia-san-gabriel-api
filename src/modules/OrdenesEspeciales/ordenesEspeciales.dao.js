@@ -58,16 +58,20 @@ export const ingresarOrdenEspecialDao = async (ordenesEspeciales) => {
     }
 };
 
-export const consultarOrdenesEspecialesDao = async () => {
+export const consultarOrdenesEspecialesDao = async (idRol, idSucursal) => {
     try{
-        const query = `select oe.idOrdenEspecial, oe.idSucursal, su.nombreSucursal sucursalEntrega, oe.nombreCliente, oe.telefonoCliente,
-                        oe.fechaEntrega, oe.FechaAproducir, oe.idUsuario, us.usuario ordenIngresadaPor,
-                        oe.estado  from ORDENESESPECIALES oe
-                        inner join SUCURSALES su ON oe.idSucursal = su.idSucursal
-                        inner join USUARIOS us ON oe.idUsuario = us.idUsuario
-                        order by oe.idOrdenEspecial desc;`;
+        const query = `SELECT oe.idOrdenEspecial, oe.idSucursal, su.nombreSucursal AS sucursalEntrega, oe.nombreCliente, oe.telefonoCliente,
+                        oe.fechaEntrega, oe.FechaAproducir, oe.idUsuario, us.usuario AS ordenIngresadaPor, oe.estado  
+                        FROM 
+                            ORDENESESPECIALES oe
+                            INNER JOIN SUCURSALES su ON oe.idSucursal = su.idSucursal
+                            INNER JOIN USUARIOS us ON oe.idUsuario = us.idUsuario
+                        WHERE
+                            (us.idRol = ? OR oe.idSucursal = ?)
+                         ORDER BY 
+                            oe.idOrdenEspecial DESC;`;
 
-        const OrdenesEspeciales = await Connection.execute(query);
+        const OrdenesEspeciales = await Connection.execute(query, [idRol, idSucursal]);
 
         return OrdenesEspeciales.rows;
     }catch(error){

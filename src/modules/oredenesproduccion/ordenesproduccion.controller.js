@@ -3,7 +3,8 @@ import { consultarDetalleOrdenPorCriteriosService, consultarDetalleOrdenProducci
 
 export const consultarOrdenProduccionController = async (req, res, next) => {
   try {
-    const ordenesProduccion = await consultarOrdenProduccionService();
+    const {idRol, idSucursal} = req.query;
+    const ordenesProduccion = await consultarOrdenProduccionService(idRol, idSucursal);
     const responseData = {
       status: 200,
       message: "Consulta exitosa",
