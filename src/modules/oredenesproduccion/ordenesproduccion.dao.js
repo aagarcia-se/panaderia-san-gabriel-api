@@ -11,7 +11,6 @@ export const consultarOrdenProduccionDao = async (idRol, idSucursal) => {
       console.log(idRol);
 
       if(idRol == 1){
-        console.log('entra');
         query = `SELECT op.idOrdenProduccion, op.idSucursal, op.ordenTurno, s.nombresucursal, op.nombrepanadero, op.fechaAProducir, 
                         op.estadoOrden
                     FROM 
