@@ -95,7 +95,7 @@ export const desbloquearUsuarioDao = async (idUsuario) => {
 export const elminarUsuarioDao = async (idUsuario) => {
   try {
     const query =
-      "delete from usuarios WHERE idUsuario = ?";
+      "UPDATE usuarios set estado = 'N' WHERE idUsuario = ?";
     const usuario = await Connection.execute(query, [idUsuario]);
 
     return usuario.toJSON().rowsAffected;

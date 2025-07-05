@@ -4,29 +4,39 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const consultarOrdenProduccionDao = async (idRol, idSucursal) => {
     try {
-      // Consulta SQL
-      const query = `SELECT op.idOrdenProduccion, op.idSucursal, op.ordenTurno, s.nombresucursal, op.nombrepanadero, op.fechaAProducir, 
-                      op.estadoOrden,
-                      (
-                          SELECT COUNT(*) 
-                          FROM DETALLESORDENESPRODUCCION AS dp 
-                          WHERE dp.idOrdenProduccion = op.idOrdenProduccion
-                      ) AS cantidadProductos
-                  FROM 
-                      ORDENESPRODUCCION AS op
+
+      let query = '';
+      let ordenesProduccion = null;
+
+      console.log(idRol);
+
+      if(idRol == 1){
+        query = `SELECT op.idOrdenProduccion, op.idSucursal, op.ordenTurno, s.nombresucursal, op.nombrepanadero, op.fechaAProducir, 
+                        op.estadoOrden
+                    FROM 
+                        ORDENESPRODUCCION AS op
+                        INNER JOIN SUCURSALES AS s ON op.idSucursal = s.idSucursal
+                        INNER JOIN USUARIOS AS u ON op.idUsuario = u.idUsuario
+                    ORDER BY 
+                        op.idOrdenProduccion DESC;`;
+                              // Ejecutar la consulta
+       ordenesProduccion = await Connection.execute(query);
+      }else{
+        query = `SELECT op.idOrdenProduccion, op.idSucursal, op.ordenTurno, s.nombresucursal, op.nombrepanadero, 
+                      op.fechaAProducir, op.estadoOrden
+                  FROM ORDENESPRODUCCION AS op
                       INNER JOIN SUCURSALES AS s ON op.idSucursal = s.idSucursal
                       INNER JOIN USUARIOS AS u ON op.idUsuario = u.idUsuario
-                  WHERE
-                      (u.idRol = ? OR op.idSucursal = ?)
+                    WHERE s.idSucursal = ?
                   ORDER BY 
                       op.idOrdenProduccion DESC;`;
+                            // Ejecutar la consulta
+       ordenesProduccion = await Connection.execute(query, [idSucursal]);
+      }
 
-      // Ejecutar la consulta
-      const ordenesProduccion = await Connection.execute(query, [idRol, idSucursal]);
-
-      // Devolver los registros encontrados
       return ordenesProduccion.rows;
     } catch (error) {
+      console.log(error);
       const dbError = getDatabaseError(error.message);
       throw new CustomError(dbError);
     }
