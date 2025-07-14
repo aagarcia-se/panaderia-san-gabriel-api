@@ -156,9 +156,36 @@ export const consultarVentaporId = async (idVenta) => {
       return ventaPorId.rows[0];
 
   }catch(error){
-    console.log(error);
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
 
+}
+
+export const consultarTopProductosMasVendiddosDao = async () => {
+    try {
+        const query = `SELECT 
+                        p.idProducto,
+                        p.nombreProducto,
+                        SUM(dv.cantidadVendida) AS cantidad_total_vendida
+                    FROM 
+                        DETALLESVENTAS dv
+                    JOIN 
+                        VENTAS v ON dv.idVenta = v.idVenta
+                    JOIN 
+                        PRODUCTOS p ON dv.idProducto = p.idProducto
+                    WHERE 
+                        v.estadoVenta = 'C'  -- Solo ventas completadas
+                        AND strftime('%Y', v.fechaVenta) = strftime('%Y', 'now')  -- Año actual
+                    GROUP BY 
+                        p.idProducto, p.nombreProducto
+                    ORDER BY 
+                        cantidad_total_vendida DESC
+                    LIMIT 5;`;
+        const result = await Connection.execute(query);
+        return result.rows;
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
 }

@@ -8,7 +8,6 @@ export const consultarOrdenProduccionDao = async (idRol, idSucursal) => {
       let query = '';
       let ordenesProduccion = null;
 
-      console.log(idRol);
 
       if(idRol == 1){
         query = `SELECT op.idOrdenProduccion, op.idSucursal, op.ordenTurno, s.nombresucursal, op.nombrepanadero, op.fechaAProducir, 
@@ -36,7 +35,6 @@ export const consultarOrdenProduccionDao = async (idRol, idSucursal) => {
 
       return ordenesProduccion.rows;
     } catch (error) {
-      console.log(error);
       const dbError = getDatabaseError(error.message);
       throw new CustomError(dbError);
     }

@@ -20,8 +20,6 @@ export const ingresarGastosDiariosDao = async (idVenta, gastosDiarios) => {
 
         const idGastoDiario = inserHeader.toJSON().lastInsertRowid;
 
-        console.log(idGastoDiario);
-
         if (!idGastoDiario) {
             return 0;
         }
@@ -43,7 +41,6 @@ export const ingresarGastosDiariosDao = async (idVenta, gastosDiarios) => {
         return { idGastoDiario, ...gastosDiarios };
         
     } catch (error) {
-        console.log(error);
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
