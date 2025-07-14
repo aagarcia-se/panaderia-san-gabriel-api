@@ -83,3 +83,14 @@ export const eliminarSucursalDao = async (idSucursal) => {
     throw new CustomError(dbError);
   }
 };
+
+export const consultarCantidadSucursalesDao = async () => {
+  try {
+      const query = "SELECT COUNT(*) as cantidadSucursales FROM SUCURSALES WHERE estado = 'A';";
+      const result = await Connection.execute(query);
+      return result.rows[0].cantidadSucursales;
+  } catch (error) {
+      const dbError = getDatabaseError(error.message);
+      throw new CustomError(dbError);
+  }
+}

@@ -142,3 +142,14 @@ export const actualizarDatosUsuarioDao = async (dataUsuario) => {
     throw new CustomError(dbError);
   }
 }
+
+export const consultarCantidadEmpleadosDao = async () => {
+  try {
+      const query = "SELECT COUNT(*) as cantiadEmpleados FROM USUARIOS WHERE estado = 'A';";
+      const result = await Connection.execute(query);
+      return result.rows[0].cantiadEmpleados;
+  } catch (error) {
+      const dbError = getDatabaseError(error.message);
+      throw new CustomError(dbError);
+  }
+}

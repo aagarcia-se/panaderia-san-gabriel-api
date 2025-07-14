@@ -20,6 +20,7 @@ import { descontarStockRoute } from "./modules/descontarStock/descontarStock.rou
 import { reportesRoute } from "./modules/reportes/reportes.routes.js";
 import { trasladosRoute } from "./modules/traslados/traslados.routes.js";
 import { eliminacionesRoute } from "./modules/eliminacionesTracking/eliminaciones.routes.js";
+import { dashboardDataRoute } from "./modules/dashboardData/dashboardData.routes.js";
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/api", descontarStockRoute);
 app.use("/api", reportesRoute);
 app.use("/api", trasladosRoute);
 app.use("/api", eliminacionesRoute);
+app.use("/api", dashboardDataRoute);
 
 // Middleware de manejo de errores
 app.use(errorHandler);
