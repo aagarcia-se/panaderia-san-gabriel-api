@@ -62,3 +62,37 @@ export const generarReporteVentasDao = async (fechaInicio, fechaFin, idSucursal)
         throw new CustomError(dbError);
     }
 };
+
+export const generarReporteDePerdidasDao = async (fechaInicio, fechaFin, idSucursal) => {
+    console.log(fechaInicio, fechaFin, idSucursal);
+    try {
+        const script = ` SELECT 
+                            p.idProducto,
+                            p.nombreProducto AS producto,
+                            s.nombreSucursal AS sucursal,
+                            SUM(dd.cantidadUnidades) AS total_perdido,
+                            COUNT(DISTINCT DATE(dd.fechaDescuento)) AS dias_con_perdidas
+                        FROM DETALLEDESCUENTODESTOCK dd
+                        JOIN DESCUENTODESTOCK d ON dd.idDescuento = d.idDescuento
+                        JOIN PRODUCTOS p ON dd.idProducto = p.idProducto
+                        JOIN SUCURSALES s ON d.idSucursal = s.idSucursal
+                        WHERE d.tipoDescuento = 'MAL ESTADO'
+                            AND d.idSucursal = ?
+                            AND DATE(dd.fechaDescuento) BETWEEN ? AND ?
+                            AND d.estado = 'A'
+                        GROUP BY p.idProducto, p.nombreProducto, s.nombreSucursal
+                        ORDER BY total_perdido DESC;`;
+
+        const params = [
+            idSucursal,
+            fechaInicio,
+            fechaFin
+        ];
+
+        const result = await Connection.execute(script, params);
+        return result.rows;
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+};
