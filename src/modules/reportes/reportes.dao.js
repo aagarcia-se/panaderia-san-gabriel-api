@@ -64,24 +64,31 @@ export const generarReporteVentasDao = async (fechaInicio, fechaFin, idSucursal)
 };
 
 export const generarReporteDePerdidasDao = async (fechaInicio, fechaFin, idSucursal) => {
-    console.log(fechaInicio, fechaFin, idSucursal);
     try {
-        const script = ` SELECT 
-                            p.idProducto,
-                            p.nombreProducto AS producto,
-                            s.nombreSucursal AS sucursal,
-                            SUM(dd.cantidadUnidades) AS total_perdido,
-                            COUNT(DISTINCT DATE(dd.fechaDescuento)) AS dias_con_perdidas
-                        FROM DETALLEDESCUENTODESTOCK dd
-                        JOIN DESCUENTODESTOCK d ON dd.idDescuento = d.idDescuento
-                        JOIN PRODUCTOS p ON dd.idProducto = p.idProducto
-                        JOIN SUCURSALES s ON d.idSucursal = s.idSucursal
-                        WHERE d.tipoDescuento = 'MAL ESTADO'
-                            AND d.idSucursal = ?
-                            AND DATE(dd.fechaDescuento) BETWEEN ? AND ?
-                            AND d.estado = 'A'
-                        GROUP BY p.idProducto, p.nombreProducto, s.nombreSucursal
-                        ORDER BY total_perdido DESC;`;
+        const script = `SELECT 
+                        p.idProducto,
+                        p.nombreProducto AS producto,
+                        s.nombreSucursal AS sucursal,
+                        CONCAT(u.nombreUsuario, ' ', u.apellidoUsuario) AS usuario,
+                        SUM(dd.cantidadUnidades) AS total_perdido,
+                        SUM(dd.cantidadUnidades * pr.precioPorUnidad) AS dineroPerdida,
+                        COUNT(DISTINCT DATE(dd.fechaDescuento)) AS dias_con_perdidas
+                    FROM DETALLEDESCUENTODESTOCK dd
+                    JOIN DESCUENTODESTOCK d ON dd.idDescuento = d.idDescuento
+                    JOIN PRODUCTOS p ON dd.idProducto = p.idProducto
+                    JOIN SUCURSALES s ON d.idSucursal = s.idSucursal
+                    JOIN USUARIOS u ON d.idUsuario = u.idUsuario
+                    JOIN PRECIOS pr ON dd.idProducto = pr.idProducto
+                    WHERE d.tipoDescuento = 'MAL ESTADO'
+                        AND d.idSucursal = ?
+                        AND DATE(dd.fechaDescuento) BETWEEN ? AND ?
+                        AND d.estado = 'A'
+                    GROUP BY 
+                        p.idProducto, 
+                        p.nombreProducto, 
+                        s.nombreSucursal,
+                        CONCAT(u.nombreUsuario, ' ', u.apellidoUsuario)
+                    ORDER BY total_perdido DESC;`;
 
         const params = [
             idSucursal,
@@ -92,6 +99,7 @@ export const generarReporteDePerdidasDao = async (fechaInicio, fechaFin, idSucur
         const result = await Connection.execute(script, params);
         return result.rows;
     } catch (error) {
+        console.log(error);
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
