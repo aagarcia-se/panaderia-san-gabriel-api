@@ -2,7 +2,7 @@ import { Connection } from "../../config/database/databaseSqlite.js";
 import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
-export const generarReporteHistorialStockDao = async (idProducto, idSucursal) => {
+export const generarReporteHistorialStockDao = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
     try {
         const script = `select h.idHistorial, p.nombreProducto, h.tipoMovimiento, h.stockAnterior, h.cantidad,
                         h.stockNuevo, h.fechaMovimiento, h.observaciones, u.nombreUsuario  
@@ -11,16 +11,21 @@ export const generarReporteHistorialStockDao = async (idProducto, idSucursal) =>
                         inner join USUARIOS u ON h.idUsuario = u.idUsuario
                         where h.idProducto = ?
                         and h.idSucursal = ?
-                        order by h.idHistorial asc;`;
+  						and h.fechaMovimiento between ? and ?
+                        order by h.idHistorial asc;
+`;
 
         const params = [
             idProducto,
-            idSucursal
+            idSucursal,
+            fechaInicio,
+            fechaFin
         ];
 
         const result = await Connection.execute(script, params);
         return result.rows;
     } catch (error) {
+        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
