@@ -4,8 +4,8 @@ import { generarReporteDePerdidasServices, generarReporteHistorialStockServices,
 export const generarReporteHistorialStockController = async (req, res, next) => {
     try {
 
-        const {idProducto, idSucursal} = req.query;
-        const reporte   = await generarReporteHistorialStockServices(idProducto, idSucursal);
+        const {idProducto, idSucursal, fechaInicio, fechaFin} = req.query;
+        const reporte   = await generarReporteHistorialStockServices(idProducto, idSucursal, fechaInicio, fechaFin);
         const responseData = {
           status: 200,
           message: "Consulta exitosa",

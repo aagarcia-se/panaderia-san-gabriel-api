@@ -3,9 +3,9 @@ import { getError } from "../../utils/generalErrors.js";
 import { generarReporteDePerdidasDao, generarReporteHistorialStockDao, generarReporteVentasDao } from "./reportes.dao.js";
 
 
-export const generarReporteHistorialStockServices = async (idProducto, idSucursal) => {
+export const generarReporteHistorialStockServices = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
     try {
-        const reporte = await generarReporteHistorialStockDao(idProducto, idSucursal);
+        const reporte = await generarReporteHistorialStockDao(idProducto, idSucursal, fechaInicio, fechaFin);
 
         if (reporte.length === 0) {
             throw new CustomError(getError(1));
