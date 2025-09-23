@@ -11,7 +11,7 @@ export const generarReporteHistorialStockDao = async (idProducto, idSucursal, fe
                         inner join USUARIOS u ON h.idUsuario = u.idUsuario
                         where h.idProducto = ?
                         and h.idSucursal = ?
-  						and h.fechaMovimiento between ? and ?
+  						and date(h.fechaMovimiento) between ? and ?
                         order by h.idHistorial asc;
 `;
 
