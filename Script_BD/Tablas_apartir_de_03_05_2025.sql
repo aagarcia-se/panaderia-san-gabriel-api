@@ -3,7 +3,8 @@ DROP TABLE IF EXISTS GASTOSDIARIOSDETALLES;
 DROP TABLE IF EXISTS TRASLADOSPRODUCTOS;
 DROP TABLE IF EXISTS TRASLADOSPRODUCTOSDETALLES;
 DROP TABLE IF EXISTS ELIMINACIONESDIARIAS;
-DROP TABLE IF EXISTS DETALLESVENTASELMINADAS;
+DROP TABLE IF EXISTS VENTASELIMINADAS;
+DROP TABLE IF EXISTS DETALLESVENTASELIMINADAS;
 
 CREATE TABLE IF NOT EXISTS GASTOSDIARIOS (
     idGastoDiario INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,17 +95,34 @@ CREATE TABLE IF NOT EXISTS RESPUESTAS(
     FOREIGN KEY (idPregunta) REFERENCES PREGUNTAS(idPregunta)
 );
 
--- Crear la tabla DETALESVENTAS (Detalles de la Venta)
-CREATE TABLE IF NOT EXISTS DETALLESVENTASELMINADAS (
-    idDetalleVentaEliminada INTEGER PRIMARY KEY AUTOINCREMENT,  -- Identificador único del detalle
-    idVentaEliminada INTEGER NOT NULL,                         -- Identificador de la venta
-    idProducto INTEGER NOT NULL,                      -- Identificador del producto vendido
-    cantidadVendidaEliminada INTEGER NOT NULL,                 -- Cantidad vendida del producto
-    precioUnitario DECIMAL(10, 2) NOT NULL,           -- Precio unitario al momento de la venta
-    descuento DECIMAL(10, 2) DEFAULT 0.00,            -- Descuento aplicado al producto
-    subtotal DECIMAL(10, 2) ,  -- Subtotal calculado
-    FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta) ON DELETE CASCADE,  -- Integridad referencial con la tabla de ventas
-    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto)  -- Integridad referencial con la tabla de productos
+
+CREATE TABLE IF NOT EXISTS VENTASELIMINADAS(
+    idEliminacion INTEGER PRIMARY KEY AUTOINCREMENT,
+    idVenta INTEGER,
+    idUsuario INTEGER,
+    idSucursal INTEGER,
+    turno TEXT NULL CHECK(turno IN ('AM', 'PM')) DEFAULT 'AM',
+    montoTotalIngresado DECIMAL(10, 2) NOT NULL,
+    montoTotalGastos DECIMAL(10, 2) NOT NULL,
+    montoEsperado DECIMAL(10, 2) NOT NULL,
+    diferencia DECIMAL(10, 2),
+    fechaEliminacion DATETIME,
+    estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
+    FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario),
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
+);
+
+
+-- Crear la tabla DETALLESVENTASELIMINADAS (Detalles de la Venta Eliminada)
+CREATE TABLE IF NOT EXISTS DETALLESVENTASELIMINADAS (
+    idDetalleEliminacion INTEGER PRIMARY KEY AUTOINCREMENT,  -- Identificador único del detalle
+    idEliminacion INTEGER NOT NULL,                       -- Identificador de la eliminación diaria
+    idProducto INTEGER NOT NULL,                                -- Identificador del producto vendido
+    cantidadVendidaEliminada INTEGER NOT NULL,                  -- Cantidad vendida del producto
+    precioUnitario DECIMAL(10, 2) NOT NULL,                     -- Precio unitario al momento de la venta
+    descuento DECIMAL(10, 2) DEFAULT 0.00,                      -- Descuento aplicado al producto
+    subtotal DECIMAL(10, 2),                                    -- Subtotal calculado
+    FOREIGN KEY (idEliminacion) REFERENCES VENTASELIMINADAS(idEliminacion) ON DELETE CASCADE  -- Integridad referencial corregida
 );
 
 

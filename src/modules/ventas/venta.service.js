@@ -1,7 +1,8 @@
 import CustomError from "../../utils/CustomError.js";
 import { obtenerSoloFecha } from "../../utils/date.utils.js";
 import { getError } from "../../utils/generalErrors.js";
-import { registrarEliminacionPorDia } from "../eliminacionesTracking/eliminacionesdiarias.dao.js";
+import { registrarEliminacionPorDia, registrarVentaEliminadaDao } from "../eliminacionesTracking/eliminacionesdiarias.dao.js";
+import { detalleVentaEliminadaPayload } from "../eliminacionesTracking/eliminacionesdiarias.utils.js";
 import { ingresarGastosDiariosService } from "../GastosDiarios/gastosDiarios.service.js";
 import { registrarIngresoDiarioPorTurnoService } from "../ingresos/ingresos.service.js";
 import { crearPayloadingresos } from "../ingresos/ingresos.utils.js";
@@ -76,10 +77,11 @@ export const consultarDetalleVentaService = async (idVenta) => {
 
 export const eliminarVentaService = async (idVenta) => {
   try {
-
     await revertirVentaServices(idVenta);
 
     const ventaPorId = await consultarVentaporId(idVenta);
+    const detalleVenta = await consultarDetalleVentaDao(idVenta);
+
 
     const resElminacion = await eliminarVentaDao(idVenta);
     if (resElminacion === 0) {
@@ -98,7 +100,11 @@ export const eliminarVentaService = async (idVenta) => {
 
    await registrarEliminacionPorDia(eliminacionTracking);
 
-    return resElminacion;
+   const detalleEliminacion = detalleVentaEliminadaPayload(detalleVenta);
+
+   await registrarVentaEliminadaDao(detalleEliminacion);
+
+  return resElminacion;
   } catch (error) {
     throw error;
   }
@@ -113,6 +119,7 @@ export const revertirVentaServices = async (idVenta) => {
 
         return Promise.all(
             detalleVenta.map( async (producto) => {
+              
                 try{
 
                   if(producto.controlarStock === 1 && producto.controlarStockDiario === 0){
@@ -142,9 +149,7 @@ export const revertirVentaServices = async (idVenta) => {
 
                     await IngresarHistorialStockDao(payloadHistorial);
 
-                    
                   }else{
-
                     const productoEnStockDiario = await consultarStockProductoDiarioDao(producto.idProducto, encabezadoVenta.idSucursal, obtenerSoloFecha(encabezadoVenta.fechaVenta));
 
                     const payloadRevertir = {
