@@ -25,7 +25,6 @@ export const generarReporteHistorialStockDao = async (idProducto, idSucursal, fe
         const result = await Connection.execute(script, params);
         return result.rows;
     } catch (error) {
-        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
@@ -104,7 +103,64 @@ export const generarReporteDePerdidasDao = async (fechaInicio, fechaFin, idSucur
         const result = await Connection.execute(script, params);
         return result.rows;
     } catch (error) {
-        console.log(error);
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+};
+
+export const generarReporteVentasEliminadasDao = async (fechaInicio, fechaFin, idSucursal) => {
+    try {
+        // Primero obtener las ventas eliminadas
+        const scriptVentas = `
+             SELECT 
+                ve.idEliminacion,
+                ve.idVenta,
+                concat(u.nombreUsuario, ' ', u.apellidoUsuario)usuario,
+                ve.idSucursal,
+                ve.turno,
+                ve.montoTotalIngresado,
+                ve.montoTotalGastos,
+                ve.montoEsperado,
+                ve.diferencia,
+                ve.fechaEliminacion
+            FROM VENTASELIMINADAS ve
+            INNER JOIN USUARIOS u ON ve.idUsuario = u.idUsuario
+            WHERE fechaEliminacion BETWEEN ? AND ?
+                AND ve.idSucursal = ?
+                AND ve.estado = 'A'
+            ORDER BY ve.fechaEliminacion DESC, ve.idEliminacion DESC;
+        `;
+
+        const ventasResult = await Connection.execute(scriptVentas, [fechaInicio, fechaFin, idSucursal]);
+        
+        // Para cada venta, obtener sus detalles
+        const ventasConDetalles = [];
+        
+        for (const venta of ventasResult.rows) {
+            const scriptDetalles = `
+                SELECT 
+                    dv.idProducto,
+                    p.nombreProducto,
+                    dv.cantidadVendidaEliminada,
+                    dv.precioUnitario,
+                    dv.descuento,
+                    dv.subtotal
+                FROM DETALLESVENTASELIMINADAS dv
+                INNER JOIN PRODUCTOS p on dv.idProducto = p.idProducto
+                WHERE dv.idEliminacion = ?
+                ORDER BY dv.idDetalleEliminacion;
+            `;
+            
+            const detallesResult = await Connection.execute(scriptDetalles, [venta.idEliminacion]);
+            
+            ventasConDetalles.push({
+                ...venta,
+                ventaEliminadaDetalle: detallesResult.rows
+            });
+        }
+
+        return ventasConDetalles;
+    } catch (error) {
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }

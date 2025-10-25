@@ -124,7 +124,3 @@ CREATE TABLE IF NOT EXISTS DETALLESVENTASELIMINADAS (
     subtotal DECIMAL(10, 2),                                    -- Subtotal calculado
     FOREIGN KEY (idEliminacion) REFERENCES VENTASELIMINADAS(idEliminacion) ON DELETE CASCADE  -- Integridad referencial corregida
 );
-
-
-
-
