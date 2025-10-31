@@ -7,11 +7,12 @@ export const ingresarDescuentoDao = async (stockADescontarData) => {
     try{
         const {descuentoInfo, detalleDescuento} = stockADescontarData;
         
-        const insertHeader = `INSERT INTO DESCUENTODESTOCK (idSucursal, idUsuario, tipoDescuento, fechaDescuento, fechaCreacion)
-                              VALUES (?, ?, ?, ?, ?);`
+        const insertHeader = `INSERT INTO DESCUENTODESTOCK (idSucursal, descuentoTurno, idUsuario, tipoDescuento, fechaDescuento, fechaCreacion)
+                              VALUES (?, ?, ?, ?, ?, ?);`
 
         const resInsertHeader = await Connection.execute(insertHeader, [
             descuentoInfo.idSucursal,
+            descuentoInfo.descuentoTurno || "AM",
             descuentoInfo.idUsuario,
             descuentoInfo.tipoDescuento,
             descuentoInfo.fechaDescuento,
@@ -49,7 +50,7 @@ export const ingresarDescuentoDao = async (stockADescontarData) => {
 
 export const consultarDescuentoStockPorSucursalDato = async (idSucursal) => {
     try{
-        const consulta = `SELECT des.idDescuento, des.idSucursal, s.nombreSucursal, des.idUsuario, concat(u.nombreUsuario ,' ' , u.apellidoUsuario) nombreUsuario,
+        const consulta = `SELECT des.idDescuento, des.idSucursal, des.descuentoTurno, s.nombreSucursal, des.idUsuario, concat(u.nombreUsuario ,' ' , u.apellidoUsuario) nombreUsuario,
                           des.tipoDescuento, des.fechaDescuento, des.fechaCreacion,  des.estado
                           FROM DESCUENTODESTOCK des 
                           INNER JOIN SUCURSALES s ON des.idSucursal = s.idSucursal 
@@ -88,7 +89,8 @@ export const consultarDescuentoporProductoDao = async (idProducto, idSucursal, i
     try{
         const consulta = `SELECT 
                                 MIN(dd.idDetalleDescuento) AS idDetalleDescuento, 
-                                des.idSucursal, 
+                                des.idSucursal,
+                                des.descuentoTurno,
                                 dd.idProducto,
                                 SUM(dd.cantidadUnidades) AS unidadesDescontadas, 
                                 DATE(dd.fechaDescuento) AS fechaDescuento
@@ -122,7 +124,7 @@ export const consultarDescuentoporProductoDao = async (idProducto, idSucursal, i
 export const consultarDetalleDescuentosDao = async (idDescuento) => {
     try{
 
-        const scriptHeader = `select des.idDescuento, des.idSucursal, s.nombreSucursal, des.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario) nombreUsuario, des.tipoDescuento,
+        const scriptHeader = `select des.idDescuento, des.idSucursal, des.descuentoTurno, s.nombreSucursal, des.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario) nombreUsuario, des.tipoDescuento,
                                 des.fechaDescuento, des.estado from DESCUENTODESTOCK des
                                 inner join SUCURSALES s ON des.idSucursal = s.idSucursal
                                 inner join USUARIOS u ON des.idUsuario = u.idUsuario
