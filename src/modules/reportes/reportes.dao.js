@@ -165,3 +165,99 @@ export const generarReporteVentasEliminadasDao = async (fechaInicio, fechaFin, i
         throw new CustomError(dbError);
     }
 };
+
+export const generarReporteBalanceStokDao = async (fecha, idSucursal, turno) => {
+    try {
+
+        const script = `
+                with params as (
+                select ? as turnoFiltro 
+                ),
+                produccion as (
+                select 
+                    do.idProducto,
+                    do.cantidadUnidades as unidadesProducidas,
+                    op.ordenTurno
+                from DETALLESORDENESPRODUCCION do
+                inner join ORDENESPRODUCCION op 
+                    on op.idOrdenProduccion = do.idOrdenProduccion
+                where op.fechaAproducir = ?
+                    and op.idSucursal = ?
+                ),
+                ventasR as (
+                select
+                    dv.idProducto,
+                    dv.cantidadVendida as unidadesVendidas,
+                    v.ventaTurno
+                from DETALLESVENTAS dv
+                inner join VENTAS v 
+                    on v.idVenta = dv.idVenta
+                where v.fechaCreacion = ?
+                    and v.idSucursal = ?
+                ),
+                descuentos as (
+                select 
+                    ds.idProducto,
+                    ds.cantidadUnidades as unidadesDescontadas,
+                    d.descuentoTurno
+                from DETALLEDESCUENTODESTOCK ds
+                inner join DESCUENTODESTOCK d 
+                    on d.idDescuento = ds.idDescuento
+                where date(d.fechaDescuento) = ?
+                    and d.idSucursal = ?
+                ),
+                base as (
+                select 
+                    p.idProducto,
+                    pr.nombreProducto,
+                    p.ordenTurno as turno,
+                    p.unidadesProducidas,
+                    coalesce(v.unidadesVendidas, 0) as unidadesVendidas,
+                    coalesce(d.unidadesDescontadas, 0) as unidadesDescontadas,
+                    (p.unidadesProducidas - coalesce(v.unidadesVendidas, 0) - coalesce(d.unidadesDescontadas, 0)) as stockDisponible
+                from produccion p
+                left join ventasR v 
+                    on v.idProducto = p.idProducto 
+                    and v.ventaTurno = p.ordenTurno
+                left join descuentos d 
+                    on d.idProducto = p.idProducto 
+                    and d.descuentoTurno = p.ordenTurno
+                inner join PRODUCTOS pr 
+                    on pr.idProducto = p.idProducto
+                where pr.idCategoria = 1
+                )
+                select 
+                b.idProducto,
+                b.nombreProducto,
+                case when p.turnoFiltro = '' then 'TODOS' else b.turno end as turno,
+                sum(b.unidadesProducidas) as unidadesProducidas,
+                sum(b.unidadesVendidas) as unidadesVendidas,
+                sum(b.unidadesDescontadas) as unidadesDescontadas,
+                sum(b.stockDisponible) as stockDisponible
+                from base b
+                cross join params p
+                where (p.turnoFiltro = '' or b.turno = p.turnoFiltro)
+                AND b.idProducto != 42
+                group by b.idProducto, b.nombreProducto, case when p.turnoFiltro = '' then 'TODOS' else b.turno end
+                order by b.idProducto asc, b.turno asc;
+        `;
+
+        const params = [
+            turno,
+            fecha,
+            idSucursal,
+            fecha,
+            idSucursal,
+            fecha,
+            idSucursal
+        ];
+
+        const result = await Connection.execute(script, params);
+        return result.rows;
+        
+    } catch (error) {
+        console.log(error);
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
