@@ -13,7 +13,7 @@ export const generarReporteHistorialStockDao = async (idProducto, idSucursal, fe
                         and h.idSucursal = ?
   						and date(h.fechaMovimiento) between ? and ?
                         order by h.idHistorial asc;
-`;
+                `;
 
         const params = [
             idProducto,
@@ -170,81 +170,130 @@ export const generarReporteBalanceStokDao = async (fecha, idSucursal, turno) => 
     try {
 
         const script = `
-                with params as (
-                select ? as turnoFiltro 
+               WITH params AS (SELECT ? AS turnoFiltro),
+                produccion AS (
+                    SELECT 
+                        do.idProducto,
+                        do.cantidadUnidades AS unidadesProducidas,
+                        op.ordenTurno
+                    FROM DETALLESORDENESPRODUCCION do
+                    INNER JOIN ORDENESPRODUCCION op 
+                        ON op.idOrdenProduccion = do.idOrdenProduccion
+                    WHERE op.fechaAproducir = ?
+                        AND op.idSucursal = ?
                 ),
-                produccion as (
-                select 
-                    do.idProducto,
-                    do.cantidadUnidades as unidadesProducidas,
-                    op.ordenTurno
-                from DETALLESORDENESPRODUCCION do
-                inner join ORDENESPRODUCCION op 
-                    on op.idOrdenProduccion = do.idOrdenProduccion
-                where op.fechaAproducir = ?
-                    and op.idSucursal = ?
+                historial_stock AS (
+                    SELECT 
+                        h.idProducto,
+                        h.cantidad,
+                        h.fechaMovimiento,
+                        CASE 
+                            WHEN (ROW_NUMBER() OVER (PARTITION BY h.idProducto ORDER BY h.fechaMovimiento ASC)) = 1 THEN 'AM'
+                            ELSE 'PM'
+                        END AS turno_historial
+                    FROM HISTORIALSTOCK h
+                    INNER JOIN PRODUCTOS p ON h.idProducto = p.idProducto
+                    WHERE h.tipoReferencia = 'CONTROL DE STOCK'
+                        AND DATE(h.fechaMovimiento) = ?
+                        AND h.idSucursal = ?
                 ),
-                ventasR as (
-                select
-                    dv.idProducto,
-                    dv.cantidadVendida as unidadesVendidas,
-                    v.ventaTurno
-                from DETALLESVENTAS dv
-                inner join VENTAS v 
-                    on v.idVenta = dv.idVenta
-                where v.fechaCreacion = ?
-                    and v.idSucursal = ?
+                stock_existente AS (
+                    SELECT 
+                        h.idProducto,
+                        h.stockNuevo AS unidadesExistentes,
+                        h.fechaMovimiento
+                    FROM HISTORIALSTOCK h
+                    INNER JOIN PRODUCTOS p ON h.idProducto = p.idProducto
+                    WHERE h.idSucursal = ?
+                    ORDER BY h.idHistorial DESC
                 ),
-                descuentos as (
-                select 
-                    ds.idProducto,
-                    ds.cantidadUnidades as unidadesDescontadas,
-                    d.descuentoTurno
-                from DETALLEDESCUENTODESTOCK ds
-                inner join DESCUENTODESTOCK d 
-                    on d.idDescuento = ds.idDescuento
-                where date(d.fechaDescuento) = ?
-                    and d.idSucursal = ?
+                produccion_con_historial AS (
+                    SELECT 
+                        p.idProducto,
+                        p.ordenTurno,
+                        CASE 
+                            WHEN p.unidadesProducidas = 0 THEN 
+                                COALESCE(
+                                    (SELECT hs.cantidad 
+                                    FROM historial_stock hs 
+                                    WHERE hs.idProducto = p.idProducto 
+                                    AND hs.turno_historial = p.ordenTurno
+                                    LIMIT 1),
+                                    (SELECT se.unidadesExistentes
+                                    FROM stock_existente se
+                                    WHERE se.idProducto = p.idProducto
+                                    LIMIT 1),
+                                    0
+                                )
+                            ELSE p.unidadesProducidas
+                        END AS unidadesProducidas
+                    FROM produccion p
                 ),
-                base as (
-                select 
-                    p.idProducto,
-                    pr.nombreProducto,
-                    p.ordenTurno as turno,
-                    p.unidadesProducidas,
-                    coalesce(v.unidadesVendidas, 0) as unidadesVendidas,
-                    coalesce(d.unidadesDescontadas, 0) as unidadesDescontadas,
-                    (p.unidadesProducidas - coalesce(v.unidadesVendidas, 0) - coalesce(d.unidadesDescontadas, 0)) as stockDisponible
-                from produccion p
-                left join ventasR v 
-                    on v.idProducto = p.idProducto 
-                    and v.ventaTurno = p.ordenTurno
-                left join descuentos d 
-                    on d.idProducto = p.idProducto 
-                    and d.descuentoTurno = p.ordenTurno
-                inner join PRODUCTOS pr 
-                    on pr.idProducto = p.idProducto
-                where pr.idCategoria = 1
+                ventasR AS (
+                    SELECT
+                        dv.idProducto,
+                        dv.cantidadVendida AS unidadesVendidas,
+                        v.ventaTurno
+                    FROM DETALLESVENTAS dv
+                    INNER JOIN VENTAS v 
+                        ON v.idVenta = dv.idVenta
+                    WHERE v.fechaCreacion = ?
+                        AND v.idSucursal = ?
+                ),
+                descuentos AS (
+                    SELECT 
+                        ds.idProducto,
+                        ds.cantidadUnidades AS unidadesDescontadas,
+                        d.descuentoTurno
+                    FROM DETALLEDESCUENTODESTOCK ds
+                    INNER JOIN DESCUENTODESTOCK d 
+                        ON d.idDescuento = ds.idDescuento
+                    WHERE DATE(d.fechaDescuento) = ?
+                        AND d.idSucursal = ?
+                ),
+                base AS (
+                    SELECT 
+                        ph.idProducto,
+                        pr.nombreProducto,
+                        ph.ordenTurno AS turno,
+                        ph.unidadesProducidas,
+                        COALESCE(v.unidadesVendidas, 0) AS unidadesVendidas,
+                        COALESCE(d.unidadesDescontadas, 0) AS unidadesDescontadas,
+                        (ph.unidadesProducidas - COALESCE(v.unidadesVendidas, 0) - COALESCE(d.unidadesDescontadas, 0)) AS stockDisponible
+                    FROM produccion_con_historial ph
+                    LEFT JOIN ventasR v 
+                        ON v.idProducto = ph.idProducto 
+                        AND v.ventaTurno = ph.ordenTurno
+                    LEFT JOIN descuentos d 
+                        ON d.idProducto = ph.idProducto 
+                        AND d.descuentoTurno = ph.ordenTurno
+                    INNER JOIN PRODUCTOS pr 
+                        ON pr.idProducto = ph.idProducto
+                    WHERE pr.idCategoria = 1
+                    and pr.tipoProduccion = 'bandejas'
                 )
-                select 
-                b.idProducto,
-                b.nombreProducto,
-                case when p.turnoFiltro = '' then 'TODOS' else b.turno end as turno,
-                sum(b.unidadesProducidas) as unidadesProducidas,
-                sum(b.unidadesVendidas) as unidadesVendidas,
-                sum(b.unidadesDescontadas) as unidadesDescontadas,
-                sum(b.stockDisponible) as stockDisponible
-                from base b
-                cross join params p
-                where (p.turnoFiltro = '' or b.turno = p.turnoFiltro)
-                AND b.idProducto != 42
-                group by b.idProducto, b.nombreProducto, case when p.turnoFiltro = '' then 'TODOS' else b.turno end
-                order by b.idProducto asc, b.turno asc;
+                SELECT 
+                    b.idProducto,
+                    b.nombreProducto,
+                    CASE WHEN p.turnoFiltro = '' THEN 'TODOS' ELSE b.turno END AS turno,
+                    SUM(b.unidadesProducidas) AS unidadesProducidas,
+                    SUM(b.unidadesVendidas) AS unidadesVendidas,
+                    SUM(b.unidadesDescontadas) AS unidadesDescontadas,
+                    SUM(b.stockDisponible) AS stockDisponible
+                FROM base b
+                CROSS JOIN params p
+                WHERE (p.turnoFiltro = '' OR b.turno = p.turnoFiltro)
+                    AND b.idProducto != 42
+                GROUP BY b.idProducto, b.nombreProducto, CASE WHEN p.turnoFiltro = '' THEN 'TODOS' ELSE b.turno END
+                ORDER BY b.idProducto ASC, b.turno ASC;
         `;
 
         const params = [
             turno,
             fecha,
+            idSucursal,
+            fecha,
+            idSucursal,
             idSucursal,
             fecha,
             idSucursal,
