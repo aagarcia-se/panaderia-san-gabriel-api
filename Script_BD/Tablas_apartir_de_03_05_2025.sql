@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS TRASLADOSPRODUCTOSDETALLES;
 DROP TABLE IF EXISTS ELIMINACIONESDIARIAS;
 DROP TABLE IF EXISTS VENTASELIMINADAS;
 DROP TABLE IF EXISTS DETALLESVENTASELIMINADAS;
+DROP TABLE IF EXISTS SOBRANTES;
 
 CREATE TABLE IF NOT EXISTS GASTOSDIARIOS (
     idGastoDiario INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -123,4 +124,15 @@ CREATE TABLE IF NOT EXISTS DETALLESVENTASELIMINADAS (
     descuento DECIMAL(10, 2) DEFAULT 0.00,                      -- Descuento aplicado al producto
     subtotal DECIMAL(10, 2),                                    -- Subtotal calculado
     FOREIGN KEY (idEliminacion) REFERENCES VENTASELIMINADAS(idEliminacion) ON DELETE CASCADE  -- Integridad referencial corregida
+);
+
+
+-- Crear la tabla SOBRANTES aara guardar los sobrantes de los productos
+CREATE TABLE IF NOT EXISTS SOBRANTES (
+    idSobrante INTEGER PRIMARY KEY AUTOINCREMENT,  -- Identificador único del detalle
+    idVenta INTEGER NOT NULL,                         -- Identificador de la venta
+    idProducto INTEGER NOT NULL,                      -- Identificador del producto vendido
+    cantidadSobrante INTEGER NOT NULL,                 -- Cantidad vendida del producto
+    FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta) ON DELETE CASCADE,  -- Integridad referencial con la tabla de ventas
+    FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto)  -- Integridad referencial con la tabla de productos
 );
