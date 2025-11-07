@@ -250,3 +250,18 @@ export const procesarVentaService = async (venta) => {
         throw error;
     }
 };
+
+export const crearPayloadSobrante = (idVenta, detalleVenta) => {
+
+    const payloadSobrante = detalleVenta.map((detalle) => {
+        const payload = {
+            idVenta: idVenta,
+            idProducto: detalle.idProducto,
+            unidadesSobrantes: detalle.unidadesNoVendidas,
+        }
+
+        return payload;
+    });
+
+    return payloadSobrante;
+}
