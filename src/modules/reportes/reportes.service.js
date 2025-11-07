@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { generarReporteBalanceStokDao, generarReporteDePerdidasDao, generarReporteHistorialStockDao, generarReporteVentasDao, generarReporteVentasEliminadasDao } from "./reportes.dao.js";
+import { generarReporteBalanceStokDao, generarReporteDePerdidasDao, generarReporteHistorialStockDao, generarReporteSobrantesDao, generarReporteVentasDao, generarReporteVentasEliminadasDao } from "./reportes.dao.js";
 
 
 export const generarReporteHistorialStockServices = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
@@ -61,6 +61,19 @@ export const generarReporteVentasEliminadasServices = async (fechaInicio, fechaF
 export const generarReporteBalanceStockServices = async (fecha, idSucursal, turno) => {
     try {
         const reporte = await generarReporteBalanceStokDao(fecha, idSucursal, turno);
+        if (reporte.length === 0) {
+            throw new CustomError(getError(1));
+        }
+
+        return reporte;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const generarReporteSobrantesServices = async (fecha, idSucursal) => {
+    try {
+        const reporte = await generarReporteSobrantesDao(fecha, idSucursal);
         if (reporte.length === 0) {
             throw new CustomError(getError(1));
         }

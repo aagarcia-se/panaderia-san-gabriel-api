@@ -310,3 +310,44 @@ export const generarReporteBalanceStokDao = async (fecha, idSucursal, turno) => 
         throw new CustomError(dbError);
     }
 }
+
+export const generarReporteSobrantesDao = async (fecha, idSucursal) => {
+    try {
+        // Primero obtener las ventas eliminadas
+        const scriptVentas = `
+                                select v.idVenta, s.nombreSucursal, concat(u.nombreUsuario, ' ',u.apellidoUsuario)usuario,
+                                v.ventaTurno, v.fechaVenta
+                                from ventas v
+                                inner join usuarios u on v.idUsuario = u.idUsuario
+                                inner join sucursales s on v.idSucursal = s.idSucursal
+                                where v.fechaVenta = ?
+                                and v.idSucursal = ?;
+        `;
+
+        const ventasResult = await Connection.execute(scriptVentas, [fecha, idSucursal]);
+        
+        // Para cada venta, obtener sus detalles
+        const ventasConDetalles = [];
+        
+        for (const venta of ventasResult.rows) {
+            const scriptDetalles = `
+                                select s.idSobrante, s.idProducto, p.nombreProducto, s.unidadesSobrantes
+                                from SOBRANTES s
+                                inner join PRODUCTOS p on s.idProducto = p.idProducto
+                                where s.idVenta = ?;
+            `;
+            
+            const detallesResult = await Connection.execute(scriptDetalles, [venta.idVenta]);
+            
+            ventasConDetalles.push({
+                ...venta,
+                ventaDetalle: detallesResult.rows
+            });
+        }
+
+        return ventasConDetalles;
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+};
