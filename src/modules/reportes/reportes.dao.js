@@ -76,7 +76,8 @@ export const generarReporteDePerdidasDao = async (fechaInicio, fechaFin, idSucur
                         CONCAT(u.nombreUsuario, ' ', u.apellidoUsuario) AS usuario,
                         SUM(dd.cantidadUnidades) AS total_perdido,
                         SUM(dd.cantidadUnidades * pr.precioPorUnidad) AS dineroPerdida,
-                        COUNT(DISTINCT DATE(dd.fechaDescuento)) AS dias_con_perdidas
+                        COUNT(DISTINCT DATE(dd.fechaDescuento)) AS dias_con_perdidas,
+                        dd.fechaDescuento
                     FROM DETALLEDESCUENTODESTOCK dd
                     JOIN DESCUENTODESTOCK d ON dd.idDescuento = d.idDescuento
                     JOIN PRODUCTOS p ON dd.idProducto = p.idProducto
@@ -92,7 +93,7 @@ export const generarReporteDePerdidasDao = async (fechaInicio, fechaFin, idSucur
                         p.nombreProducto, 
                         s.nombreSucursal,
                         CONCAT(u.nombreUsuario, ' ', u.apellidoUsuario)
-                    ORDER BY total_perdido DESC;`;
+                    ORDER BY dd.fechaDescuento DESC;`;
 
         const params = [
             idSucursal,
@@ -339,10 +340,13 @@ export const generarReporteSobrantesDao = async (fecha, idSucursal) => {
             
             const detallesResult = await Connection.execute(scriptDetalles, [venta.idVenta]);
             
-            ventasConDetalles.push({
-                ...venta,
-                ventaDetalle: detallesResult.rows
-            });
+            if (detallesResult.rows.length === 0) {
+                ventasConDetalles.push({
+                    ...venta,
+                    ventaDetalle: []
+                });
+                continue;
+            }
         }
 
         return ventasConDetalles;

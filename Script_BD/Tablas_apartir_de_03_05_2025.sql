@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS SOBRANTES (
     idSobrante INTEGER PRIMARY KEY AUTOINCREMENT,  -- Identificador único del detalle
     idVenta INTEGER NOT NULL,                         -- Identificador de la venta
     idProducto INTEGER NOT NULL,                      -- Identificador del producto vendido
-    cantidadSobrante INTEGER NOT NULL,                 -- Cantidad vendida del producto
+    unidadesSobrantes INTEGER NOT NULL,                 -- Cantidad vendida del producto
     FOREIGN KEY (idVenta) REFERENCES VENTAS(idVenta) ON DELETE CASCADE,  -- Integridad referencial con la tabla de ventas
     FOREIGN KEY (idProducto) REFERENCES PRODUCTOS(idProducto)  -- Integridad referencial con la tabla de productos
 );
