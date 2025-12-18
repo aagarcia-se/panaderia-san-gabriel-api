@@ -1,5 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
+import { agruparPorProducto } from "./reoirtes.utils.js";
 import { generarReporteBalanceStokDao, generarReporteDePerdidasDao, generarReporteHistorialStockDao, generarReporteSobrantesDao, generarReporteVentasDao, generarReporteVentasEliminadasDao } from "./reportes.dao.js";
 
 
@@ -39,7 +40,10 @@ export const generarReporteDePerdidasServices = async (fechaInicio, fechaFin, id
             throw new CustomError(getError(1));
         }
 
-        return reporte;
+        // Agrupar los datos por producto
+        const reporteAgrupado = agruparPorProducto(reporte);
+
+        return reporteAgrupado;
     } catch (error) {
         throw error;
     }
