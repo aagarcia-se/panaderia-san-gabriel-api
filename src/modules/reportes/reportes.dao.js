@@ -69,31 +69,19 @@ export const generarReporteVentasDao = async (fechaInicio, fechaFin, idSucursal)
 
 export const generarReporteDePerdidasDao = async (fechaInicio, fechaFin, idSucursal) => {
     try {
-        const script = `SELECT 
-                        p.idProducto,
-                        p.nombreProducto AS producto,
-                        s.nombreSucursal AS sucursal,
-                        CONCAT(u.nombreUsuario, ' ', u.apellidoUsuario) AS usuario,
-                        SUM(dd.cantidadUnidades) AS total_perdido,
-                        SUM(dd.cantidadUnidades * pr.precioPorUnidad) AS dineroPerdida,
-                        COUNT(DISTINCT DATE(dd.fechaDescuento)) AS dias_con_perdidas,
-                        dd.fechaDescuento
-                    FROM DETALLEDESCUENTODESTOCK dd
-                    JOIN DESCUENTODESTOCK d ON dd.idDescuento = d.idDescuento
-                    JOIN PRODUCTOS p ON dd.idProducto = p.idProducto
-                    JOIN SUCURSALES s ON d.idSucursal = s.idSucursal
-                    JOIN USUARIOS u ON d.idUsuario = u.idUsuario
-                    JOIN PRECIOS pr ON dd.idProducto = pr.idProducto
-                    WHERE d.tipoDescuento = 'MAL ESTADO'
-                        AND d.idSucursal = ?
-                        AND DATE(dd.fechaDescuento) BETWEEN ? AND ?
-                        AND d.estado = 'A'
-                    GROUP BY 
-                        p.idProducto, 
-                        p.nombreProducto, 
-                        s.nombreSucursal,
-                        CONCAT(u.nombreUsuario, ' ', u.apellidoUsuario)
-                    ORDER BY dd.fechaDescuento DESC;`;
+        const script = `select d.idDescuento, CONCAT(u.nombreUsuario, ' ', u.apellidoUsuario) as usuario, s.nombreSucursal as sucursal, 
+                        d.descuentoTurno as turno, d.fechaDescuento,
+                        dd.idProducto, p.nombreProducto, dd.cantidadUnidades as unidadesPerdidas, 
+                        (dd.cantidadUnidades * pr.precioPorUnidad) AS dineroPerdida
+                        from descuentodestock d
+                        join detalledescuentodestock dd on d.idDescuento = dd.idDescuento
+                        join productos p on dd.idProducto = p.idProducto
+                        join sucursales s on d.idSUcursal = s.idSucursal
+                        join usuarios u on d.idUsuario = u.idUsuario
+                        join precios pr on dd.idProducto = pr.idProducto
+                        where d.tipoDescuento = 'MAL ESTADO'
+                        and d.idSucursal = ?
+                        and date(d.fechaDescuento) between ? and ?;`;
 
         const params = [
             idSucursal,
