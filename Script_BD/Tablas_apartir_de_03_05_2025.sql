@@ -59,7 +59,8 @@ CREATE TABLE IF NOT EXISTS ELIMINACIONESDIARIAS (
     FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
 );
 
-CREATE TABLE IF NOT EXISTS CAMPANIAS(
+DROP TABLE IF EXISTS campanias;
+CREATE TABLE IF NOT EXISTS campanias(
     idCampania INTEGER PRIMARY KEY AUTOINCREMENT,
     nombreCampania TEXT NOT NULL,
     descripcion TEXT,
@@ -74,28 +75,43 @@ CREATE TABLE IF NOT EXISTS CAMPANIAS(
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A'
 );
 
-CREATE TABLE IF NOT EXISTS PREGUNTAS(
+DROP TABLE IF EXISTS preguntas_campania;
+CREATE TABLE IF NOT EXISTS preguntas_campania(
     idPregunta INTEGER PRIMARY KEY AUTOINCREMENT,
     idCampania INTEGER NOT NULL,
-    typeResponse TEXT NOT NULL,
-    pregunta TEXT,
-    textoOpciones TEXT,
-    fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    fechaActualizacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    tipo TEXT NOT NULL CHECK(tipo IN ('pregunta', 'texto')),
+    pregunta TEXT NOT NULL,
+    orden INTEGER NOT NULL DEFAULT 1,
+    obligatoria INTEGER NOT NULL CHECK(obligatoria IN (0, 1)) DEFAULT 1,
+    fechaCreacion DATETIME DEFAULT,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
-    FOREIGN KEY (idCampania) REFERENCES CAMPANIAS(idCampania)
+    FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS RESPUESTAS(
+-- Tabla para registrar cada respuesta completa de un cliente
+DROP TABLE IF EXISTS respuestas_cliente;
+CREATE TABLE IF NOT EXISTS respuestas_cliente(
     idRespuesta INTEGER PRIMARY KEY AUTOINCREMENT,
-    idPregunta INTEGER NOT NULL,
-    respuesta TEXT,
-    fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    fechaActualizacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    idCampania INTEGER NOT NULL,
+    nombreCliente TEXT,
+    telefono TEXT,
+    correo TEXT,
+    fechaRespuesta DATETIME DEFAULT,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
-    FOREIGN KEY (idPregunta) REFERENCES PREGUNTAS(idPregunta)
+    FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE
 );
 
+-- Tabla para el detalle de cada pregunta respondida
+DROP TABLE IF EXISTS detalle_respuestas;
+CREATE TABLE IF NOT EXISTS detalle_respuestas(
+    idDetalle INTEGER PRIMARY KEY AUTOINCREMENT,
+    idRespuesta INTEGER NOT NULL,
+    idPregunta INTEGER NOT NULL,
+    respuesta TEXT NOT NULL,
+    fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (idRespuesta) REFERENCES respuestas_cliente(idRespuesta) ON DELETE CASCADE,
+    FOREIGN KEY (idPregunta) REFERENCES preguntas_campania(idPregunta) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS VENTASELIMINADAS(
     idEliminacion INTEGER PRIMARY KEY AUTOINCREMENT,

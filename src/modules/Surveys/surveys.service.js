@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { ConsultarCampaniaActivaDao } from "./surveys.dao.js";
+import { ConsultarCampaniaActivaDao, consultarPregutasPorCampaniaDao, registrarRespuestasDao } from "./surveys.dao.js";
 
 export const ConsultarCampaniaActivaService = async (fechaHoy) => {
   try {
@@ -17,5 +17,30 @@ export const ConsultarCampaniaActivaService = async (fechaHoy) => {
   }
 };
 
+export const consultarPregutasPorCampaniaServices = async (idCampania) => {
+  try {
+    const preguntas = await consultarPregutasPorCampaniaDao(idCampania);
 
+    if (preguntas === 0) {
+      throw new CustomError(getError(1));
+    }
 
+    return preguntas;
+  }
+  catch (error) {
+    throw error;
+  }
+};
+
+export const registrarRespuestasServicio = async (data) => {
+  try{
+    const resInsert = await registrarRespuestasDao(data);
+    if(resInsert === 0){
+      throw new CustomError(getError(2));
+    }
+
+    return resInsert;
+  }catch(error){
+    throw error;
+  }
+}
