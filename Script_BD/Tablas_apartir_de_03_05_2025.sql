@@ -116,8 +116,8 @@ CREATE TABLE IF NOT EXISTS campanias(
     activa INTEGER NOT NULL CHECK(activa IN (0, 1)) DEFAULT 1,
     tipoEncuesta TEXT,
     urlEncuesta TEXT,
-    fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    fechaActualizacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fechaCreacion DATETIME ,
+    fechaActualizacion DATETIME,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A'
 );
 
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS preguntas_campania(
     pregunta TEXT NOT NULL,
     orden INTEGER NOT NULL DEFAULT 1,
     obligatoria INTEGER NOT NULL CHECK(obligatoria IN (0, 1)) DEFAULT 1,
-    fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fechaCreacion DATETIME,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE
 );
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS respuestas_cliente(
     nombreCliente TEXT,
     telefono TEXT,
     correo TEXT,
-    fechaRespuesta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fechaRespuesta DATETIME,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
     FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE
 );
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS detalle_respuestas(
     idRespuesta INTEGER NOT NULL,
     idPregunta INTEGER NOT NULL,
     respuesta TEXT NOT NULL,
-    fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fechaCreacion DATETIME,
     FOREIGN KEY (idRespuesta) REFERENCES respuestas_cliente(idRespuesta) ON DELETE CASCADE,
     FOREIGN KEY (idPregunta) REFERENCES preguntas_campania(idPregunta) ON DELETE CASCADE
 );

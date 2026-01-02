@@ -47,6 +47,13 @@ VALUES(11, 'Traslados', 'Realizar traslados de productos entre sucursales', '/tr
 INSERT INTO permisos ("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
 VALUES(12, 'Descuento de stock', 'Ingreso y gestion de descuentos', '/descuento-stock', '2025-01-25', 'A');
 
+-- Permiso para visualizacion de roles
+INSERT INTO permisos("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES (13, 'Reportes', 'Generar Reportes Varios', '/reportes', '2025-05-16', 'A');
+
+INSERT INTO permisos("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
+VALUES (13, 'Reportes', 'Generar Reportes Varios', '/reportes', '2025-05-16', 'A');
+
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES
 (1, 'Admin', 'Administrador de todo el sistema', '2025-01-25', 'A');
@@ -64,7 +71,9 @@ INSERT INTO ROLESPERMISOS (idRol, idPermiso) VALUES
 (1, 9),
 (1, 10),
 (1, 11),
-(1, 12);
+(1, 12),
+(1, 13),
+(1, 14);
 
 -- Crear usuario administrador
 INSERT INTO USUARIOS (idUsuario, nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, estadoUsuario, fechaCreacion, estado) VALUES

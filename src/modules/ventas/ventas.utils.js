@@ -217,10 +217,10 @@ export const procesarVentaService = async (venta) => {
         let productosProcesados;     
         let idSucursal = encabezadoVenta.idSucursal;
 
-        if(encabezadoVenta.idOrdenProduccion !== null){
+       // if(encabezadoVenta.idOrdenProduccion !== null){
             // 1. Procesar productos de panadería o repostería (si existen)
             productosProcesados = await obtenerProductosPanaderiaVendidos(encabezadoVenta, detalleVenta, idSucursal);
-        }
+        //}
 
         //2. Agregar precios unitarios a todos los productos
         const productosConPrecios = await agregarPreciosAProductosVenta(productosProcesados);
