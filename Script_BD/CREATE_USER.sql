@@ -52,7 +52,7 @@ INSERT INTO permisos("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAc
 VALUES (13, 'Reportes', 'Generar Reportes Varios', '/reportes', '2025-05-16', 'A');
 
 INSERT INTO permisos("idPermiso", "nombrePermiso", "descripcionPermiso", "rutaAcceso", "fechaCreacion", "estado") 
-VALUES (13, 'Reportes', 'Generar Reportes Varios', '/reportes', '2025-05-16', 'A');
+VALUES (14, 'Crear Encuestas', 'Crear y gestionar encuestas', '/encuestas-config', '2026-01-02', 'A');
 
 -- Crear Rol administrador por defecto
 INSERT INTO ROLES (idRol, nombreRol, descripcionRol, fechaCreacion, estado) VALUES

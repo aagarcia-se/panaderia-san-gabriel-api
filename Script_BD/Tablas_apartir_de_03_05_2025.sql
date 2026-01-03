@@ -139,9 +139,12 @@ CREATE TABLE IF NOT EXISTS respuestas_cliente(
     nombreCliente TEXT,
     telefono TEXT,
     correo TEXT,
+    nombreVendedor TEXT,
+    idSucursal INTEGER,
     fechaRespuesta DATETIME,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
-    FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE
+    FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE,
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
 );
 
 CREATE TABLE IF NOT EXISTS detalle_respuestas(
