@@ -139,9 +139,12 @@ CREATE TABLE IF NOT EXISTS respuestas_cliente(
     nombreCliente TEXT,
     telefono TEXT,
     correo TEXT,
+    nombreVendedor TEXT,
+    idSucursal INTEGER,
     fechaRespuesta DATETIME,
     estado TEXT NOT NULL CHECK(estado IN ('A', 'N')) DEFAULT 'A',
-    FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE
+    FOREIGN KEY (idCampania) REFERENCES campanias(idCampania) ON DELETE CASCADE,
+    FOREIGN KEY (idSucursal) REFERENCES SUCURSALES(idSucursal)
 );
 
 CREATE TABLE IF NOT EXISTS detalle_respuestas(
@@ -153,3 +156,20 @@ CREATE TABLE IF NOT EXISTS detalle_respuestas(
     FOREIGN KEY (idRespuesta) REFERENCES respuestas_cliente(idRespuesta) ON DELETE CASCADE,
     FOREIGN KEY (idPregunta) REFERENCES preguntas_campania(idPregunta) ON DELETE CASCADE
 );
+
+-- Tabla para activar fecha de producción
+DROP INDEX IF EXISTS idx_activacion_expira;
+DROP TABLE IF EXISTS activacion_fecha_produccion;
+
+CREATE TABLE IF NOT EXISTS activacion_fecha_produccion (
+    idActivacion      INTEGER PRIMARY KEY AUTOINCREMENT,
+    activado_por      INTEGER NOT NULL,
+    activado_en       DATETIME NOT NULL,
+    expira_en         DATETIME NOT NULL,
+    notas             TEXT,
+    estado            TEXT NOT NULL DEFAULT 'A',
+    FOREIGN KEY (activado_por) REFERENCES usuarios(idUsuario)
+);
+
+CREATE INDEX IF NOT EXISTS idx_activacion_expira 
+ON activacion_fecha_produccion(expira_en);

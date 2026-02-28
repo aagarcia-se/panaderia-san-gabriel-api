@@ -43,14 +43,15 @@ export const consultarPregutasPorCampaniaDao = async (idCampania) =>{
 export const registrarRespuestasDao = async (data) =>{
   try{
     const {usuario, respuestas} = data;
-    const scriptResputas = `INSERT INTO respuestas_cliente (idCampania, nombreCliente, telefono, correo, fechaRespuesta)
-                            VALUES (?, ?, ?, ?, ?);`;
+    const scriptResputas = `INSERT INTO respuestas_cliente (idCampania, nombreCliente, telefono, correo, nombreVendedor, fechaRespuesta)
+                            VALUES (?, ?, ?, ?, ?, ?);`;
 
     const resInsert = await Connection.execute(scriptResputas, [
       data.idCampania,
       usuario.nombre,
       usuario.telefono,
       usuario.correo,
+      usuario.nombreVendedor,
       data.fechaRespuesta
     ])
 
