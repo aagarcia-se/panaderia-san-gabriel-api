@@ -156,3 +156,20 @@ CREATE TABLE IF NOT EXISTS detalle_respuestas(
     FOREIGN KEY (idRespuesta) REFERENCES respuestas_cliente(idRespuesta) ON DELETE CASCADE,
     FOREIGN KEY (idPregunta) REFERENCES preguntas_campania(idPregunta) ON DELETE CASCADE
 );
+
+-- Tabla para activar fecha de producción
+DROP INDEX IF EXISTS idx_activacion_expira;
+DROP TABLE IF EXISTS activacion_fecha_produccion;
+
+CREATE TABLE IF NOT EXISTS activacion_fecha_produccion (
+    idActivacion      INTEGER PRIMARY KEY AUTOINCREMENT,
+    activado_por      INTEGER NOT NULL,
+    activado_en       DATETIME NOT NULL,
+    expira_en         DATETIME NOT NULL,
+    notas             TEXT,
+    estado            TEXT NOT NULL DEFAULT 'A',
+    FOREIGN KEY (activado_por) REFERENCES usuarios(idUsuario)
+);
+
+CREATE INDEX IF NOT EXISTS idx_activacion_expira 
+ON activacion_fecha_produccion(expira_en);
