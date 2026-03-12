@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authMiddleware from "../../middlewares/authMiddleware.js";
-import { generarReporteBalanceStockController, generarReporteDePerdidasController, generarReporteHistorialStockController, generarReporteSobrantesController, generarReporteVentasEliminadasController } from "./reportes.controller.js";
+import { consultarGastosPorFechaYSucursalController, generarReporteBalanceStockController, generarReporteDePerdidasController, generarReporteHistorialStockController, generarReporteSobrantesController, generarReporteVentasEliminadasController } from "./reportes.controller.js";
 import { generarReporteVentasController } from "./reportes.controller.js";
 
 export const reportesRoute = Router();    
@@ -11,3 +11,4 @@ reportesRoute.get("/generar-reporte-perdidas", authMiddleware, generarReporteDeP
 reportesRoute.get("/generar-reporte-ventas-eliminadas", authMiddleware, generarReporteVentasEliminadasController);
 reportesRoute.get("/generar-reporte-balance-stock", authMiddleware, generarReporteBalanceStockController);
 reportesRoute.get("/generar-reporte-sobrantes", authMiddleware, generarReporteSobrantesController);
+reportesRoute.get("/gastos-por-fecha-y-sucursal", authMiddleware, consultarGastosPorFechaYSucursalController);

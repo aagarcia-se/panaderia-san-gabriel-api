@@ -343,3 +343,31 @@ export const generarReporteSobrantesDao = async (fecha, idSucursal) => {
         throw new CustomError(dbError);
     }
 };
+
+export const consultarGastosPorFechaYSucursalDao = async (fechaInicio, fechaFin, idSucursal) => {
+    try {
+        const script = `
+                        SELECT
+                            gd.detalleGasto,
+                            gd.subtotal AS montoGasto,
+                            g.fechaIngreso
+                        FROM gastosdiarios g
+                            JOIN gastosdiariosdetalles gd ON g.idGastoDiario  = gd.idGastoDiario
+                            JOIN ventas v ON g.idVenta        = v.idVenta
+                            JOIN sucursales s ON v.idSucursal     = s.idSucursal
+                        WHERE
+                            g.fechaIngreso >= ?
+                            AND g.fechaIngreso < ?
+                            AND g.estado = 'A'
+                            AND v.idSucursal = ?
+                        ORDER BY
+                            s.nombreSucursal,
+                            g.fechaIngreso;
+        `;
+        const result = await Connection.execute(script, [fechaInicio, fechaFin, idSucursal]);
+        return result.rows;
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+};

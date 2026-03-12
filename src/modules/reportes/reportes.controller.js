@@ -1,4 +1,4 @@
-import { generarReporteBalanceStockServices, generarReporteDePerdidasServices, generarReporteHistorialStockServices, generarReporteSobrantesServices, generarReporteVentasEliminadasServices, generarReporteVentasServices } from "./reportes.service.js";
+import { consultarGastosPorFechaYSucursalServices, generarReporteBalanceStockServices, generarReporteDePerdidasServices, generarReporteHistorialStockServices, generarReporteSobrantesServices, generarReporteVentasEliminadasServices, generarReporteVentasServices } from "./reportes.service.js";
 
 
 export const generarReporteHistorialStockController = async (req, res, next) => {
@@ -84,6 +84,21 @@ export const generarReporteSobrantesController = async (req, res, next) => {
     try {
         const {fecha, idSucursal} = req.query;
         const reporte   = await generarReporteSobrantesServices(fecha, idSucursal);
+        const responseData = {
+          status: 200,
+          message: "Consulta exitosa",
+          reporte,
+        };
+        res.status(200).json(responseData);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const consultarGastosPorFechaYSucursalController = async (req, res, next) => {
+    try {
+        const {fechaInicio, fechaFin, idSucursal} = req.query;
+        const reporte   = await consultarGastosPorFechaYSucursalServices(fechaInicio, fechaFin, idSucursal);
         const responseData = {
           status: 200,
           message: "Consulta exitosa",
