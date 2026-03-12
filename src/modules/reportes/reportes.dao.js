@@ -354,10 +354,10 @@ export const consultarGastosPorFechaYSucursalDao = async (fechaInicio, fechaFin,
                         FROM gastosdiarios g
                             JOIN gastosdiariosdetalles gd ON g.idGastoDiario  = gd.idGastoDiario
                             JOIN ventas v ON g.idVenta        = v.idVenta
-                            JOIN sucursales s ON v.idSucursal     = s.idSucursal
+                            JOIN sucursales s ON v.idSucursal = s.idSucursal
                         WHERE
                             g.fechaIngreso >= ?
-                            AND g.fechaIngreso < ?
+                            AND g.fechaIngreso <= ?
                             AND g.estado = 'A'
                             AND v.idSucursal = ?
                         ORDER BY
