@@ -371,3 +371,23 @@ export const consultarGastosPorFechaYSucursalDao = async (fechaInicio, fechaFin,
         throw new CustomError(dbError);
     }
 };
+
+export const consultarVentaPorProductoDao = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
+    try {
+        const script = `select  ROW_NUMBER() OVER (ORDER BY dv.idDetalleVenta) AS correlativo,
+                            p.nombreProducto, v.ventaTurno, dv.cantidadVendida unidadesVendidas, 
+                            dv.precioUnitario, dv.subtotal totalEnQuetzales, v.fechaVenta
+                            from ventas v
+                            join detallesventas dv on v.idVenta = dv.idVenta
+                            join productos p on dv.idProducto = p.idProducto
+                            where p.idProducto = ?
+                            and v.idSucursal = ?
+                            and v.fechaVenta between ? and ?;
+        `;
+        const result = await Connection.execute(script, [idProducto, idSucursal, fechaInicio, fechaFin]);
+        return result.rows;
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+};
