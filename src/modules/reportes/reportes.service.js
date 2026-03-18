@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { agruparPorProducto } from "./reoirtes.utils.js";
-import { consultarGastosPorFechaYSucursalDao, generarReporteBalanceStokDao, generarReporteDePerdidasDao, generarReporteHistorialStockDao, generarReporteSobrantesDao, generarReporteVentasDao, generarReporteVentasEliminadasDao } from "./reportes.dao.js";
+import { consultarGastosPorFechaYSucursalDao, consultarVentaPorProductoDao, generarReporteBalanceStokDao, generarReporteDePerdidasDao, generarReporteHistorialStockDao, generarReporteSobrantesDao, generarReporteVentasDao, generarReporteVentasEliminadasDao } from "./reportes.dao.js";
 
 
 export const generarReporteHistorialStockServices = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
@@ -91,6 +91,18 @@ export const generarReporteSobrantesServices = async (fecha, idSucursal) => {
 export const consultarGastosPorFechaYSucursalServices = async (fechaInicio, fechaFin, idSucursal) => {
     try {
         const reporte = await consultarGastosPorFechaYSucursalDao(fechaInicio, fechaFin, idSucursal);
+        if (reporte.length === 0) {
+            throw new CustomError(getError(1));
+        }
+        return reporte;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const consultarVentaPorProductoServices = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
+    try {
+        const reporte = await consultarVentaPorProductoDao(idProducto, idSucursal, fechaInicio, fechaFin);
         if (reporte.length === 0) {
             throw new CustomError(getError(1));
         }
