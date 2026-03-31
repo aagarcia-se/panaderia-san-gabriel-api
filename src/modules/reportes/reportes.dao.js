@@ -317,6 +317,8 @@ export const generarReporteSobrantesDao = async (fecha, idSucursal) => {
         
         // Para cada venta, obtener sus detalles
         const ventasConDetalles = [];
+
+        console.log(ventasResult.rows);
         
         for (const venta of ventasResult.rows) {
             const scriptDetalles = `
@@ -328,12 +330,11 @@ export const generarReporteSobrantesDao = async (fecha, idSucursal) => {
             
             const detallesResult = await Connection.execute(scriptDetalles, [venta.idVenta]);
             
-            if (detallesResult.rows.length === 0) {
+            if (detallesResult.rows.length !== 0) {
                 ventasConDetalles.push({
                     ...venta,
-                    ventaDetalle: []
+                    ventaDetalle: detallesResult.rows
                 });
-                continue;
             }
         }
 
