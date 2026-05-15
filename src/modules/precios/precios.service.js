@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarPrcioProductoDao, consultarPrecioProductoPorIdDao, consultarPreciosProductosDao,  elimarPrecioProductoDao,  IngresarPrecioProductoDao } from "./precios.dao.js";
+import { actualizarPrcioProductoDao, consultarPrecioProductoPorIdDao, consultarPrecioProductoPorIdOptimizadoDao, consultarPreciosProductosDao,  elimarPrecioProductoDao,  IngresarPrecioProductoDao } from "./precios.dao.js";
 
 
 export const ingresarPrecioProductoService = async (dataPrecio) => {
@@ -72,4 +72,19 @@ export const consultarPrecioProductoPorIdService = async (idProducto) => {
   } catch (error) {
     throw error;
   }
+};
+
+//Sercicios optimizados
+export const consultarPrecioProductoPorIdOptimizadoService = async (idsProductos) => {
+   try {
+        const productos = await consultarPrecioProductoPorIdOptimizadoDao(idsProductos);
+
+        const preciosMap = new Map(productos.map(p => [p.idProducto, p]));
+
+        return {
+            getPrecio: (idProducto) => preciosMap.get(idProducto) ?? null
+        };
+    } catch (error) {
+        throw error;
+    }
 };

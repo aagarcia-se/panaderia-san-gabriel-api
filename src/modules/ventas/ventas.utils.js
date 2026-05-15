@@ -2,7 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarDescuentoporProductosDao } from "../descontarStock/descontarStock.dao.js";
 import { consultarUnidadesDeProductoPorOrdenService, consultarUnidadesDeProductosPorOrdenOptimizadoService } from "../oredenesproduccion/ordenesproduccion.service.js";
-import { consultarPrecioProductoPorIdService } from "../precios/precios.service.js";
+import { consultarPrecioProductoPorIdOptimizadoService, consultarPrecioProductoPorIdService } from "../precios/precios.service.js";
 import { consultarStockProductoDao, consultarStockProductoDiarioDao } from "../StockProductos/stockProductos.dao.js";
 import { consultarStockProductoDiarioOptimizadoService, consultarStockProductosOptimizadoService } from "../StockProductos/stockProductos.service.js";
     
@@ -202,7 +202,7 @@ export const procesarVentaService = async (venta) => {
         //}
 
         //2. Agregar precios unitarios a todos los productos
-        const productosConPrecios = await agregarPreciosAProductosVenta(productosProcesados);
+        const productosConPrecios = await agregarPreciosAProductosVentaOptimizado(productosProcesados);
 
         // 3. Calcular subtotales por producto
        const detallesConSubtotal = calcularSubtotalVentaPorProductos(productosConPrecios);
@@ -245,6 +245,10 @@ export const crearPayloadSobrante = (idVenta, detalleVenta) => {
     return payloadSobrante;
 }
 
+
+//Funciones
+// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 
 /**
  * Obtiene los productos de panadería vendidos.
@@ -321,4 +325,15 @@ export const obtenerProductosPanaderiaVendidosOptimizado = async (encabezadoVent
     } catch (error) {
         throw error;
     }
+};
+
+
+export const agregarPreciosAProductosVentaOptimizado = async (ventaDetalle) => {
+    const idsProductos = ventaDetalle.map(d => d.idProducto);
+    const precios = await consultarPrecioProductoPorIdOptimizadoService(idsProductos); // 1 sola query
+
+    return ventaDetalle.map(detalle => ({  // sin async
+        ...detalle,
+        precioUnitario: precios.getPrecio(detalle.idProducto).precioPorUnidad,
+    }));
 };

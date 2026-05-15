@@ -108,3 +108,26 @@ export const consultarPrecioProductoPorIdDao = async (idProducto) => {
     throw new CustomError(dbError);
   }
 }
+
+//Consultas con queries optimizados
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+export const consultarPrecioProductoPorIdOptimizadoDao = async (idsProductos) => {
+    try {
+        const placeholders = idsProductos.map(() => "?").join(", ");
+        const query = `
+            SELECT p.idProducto, p.nombreProducto, ca.nombreCategoria, pr.precio, pr.precioPorUnidad
+            FROM PRODUCTOS p
+            JOIN PRECIOS pr ON p.idProducto = pr.idProducto
+            JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+            WHERE p.estado = 'A'
+            AND p.idProducto IN (${placeholders});
+        `;
+
+        const productos = await Connection.execute(query, idsProductos);
+        return productos.rows; // filas crudas, el service crea el Map
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
