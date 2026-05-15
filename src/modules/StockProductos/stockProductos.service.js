@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarDetalleOrdenProduccionService } from "../oredenesproduccion/ordenesproduccion.service.js";
-import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductoDiarioOptimizadoDao, consultarStockProductosDao, consultarStockProductosOptimizadoDao, IngresarHistorialStockBatchDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, actualizarStockProductoDiariosBatchDao, actualizarStockProductosBatchDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductoDiarioOptimizadoDao, consultarStockProductosDao, consultarStockProductosOptimizadoDao, IngresarHistorialStockBatchDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
 import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadEgresoPorVenta, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 /*------------------------------------------------------------------------------
@@ -377,7 +377,7 @@ export const consultarStockProductoDiarioOptimizadoService = async (idsProductos
 }
 
 export const descontarStockPorVentasOptimizado = async (venta) => {
-        try {
+    try {
         const { encabezadoVenta, detallesVenta } = venta;
         const idsProductos = detallesVenta.map(d => d.idProducto);
 
@@ -389,37 +389,38 @@ export const descontarStockPorVentasOptimizado = async (venta) => {
         const productosStockGeneral = detallesVenta.filter(d => d.controlarStock === 1 && d.controlarStockDiario === 0);
         const productosStockDiario = detallesVenta.filter(d => !(d.controlarStock === 1 && d.controlarStockDiario === 0));
 
-        // ✅ Construir payloads de historial para batch
+        // ✅ Acumular todos los payloads sin hacer queries
+        const payloadsStockGeneral = [];
         const payloadsHistorial = [];
+        const payloadsStockDiario = [];
 
-        // Actualizar stock general y acumular historiales
-        const actualizacionesStockGeneral = productosStockGeneral.map(async (detalle) => {
+        productosStockGeneral.forEach((detalle) => {
             const stockExistente = stockProductos.getStock(detalle.idProducto);
             if (stockExistente.idStock !== 0) {
-                const payloadDescStockGeneral = crearPayloadActualizarDebitoStockGeneral(stockExistente, detalle, encabezadoVenta.idSucursal);
-                await actualizarStockProductoDao(payloadDescStockGeneral);
-
-                // ✅ Acumular en lugar de insertar uno por uno
-                const payloadHistorial = crearPayloadEgresoPorVenta(detalle, encabezadoVenta, stockExistente);
-                payloadsHistorial.push(payloadHistorial);
+                payloadsStockGeneral.push(
+                    crearPayloadActualizarDebitoStockGeneral(stockExistente, detalle, encabezadoVenta.idSucursal)
+                );
+                payloadsHistorial.push(
+                    crearPayloadEgresoPorVenta(detalle, encabezadoVenta, stockExistente)
+                );
             }
         });
 
-        // Actualizar stock diario
-        const actualizacionesStockDiario = productosStockDiario.map(async (detalle) => {
+        productosStockDiario.forEach((detalle) => {
             const stockDiarioExistente = stockProductosDiarios.getStockDiario(detalle.idProducto);
             if (stockDiarioExistente.idStockDiario !== 0) {
-                const payloadDescStockDiario = crearPayloadActualizarDebitoStockDiario(stockDiarioExistente, detalle, encabezadoVenta.idSucursal);
-                await actualizarStockProductoDiarioDao(payloadDescStockDiario);
+                payloadsStockDiario.push(
+                    crearPayloadActualizarDebitoStockDiario(stockDiarioExistente, detalle, encabezadoVenta.idSucursal)
+                );
             }
         });
 
-        await Promise.all([...actualizacionesStockGeneral, ...actualizacionesStockDiario]);
-
-        // ✅ 1 sola llamada HTTP para todos los historiales
-        if (payloadsHistorial.length > 0) {
-            await IngresarHistorialStockBatchDao(payloadsHistorial);
-        }
+        // ✅ 3 batch en paralelo — antes eran N*3 queries
+        await Promise.all([
+            payloadsStockGeneral.length > 0 ? actualizarStockProductosBatchDao(payloadsStockGeneral) : Promise.resolve(),
+            payloadsStockDiario.length > 0 ? actualizarStockProductoDiariosBatchDao(payloadsStockDiario) : Promise.resolve(),
+            payloadsHistorial.length > 0 ? IngresarHistorialStockBatchDao(payloadsHistorial) : Promise.resolve(),
+        ]);
 
     } catch (error) {
         throw error;
