@@ -302,3 +302,49 @@ export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
     throw new CustomError(dbError);
   }
 }
+
+
+//Consultas optimizadas
+//----------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------- 
+export const consultarStockProductosOptimizadoDao = async (idsProductos, idSucursal) => {
+    try {
+        const placeholders = idsProductos.map(() => "?").join(", ");
+        const query = `select idStock, idProducto, idSucursal, stock from STOCKPRODUCTOS 
+                        where idProducto IN (${placeholders})
+                        and idSucursal = ?
+                        and estado = 'A';`;
+
+        const stockProductos = await Connection.execute(query, [...idsProductos, idSucursal]);
+        return stockProductos.rows; // filas crudas, el service crea el Map
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
+
+
+export const consultarStockProductoDiarioOptimizadoDao = async (idsProductos, idSucursal, fechaValidez) => {
+try {
+        const placeholders = idsProductos.map(() => "?").join(", ");
+        const query = `
+            SELECT idStockDiario, idProducto, idSucursal, stock, fechaValidez 
+            FROM STOCKPRODUCTOSDIARIOS
+            WHERE idProducto IN (${placeholders})
+            AND idSucursal = ?
+            AND fechaValidez = ?
+            AND estado = 'A';
+        `;
+
+        const stockProductosDiarios = await Connection.execute(query, [
+            ...idsProductos,
+            idSucursal,
+            fechaValidez
+        ]);
+
+        return stockProductosDiarios.rows; // filas crudas, el service crea el Map
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}

@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarDetalleOrdenProduccionService } from "../oredenesproduccion/ordenesproduccion.service.js";
-import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductosDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductoDiarioOptimizadoDao, consultarStockProductosDao, consultarStockProductosOptimizadoDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
 import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadEgresoPorVenta, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 /*------------------------------------------------------------------------------
@@ -341,4 +341,37 @@ export const elminarStockDiarioService = async (idOrdenProduccion) => {
   }catch(error){
     throw error;
   }
+}
+
+
+//servicios con queries optimizados
+//----------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------- 
+export const consultarStockProductosOptimizadoService = async (idsProductos, idSucursal) => {
+    try {
+      const stockProductos = await consultarStockProductosOptimizadoDao(idsProductos, idSucursal);
+      
+      const stockProductosMap = new Map(stockProductos.map(sp => [sp.idProducto, sp]));
+
+      return {
+        getStock: (idProducto) => stockProductosMap.get(idProducto) ?? { idStock: 0, stock: 0 }
+      };
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const consultarStockProductoDiarioOptimizadoService = async (idsProductos, idSucursal, fechaValidez) => {
+    try {
+        const stocks = await consultarStockProductoDiarioOptimizadoDao(idsProductos, idSucursal, fechaValidez);
+
+        const stockMap = new Map(stocks.map(s => [s.idProducto, s]));
+
+        return {
+            getStockDiario: (idProducto) => stockMap.get(idProducto) ?? { idStockDiario: 0 }
+        };
+    } catch (error) {
+        throw error;
+    }
 }

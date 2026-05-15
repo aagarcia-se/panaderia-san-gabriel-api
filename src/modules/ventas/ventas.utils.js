@@ -1,10 +1,11 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarDescuentoporProductosDao } from "../descontarStock/descontarStock.dao.js";
-import { consultarUnidadesDeProductoPorOrdenService } from "../oredenesproduccion/ordenesproduccion.service.js";
+import { consultarUnidadesDeProductoPorOrdenService, consultarUnidadesDeProductosPorOrdenOptimizadoService } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { consultarPrecioProductoPorIdService } from "../precios/precios.service.js";
 import { consultarStockProductoDao, consultarStockProductoDiarioDao } from "../StockProductos/stockProductos.dao.js";
-
+import { consultarStockProductoDiarioOptimizadoService, consultarStockProductosOptimizadoService } from "../StockProductos/stockProductos.service.js";
+    
 /**
  * Filtra los productos por categoría.
  * @param {Array} detalleVenta - Detalle de la venta.
@@ -197,7 +198,7 @@ export const procesarVentaService = async (venta) => {
 
        // if(encabezadoVenta.idOrdenProduccion !== null){
             // 1. Procesar productos de panadería o repostería (si existen)
-            productosProcesados = await obtenerProductosPanaderiaVendidos(encabezadoVenta, detalleVenta, idSucursal);
+            productosProcesados = await obtenerProductosPanaderiaVendidosOptimizado(encabezadoVenta, detalleVenta, idSucursal);
         //}
 
         //2. Agregar precios unitarios a todos los productos
@@ -243,3 +244,81 @@ export const crearPayloadSobrante = (idVenta, detalleVenta) => {
 
     return payloadSobrante;
 }
+
+
+/**
+ * Obtiene los productos de panadería vendidos.
+ * @param {Array} ventaDetalle - Detalle de la venta.
+ * @returns {Promise<Array>} - Detalle de la venta con las unidades vendidas calculadas.
+ */
+export const obtenerProductosPanaderiaVendidosOptimizado = async (encabezadoVenta, ventaDetalle, idSucursal) => {
+    try {
+        const idsProductos = ventaDetalle.map(d => d.idProducto);
+
+        // ✅ 4 queries en paralelo antes del loop — antes eran N*4 queries
+        const [descuentos, detallesOrden, stockProductos, stockProductosDiarios] = await Promise.all([
+            consultarDescuentoporProductosDao(idsProductos, idSucursal, encabezadoVenta.fechaVenta),
+            consultarUnidadesDeProductosPorOrdenOptimizadoService(encabezadoVenta.idOrdenProduccion, idsProductos),
+            consultarStockProductosOptimizadoService(idsProductos, idSucursal),
+            consultarStockProductoDiarioOptimizadoService(idsProductos, idSucursal, encabezadoVenta.fechaVenta)
+        ]);
+
+        // ✅ Sin async/await — todo es búsqueda en memoria
+        const detallesEnOrden = ventaDetalle.map((detalle) => {
+
+            if (detalle.tipoProduccion === "bandejas" && encabezadoVenta.ventaTurno === "AM") {
+
+                const productoDescontado = descuentos.getDescuento(detalle.idProducto);
+                const detalleOrden = detallesOrden.getDetalleOrden(detalle.idProducto);
+
+                if (productoDescontado.idDescuento !== 0 && detalleOrden.idDetalleOrdenProduccion !== 0) {
+                    const cantidadRestante = detalleOrden.cantidadUnidades - productoDescontado.unidadesDescontadas;
+                    if (cantidadRestante > 0) {
+                        const cantidadVendida = calcularUnidadesDePanaderiaVendidas(cantidadRestante, detalle.unidadesNoVendidas);
+                        return {
+                            ...detalle,
+                            cantidadProducida: detalleOrden.cantidadUnidades,
+                            cantidadVendida,
+                        };
+                    }
+
+                } else if (productoDescontado.idDescuento === 0 && detalleOrden.idDetalleOrdenProduccion !== 0) {
+                    const cantidadVendida = calcularUnidadesDePanaderiaVendidas(detalleOrden.cantidadUnidades, detalle.unidadesNoVendidas);
+                    if (cantidadVendida > 0) {
+                        return {
+                            ...detalle,
+                            cantidadProducida: detalleOrden.cantidadUnidades,
+                            cantidadVendida,
+                        };
+                    }
+                }
+
+            } else {
+
+                if (detalle.controlarStock === 1 && detalle.controlarStockDiario === 0) {
+                    const productoEnStock = stockProductos.getStock(detalle.idProducto);
+                    if (productoEnStock.idStock !== 0 && productoEnStock.stock > 0) {
+                        const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas);
+                        if (cantidadVendida > 0) {
+                            return { ...detalle, cantidadVendida };
+                        }
+                    }
+                } else {
+                    const productoEnStockDiario = stockProductosDiarios.getStockDiario(detalle.idProducto);
+                    if (productoEnStockDiario.idStockDiario !== 0 && productoEnStockDiario.stock > 0) {
+                        const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStockDiario.stock, detalle.unidadesNoVendidas);
+                        if (cantidadVendida > 0) {
+                            return { ...detalle, cantidadVendida };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        });
+
+        return detallesEnOrden.filter((detalle) => detalle !== null);
+    } catch (error) {
+        throw error;
+    }
+};

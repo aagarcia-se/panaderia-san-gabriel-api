@@ -257,3 +257,28 @@ export const actuailizarEstadoOrdenProd = async (fechaAProducir, ordenTurno) => 
     throw new CustomError(dbError);
   }
 }
+
+//Funciones con queries optimizados
+// --------------------------------------------------
+// --------------------------------------------------
+
+export const consultarUnidadesDeProductosPorOrdenOptimizadoDao = async (idOrdenProduccion, idsProductos) => {
+    try {
+        const placeholders = idsProductos.map(() => "?").join(", ");
+        const queryDetalle = `
+            SELECT do.idDetalleOrdenProduccion, do.idOrdenProduccion, do.idProducto, p.idCategoria, do.cantidadUnidades
+            FROM DETALLESORDENESPRODUCCION AS do
+            INNER JOIN ORDENESPRODUCCION AS op ON do.idOrdenProduccion = op.idOrdenProduccion
+            INNER JOIN PRODUCTOS AS p ON do.idProducto = p.idProducto
+            INNER JOIN CATEGORIAS AS cat ON p.idCategoria = cat.idCategoria
+            WHERE op.idOrdenProduccion = ?
+            AND do.idProducto IN (${placeholders});
+        `;
+
+        const detalleOrden = await Connection.execute(queryDetalle, [idOrdenProduccion, ...idsProductos]);
+        return detalleOrden.rows; // ✅ solo filas crudas
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
