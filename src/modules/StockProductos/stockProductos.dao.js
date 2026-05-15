@@ -348,3 +348,31 @@ try {
         throw new CustomError(dbError);
     }
 }
+
+export const IngresarHistorialStockBatchDao = async (dataHistorialStocks) => {
+    try {
+        const insert = `INSERT INTO HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, stockAnterior, stockNuevo, cantidad, fechaMovimiento, observaciones, tipoReferencia)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+
+        const batch = dataHistorialStocks.map(dataHistorialStock => ({
+            sql: insert,
+            args: [
+                dataHistorialStock.idUsuario,
+                dataHistorialStock.idProducto,
+                dataHistorialStock.idSucursal,
+                dataHistorialStock.tipoMovimiento || 'INGRESO',
+                dataHistorialStock.stockAnterior,
+                dataHistorialStock.stockNuevo,
+                dataHistorialStock.cantidad,
+                dataHistorialStock.fechaActualizacion,
+                dataHistorialStock.observaciones || "Ingreso Manual",
+                dataHistorialStock.tipoReferencia || "CONTROL DE STOCK"
+            ]
+        }));
+
+        await Connection.batch(batch, "write"); // 1 sola llamada HTTP
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}

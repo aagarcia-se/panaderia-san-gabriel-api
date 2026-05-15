@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarDetalleOrdenProduccionService } from "../oredenesproduccion/ordenesproduccion.service.js";
-import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductoDiarioOptimizadoDao, consultarStockProductosDao, consultarStockProductosOptimizadoDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductoDiarioOptimizadoDao, consultarStockProductosDao, consultarStockProductosOptimizadoDao, IngresarHistorialStockBatchDao, IngresarHistorialStockDao, registrarStockProductoDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
 import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadEgresoPorVenta, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 /*------------------------------------------------------------------------------
@@ -377,50 +377,49 @@ export const consultarStockProductoDiarioOptimizadoService = async (idsProductos
 }
 
 export const descontarStockPorVentasOptimizado = async (venta) => {
-    try {
+        try {
         const { encabezadoVenta, detallesVenta } = venta;
         const idsProductos = detallesVenta.map(d => d.idProducto);
 
-        // ✅ 2 queries en paralelo en lugar de N queries en loop
         const [stockProductos, stockProductosDiarios] = await Promise.all([
             consultarStockProductosOptimizadoService(idsProductos, encabezadoVenta.idSucursal),
             consultarStockProductoDiarioOptimizadoService(idsProductos, encabezadoVenta.idSucursal, encabezadoVenta.fechaCreacion)
         ]);
 
-        // Separar productos según su tipo de stock
         const productosStockGeneral = detallesVenta.filter(d => d.controlarStock === 1 && d.controlarStockDiario === 0);
         const productosStockDiario = detallesVenta.filter(d => !(d.controlarStock === 1 && d.controlarStockDiario === 0));
 
-        // ✅ Actualizar stock general en paralelo
+        // ✅ Construir payloads de historial para batch
+        const payloadsHistorial = [];
+
+        // Actualizar stock general y acumular historiales
         const actualizacionesStockGeneral = productosStockGeneral.map(async (detalle) => {
             const stockExistente = stockProductos.getStock(detalle.idProducto);
             if (stockExistente.idStock !== 0) {
                 const payloadDescStockGeneral = crearPayloadActualizarDebitoStockGeneral(stockExistente, detalle, encabezadoVenta.idSucursal);
-                const payloadHistorial = crearPayloadEgresoPorVenta(detalle, encabezadoVenta, stockExistente);
+                await actualizarStockProductoDao(payloadDescStockGeneral);
 
-                // Las dos escrituras de cada producto en paralelo
-                await Promise.all([
-                    actualizarStockProductoDao(payloadDescStockGeneral),
-                    IngresarHistorialStockDao(payloadHistorial)
-                ]);
-            } else {
-                // se espera otra logica para el debito de stock general
+                // ✅ Acumular en lugar de insertar uno por uno
+                const payloadHistorial = crearPayloadEgresoPorVenta(detalle, encabezadoVenta, stockExistente);
+                payloadsHistorial.push(payloadHistorial);
             }
         });
 
-        // ✅ Actualizar stock diario en paralelo
+        // Actualizar stock diario
         const actualizacionesStockDiario = productosStockDiario.map(async (detalle) => {
             const stockDiarioExistente = stockProductosDiarios.getStockDiario(detalle.idProducto);
             if (stockDiarioExistente.idStockDiario !== 0) {
                 const payloadDescStockDiario = crearPayloadActualizarDebitoStockDiario(stockDiarioExistente, detalle, encabezadoVenta.idSucursal);
                 await actualizarStockProductoDiarioDao(payloadDescStockDiario);
-            } else {
-                // se espera otra logica para el debito de stock diario
             }
         });
 
-        // Ejecutar todas las actualizaciones en paralelo
         await Promise.all([...actualizacionesStockGeneral, ...actualizacionesStockDiario]);
+
+        // ✅ 1 sola llamada HTTP para todos los historiales
+        if (payloadsHistorial.length > 0) {
+            await IngresarHistorialStockBatchDao(payloadsHistorial);
+        }
 
     } catch (error) {
         throw error;
