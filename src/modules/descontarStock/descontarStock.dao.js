@@ -85,8 +85,10 @@ export const consultarDescuentoStockPrdocutosDetalle = async (idDescuento) => {
     }
 }
 
-export const consultarDescuentoporProductoDao = async (idProducto, idSucursal, idFecha) => {
-    try{
+export const consultarDescuentoporProductosDao = async (idsProductos, idSucursal, idFecha) => {
+    try {
+        const placeholders = idsProductos.map(() => "?").join(", ");
+        
         const consulta = `SELECT 
                                 MIN(dd.idDetalleDescuento) AS idDetalleDescuento, 
                                 des.idSucursal,
@@ -96,26 +98,26 @@ export const consultarDescuentoporProductoDao = async (idProducto, idSucursal, i
                                 DATE(dd.fechaDescuento) AS fechaDescuento
                             FROM DESCUENTODESTOCK des
                             INNER JOIN DETALLEDESCUENTODESTOCK dd ON des.idDescuento = dd.idDescuento
-                            WHERE dd.idProducto = ?
+                            WHERE dd.idProducto IN (${placeholders})
                             AND des.idSucursal = ?
                             AND DATE(dd.fechaDescuento) = ?
                             GROUP BY des.idSucursal, dd.idProducto, DATE(dd.fechaDescuento);`;
         
         const descuentos = await Connection.execute(consulta, [
-            idProducto,
+            ...idsProductos,  // expande el array de IDs
             idSucursal,
             idFecha
         ]);
 
-        if(descuentos.rows.length === 0){
-            return {
-            idDescuento: 0
-            }
-        }
+        // Retorna un mapa idProducto → descuento para búsqueda O(1)
+        const descuentosMap = new Map(descuentos.rows.map(d => [d.idProducto, d]));
 
-        return descuentos.rows[0];
+        // Si un producto no tiene descuento, retorna el objeto vacío por defecto
+        return {
+            getDescuento: (idProducto) => descuentosMap.get(idProducto) ?? { idDescuento: 0 }
+        };
 
-    }catch(error){
+    } catch (error) {
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
     }
