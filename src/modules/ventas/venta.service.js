@@ -10,7 +10,7 @@ import { actuailizarEstadoOrdenProd } from "../oredenesproduccion/ordenesproducc
 import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { ingresarSobranteService } from "../sobrantes/sobrantes.service.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, consultarStockProductoDao, consultarStockProductoDiarioDao, IngresarHistorialStockDao } from "../StockProductos/stockProductos.dao.js";
-import { descontarStockPorVentas } from "../StockProductos/stockProductos.service.js";
+import { descontarStockPorVentasOptimizado } from "../StockProductos/stockProductos.service.js";
 import { consultarDetalleVentaDao, consultarVentaporId, consultarVentasPorUsuarioDao, eliminarVentaDao, ingresarVentaDao, } from "./ventas.dao.js";
 import { crearPayloadSobrante, procesarVentaService } from "./ventas.utils.js";
 
@@ -30,7 +30,7 @@ export const ingresarVentaService = async (venta) => {
     const paylodSobrante = crearPayloadSobrante(resVenta.idVenta, venta.detalleVenta);
     await ingresarSobranteService(paylodSobrante);
 
-    await descontarStockPorVentas(ventaDetalleProcesado);//debitar stock de las ventas ingresadas
+    await descontarStockPorVentasOptimizado(ventaDetalleProcesado);//debitar stock de las ventas ingresadas
 
     const detalleingreso = crearPayloadingresos(resVenta.idVenta, ventaDetalleProcesado);
 

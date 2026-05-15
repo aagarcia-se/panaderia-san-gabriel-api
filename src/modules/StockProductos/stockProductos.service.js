@@ -375,3 +375,54 @@ export const consultarStockProductoDiarioOptimizadoService = async (idsProductos
         throw error;
     }
 }
+
+export const descontarStockPorVentasOptimizado = async (venta) => {
+    try {
+        const { encabezadoVenta, detallesVenta } = venta;
+        const idsProductos = detallesVenta.map(d => d.idProducto);
+
+        // ✅ 2 queries en paralelo en lugar de N queries en loop
+        const [stockProductos, stockProductosDiarios] = await Promise.all([
+            consultarStockProductosOptimizadoService(idsProductos, encabezadoVenta.idSucursal),
+            consultarStockProductoDiarioOptimizadoService(idsProductos, encabezadoVenta.idSucursal, encabezadoVenta.fechaCreacion)
+        ]);
+
+        // Separar productos según su tipo de stock
+        const productosStockGeneral = detallesVenta.filter(d => d.controlarStock === 1 && d.controlarStockDiario === 0);
+        const productosStockDiario = detallesVenta.filter(d => !(d.controlarStock === 1 && d.controlarStockDiario === 0));
+
+        // ✅ Actualizar stock general en paralelo
+        const actualizacionesStockGeneral = productosStockGeneral.map(async (detalle) => {
+            const stockExistente = stockProductos.getStock(detalle.idProducto);
+            if (stockExistente.idStock !== 0) {
+                const payloadDescStockGeneral = crearPayloadActualizarDebitoStockGeneral(stockExistente, detalle, encabezadoVenta.idSucursal);
+                const payloadHistorial = crearPayloadEgresoPorVenta(detalle, encabezadoVenta, stockExistente);
+
+                // Las dos escrituras de cada producto en paralelo
+                await Promise.all([
+                    actualizarStockProductoDao(payloadDescStockGeneral),
+                    IngresarHistorialStockDao(payloadHistorial)
+                ]);
+            } else {
+                // se espera otra logica para el debito de stock general
+            }
+        });
+
+        // ✅ Actualizar stock diario en paralelo
+        const actualizacionesStockDiario = productosStockDiario.map(async (detalle) => {
+            const stockDiarioExistente = stockProductosDiarios.getStockDiario(detalle.idProducto);
+            if (stockDiarioExistente.idStockDiario !== 0) {
+                const payloadDescStockDiario = crearPayloadActualizarDebitoStockDiario(stockDiarioExistente, detalle, encabezadoVenta.idSucursal);
+                await actualizarStockProductoDiarioDao(payloadDescStockDiario);
+            } else {
+                // se espera otra logica para el debito de stock diario
+            }
+        });
+
+        // Ejecutar todas las actualizaciones en paralelo
+        await Promise.all([...actualizacionesStockGeneral, ...actualizacionesStockDiario]);
+
+    } catch (error) {
+        throw error;
+    }
+}
