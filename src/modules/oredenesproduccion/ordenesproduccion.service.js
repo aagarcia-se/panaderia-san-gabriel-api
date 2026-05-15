@@ -3,7 +3,7 @@ import { getError } from "../../utils/generalErrors.js";
 import { registrarBatchConsumoOrdenProduccionServices } from "../consumosordenesproduccion/consumosordenes.service.js";
 import { CalcularCantidadIngredientes } from "../consumosordenesproduccion/cosumoordenesproduccion.utils.js";
 import { elminarStockDiarioService, procesarStockPorOrdenProduccionServices } from "../StockProductos/stockProductos.service.js";
-import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
+import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, consultarUnidadesDeProductosPorOrdenOptimizadoDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden } from "./ordenesproduccion.utils.js";
 
 export const consultarOrdenProduccionService = async (idRol, idSucursal) => {
@@ -146,4 +146,22 @@ export const consultarDetalleOrdenPorCriteriosService = async (ordenTurno, fecha
   } catch (error) {
     throw error;
   }
+};
+
+//servicios con queries optimizados
+//--------------------------------------------
+//--------------------------------------------
+export const consultarUnidadesDeProductosPorOrdenOptimizadoService = async (idOrdenProduccion, idsProductos) => {
+    try {
+        const detalles = await consultarUnidadesDeProductosPorOrdenOptimizadoDao(idOrdenProduccion, idsProductos);
+
+        // Lógica de negocio en el service
+        const detallesMap = new Map(detalles.map(d => [d.idProducto, d]));
+
+        return {
+            getDetalleOrden: (idProducto) => detallesMap.get(idProducto) ?? { idDetalleOrdenProduccion: 0 }
+        };
+    } catch (error) {
+        throw error;
+    }
 };
