@@ -25,6 +25,7 @@ import { surveysRoute } from "./modules/Surveys/surveys.routes.js";
 import { activarFechaProduccionRoute } from "./modules/activar_fecha_produccion/activar-fecha-produccioin.routes.js";
 import { activacionNotificaciones } from "./modules/notificaciones/notificaciones.route.js";
 import { ordenesBatchRoutes } from "./modules/OrdenesProduccionBatch/ordenesprodbatch.route.js";
+import { ocrRoutes } from "./modules/ocr/ocr.route.js";
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use("/api", surveysRoute);
 app.use("/api", activarFechaProduccionRoute);
 app.use("/api", activacionNotificaciones);
 app.use("/api", ordenesBatchRoutes);
+app.use("/api", ocrRoutes);
 
 // Middleware de manejo de errores
 app.use(errorHandler);

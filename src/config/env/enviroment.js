@@ -15,6 +15,12 @@ export const enviroment = {
       sid_twilio: process.env.ACCOUNTSID_DEV,
       token_twilio: process.env.AUTHTOKEN_DEV,
     },
+    anthropic: {
+      api_key: process.env.ANTHROPIC_API_KEY_DEV,
+    },
+    gemini: {
+      api_key: process.env.GEMINI_API_KEY_DEV,
+    },
   },
   pil: {
     database: {
