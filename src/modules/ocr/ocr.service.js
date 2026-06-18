@@ -15,8 +15,8 @@ export const procesarImagenOcrService = async (file) => {
       textoRaw = await processingImagesWithClaudeIA(imagenBase64, mimeType);
     }
 
-    const productos = validarYLimpiarProductos(textoRaw);
-    return productos;
+    console.log(textoRaw);
+    return textoRaw;
   } catch (error) {
     throw error;
   }
