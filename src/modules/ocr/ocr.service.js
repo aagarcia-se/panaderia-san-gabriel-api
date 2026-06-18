@@ -1,15 +1,22 @@
-import { processingImagesWithGeminiIA } from "./ocr.utils.js";
+import { processingImagesWithClaudeIA, processingImagesWithGeminiIA } from "./ocr.utils.js";
 
 
-export const procesarImagenOcrService = async (image) => {
+export const procesarImagenOcrService = async (file) => {
   try {
-    const imagenBase64 = image.buffer.toString("base64");
-    const mimeType = image.mimetype;
+    const imagenBase64 = file.buffer.toString("base64");
+    const mimeType = file.mimetype;
 
-    // const textoRaw = await processingImagesWithClaudeIA(imagenBase64, mimeType);
-    const textoRaw = await processingImagesWithGeminiIA(imagenBase64, mimeType);
+    let textoRaw;
 
-    return textoRaw;
+    try {
+      textoRaw = await processingImagesWithGeminiIA(imagenBase64, mimeType);
+    } catch (geminiError) {
+      console.log("Gemini falló, usando Claude como fallback...");
+      textoRaw = await processingImagesWithClaudeIA(imagenBase64, mimeType);
+    }
+
+    const productos = validarYLimpiarProductos(textoRaw);
+    return productos;
   } catch (error) {
     throw error;
   }
