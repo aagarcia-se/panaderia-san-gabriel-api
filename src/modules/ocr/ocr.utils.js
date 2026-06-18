@@ -1,4 +1,4 @@
-import anthropicIA from "../../config/AIModels/anthropic.js";
+import anthropicIA from "../../config/AIModels/Anthropic.js";
 import geminiIA from "../../config/AIModels/GeminiIA.js";
 
 export const processingImagesWithClaudeIA = async (imagenBase64, mimeType) => {
