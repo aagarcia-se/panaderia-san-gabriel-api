@@ -1,7 +1,7 @@
 import anthropicIA from "../../config/AIModels/anthropic.js";
 import geminiIA from "../../config/AIModels/GeminiIA.js";
 
-export const processingImagesWithIA = async (imagenBase64, mimeType) => {
+export const processingImagesWithClaudeIA = async (imagenBase64, mimeType) => {
   try {
     const response = await anthropicIA.messages.create({
       model: "claude-sonnet-4-6",

@@ -26,6 +26,7 @@ import { activarFechaProduccionRoute } from "./modules/activar_fecha_produccion/
 import { activacionNotificaciones } from "./modules/notificaciones/notificaciones.route.js";
 import { ordenesBatchRoutes } from "./modules/OrdenesProduccionBatch/ordenesprodbatch.route.js";
 import { ocrRoutes } from "./modules/ocr/ocr.route.js";
+import { ventasAIRoutes } from "./modules/ventasAI/ventasAI.routes.js";
 
 const app = express();
 
@@ -62,6 +63,7 @@ app.use("/api", activarFechaProduccionRoute);
 app.use("/api", activacionNotificaciones);
 app.use("/api", ordenesBatchRoutes);
 app.use("/api", ocrRoutes);
+app.use("/api", ventasAIRoutes);
 
 // Middleware de manejo de errores
 app.use(errorHandler);
