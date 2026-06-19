@@ -8,6 +8,7 @@ const errorHandler = (err, req, res, next) => {
         servicio: err.servicio,
         message: err.message,
         code: err.code,
+        data: err.data ?? null, // 👈 agregar
       },
     });
   }

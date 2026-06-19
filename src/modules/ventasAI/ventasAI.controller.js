@@ -9,14 +9,14 @@ export const IngresarVentasAIController = async (req, res, next) => {
       return res.status(400).json({ status: 400, message: 'No se recibió ningún archivo' });
     }
 
-    if (!req.body.ventaHeader) {
+    if (!req.body.venta) {
       console.log('No se recibieron datos de la venta');
       return res.status(400).json({ status: 400, message: 'No se recibieron datos de la venta' });
     }
     
     const image       = req.file;
-    const ventaHeader = JSON.parse(req.body.ventaHeader);
-    const productos   = await IngresarVentasAIService(ventaHeader, image);
+    const venta       = JSON.parse(req.body.venta);
+    const productos   = await IngresarVentasAIService(venta, image);
 
     res.status(200).json({
       status: 200,

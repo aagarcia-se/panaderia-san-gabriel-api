@@ -26,7 +26,7 @@ export const crearProductoDao = async (dataProductos) => {
 export const consultarProductosDao = async () => {
   try {
     // Consulta SQL
-    const query = `select idProducto, nombreProducto, idCategoria, estado from productos;`
+    const query = `select idProducto, nombreProducto, idCategoria,  estado from productos;`
 
     // Ejecutar la consulta
     const productos = await Connection.execute(query);
@@ -82,4 +82,25 @@ export const desactivarProductoDao = async (idProducto) => {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
+}
+
+// ------------------------------------------------------
+// ------------- QUERIES OPTIMIZADAS  ------------------
+// ------------------------------------------------------
+export const consultarProductosOptimizadoDao = async (idsProductos) => {
+    try {
+        const placeholders = idsProductos.map(() => '?').join(', ');
+        const query = `SELECT idProducto, nombreProducto, idCategoria,
+                        controlarStock, controlarStockDiario, tipoProduccion,
+                        estado 
+                        FROM productos 
+                        WHERE idProducto IN (${placeholders})`;
+
+        const productos = await Connection.execute(query, idsProductos);
+
+        return productos.rows;
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
 }

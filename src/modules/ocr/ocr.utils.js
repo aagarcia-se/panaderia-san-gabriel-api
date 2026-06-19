@@ -20,15 +20,20 @@ export const processingImagesWithClaudeIA = async (imagenBase64, mimeType) => {
             },
             {
               type: "text",
-              text: `Esta imagen contiene una tabla datos escritos con lapiceron por el usuario
-              tiene un nombre de producto y una cantidad, en la parte superior hay una fecha en formato
-              dd/mm/yyyy. 
-              
-              Extrae todos los datos visibles y retorna ÚNICAMENTE un JSON válido 
-              con el siguiente formato, sin texto adicional, sin markdown, sin backticks:
-              {"encabezado":{"fecha":"dd/mm/yyyy"},"detalleventa":[{"nombre":"...","cantidad":0}]}
-              
-              Si un valor de cantidad no se puede leer claramente, usa -1.`
+              text: `Esta imagen contiene una hoja de "Control de Sobrantes" con DOS tablas lado a lado.
+                    Cada tabla tiene 3 columnas: Codigo, Nombre Producto y Sobrante.
+                    Los valores en la columna Sobrante pueden estar escritos a mano con lapicero.
+
+                    Extrae TODOS los productos de AMBAS tablas y retorna ÚNICAMENTE un JSON válido
+                    con el siguiente formato, sin texto adicional, sin markdown, sin backticks:
+                    {"detalleVenta":[{"idProducto":"...","nombreProducto":"...","Sobrantes":0}]}
+
+                    Reglas:
+                    - idProducto es el valor de la columna Codigo (número)
+                    - nombreProducto es el valor de la columna Nombre Producto
+                    - Sobrantes es el valor numérico de la columna Sobrante
+                    - Si Sobrante es 0 o está vacío, NO incluyas ese producto en el resultado
+                    - Si un valor no se puede leer claramente, usa -1`
             }
           ]
         }
@@ -37,6 +42,7 @@ export const processingImagesWithClaudeIA = async (imagenBase64, mimeType) => {
 
     return response.content[0].text;
   } catch (error) {
+    console.log("Error en Claude IA:", error);
     throw error;
   }
 };
@@ -55,15 +61,20 @@ export const processingImagesWithGeminiIA = async (imagenBase64, mimeType) => {
         }
       },
       {
-        text: `Esta imagen contiene una tabla datos escritos con lapiceron por el usuario
-        tiene un nombre de producto y una cantidad, en la parte superior hay una fecha en formato
-        dd/mm/yyyy. 
-        
-        Extrae todos los datos visibles y retorna ÚNICAMENTE un JSON válido 
-        con el siguiente formato, sin texto adicional, sin markdown, sin backticks:
-        {"encabezado":{"fecha":"dd/mm/yyyy"},"detalleventa":[{"nombre":"...","cantidad":0}]}
-        
-        Si un valor de cantidad no se puede leer claramente, usa -1.`
+        text: `Esta imagen contiene una hoja de "Control de Sobrantes" con DOS tablas lado a lado.
+                Cada tabla tiene 3 columnas: Codigo, Nombre Producto y Sobrante.
+                Los valores en la columna Sobrante pueden estar escritos a mano con lapicero.
+
+                Extrae TODOS los productos de AMBAS tablas y retorna ÚNICAMENTE un JSON válido
+                con el siguiente formato, sin texto adicional, sin markdown, sin backticks:
+                {"detalleVenta":[{"idProducto":"...","nombreProducto":"...","Sobrantes":0}]}
+
+                Reglas:
+                - idProducto es el valor de la columna Codigo (número)
+                - nombreProducto es el valor de la columna Nombre Producto
+                - Sobrantes es el valor numérico de la columna Sobrante
+                - Si Sobrante es 0 o está vacío, NO incluyas ese producto en el resultado
+                - Si un valor no se puede leer claramente, usa -1`
       }
     ]);
 
@@ -71,7 +82,7 @@ export const processingImagesWithGeminiIA = async (imagenBase64, mimeType) => {
     return text;
 
   } catch (error) {
-    console.error("Error en Gemini IA:", error);
+    console.log("Error en Gemini IA:", error);
     throw error;
   }
 };
