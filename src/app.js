@@ -27,6 +27,7 @@ import { activacionNotificaciones } from "./modules/notificaciones/notificacione
 import { ordenesBatchRoutes } from "./modules/OrdenesProduccionBatch/ordenesprodbatch.route.js";
 import { ocrRoutes } from "./modules/ocr/ocr.route.js";
 import { ventasAIRoutes } from "./modules/ventasAI/ventasAI.routes.js";
+import { healthRoutes } from "./modules/Health/health.route.js";
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.use("/api", activacionNotificaciones);
 app.use("/api", ordenesBatchRoutes);
 app.use("/api", ocrRoutes);
 app.use("/api", ventasAIRoutes);
+app.use("/api", healthRoutes);
 
 // Middleware de manejo de errores
 app.use(errorHandler);
