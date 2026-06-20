@@ -8,12 +8,12 @@ export const procesarImagenOcrService = async (file) => {
 
     let detalleProductosImage;
 
-    // try {
+    try {
       detalleProductosImage = await processingImagesWithGeminiIA(imagenBase64, mimeType);
-    // } catch (geminiError) {
-    //   console.log("Gemini falló, usando Claude como fallback...");
-    //   detalleProductosImage = await processingImagesWithClaudeIA(imagenBase64, mimeType);
-    // }
+    } catch (geminiError) {
+      console.log("Gemini falló, usando Claude como fallback...");
+      detalleProductosImage = await processingImagesWithClaudeIA(imagenBase64, mimeType);
+    }
     return JSON.parse(detalleProductosImage);
   } catch (error) {
     throw error;
