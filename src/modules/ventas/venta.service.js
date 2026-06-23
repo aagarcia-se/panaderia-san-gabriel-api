@@ -21,6 +21,10 @@ export const ingresarVentaService = async (venta) => {
 
     console.time("procesarVenta");
     const ventaDetalleProcesado = await procesarVentaService(venta);
+    
+    if(ventaDetalleProcesado.detallesVenta.length === 0){
+      throw new CustomError(getError(21));
+    }
     console.timeEnd("procesarVenta");
 
     console.time("ingresarVentaDao");

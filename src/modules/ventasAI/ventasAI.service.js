@@ -23,7 +23,7 @@ export const IngresarVentasAIService = async (venta, image) => {
         venta.detalleVenta = detalleVenta;
 
         const resVenta = await ingresarVentaService(venta);
-
+        
         return resVenta;
     } catch (error) {
         throw error;
