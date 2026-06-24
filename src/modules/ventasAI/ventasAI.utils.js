@@ -6,7 +6,6 @@ export const crearPayloadDetalleVenta = (detalleVentaImage, productosMap, fechaC
         : detalleVentaImage.detalleventa ?? [];
 
     return lista
-        .filter((detalle) => detalle.Sobrantes > 0)
         .map((detalle) => {
             const producto = productosMap.getProductos(Number(detalle.idProducto)); // 👈 getProductos en lugar de .find()
 

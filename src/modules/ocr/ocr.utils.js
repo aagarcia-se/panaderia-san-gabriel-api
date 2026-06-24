@@ -33,7 +33,7 @@ export const processingImagesWithClaudeIA = async (imagenBase64, mimeType) => {
                     - idProducto es el valor de la columna Codigo (número)
                     - nombreProducto es el valor de la columna Nombre Producto
                     - Sobrantes es el valor numérico de la columna Sobrante
-                    - Si Sobrante es 0 o está vacío, NO incluyas ese producto en el resultado
+                    - Si Sobrante es 0 o está vacío, se incluye el producto con sobrantes igual a 0
                     - Si un valor no se puede leer claramente, usa -1`
             }
           ]
@@ -74,7 +74,7 @@ export const processingImagesWithGeminiIA = async (imagenBase64, mimeType) => {
                 - idProducto es el valor de la columna Codigo (número)
                 - nombreProducto es el valor de la columna Nombre Producto
                 - Sobrantes es el valor numérico de la columna Sobrante
-                - Si Sobrante es 0 o está vacío, NO incluyas ese producto en el resultado
+                - Si Sobrante es 0 o está vacío, se incluye el producto con sobrantes igual a 0
                 - Si un valor no se puede leer claramente, usa -1`
       }
     ]);
