@@ -89,36 +89,61 @@ export const processingImagesWithGeminiIA = async (imagenBase64, mimeType) => {
 };
 
 export async function optimizeImage(buffer) {
+  const MAX_SIZE = 8 * 1024 * 1024; // 8 MB
 
-  const maxSize = 10 * 1024 * 1024; // 10 MB
-
-
-  // tamaño actual
-  if (buffer.length <= maxSize) {
+  // Si ya cumple, devolverla
+  if (buffer.length <= MAX_SIZE) {
     return buffer;
   }
 
-
+  let width = null;
   let quality = 90;
   let output = buffer;
 
+  const metadata = await sharp(buffer).metadata();
+  width = metadata.width;
 
-  while (output.length > maxSize && quality > 40) {
-
-
+  while (output.length > MAX_SIZE) {
     output = await sharp(buffer)
+      .resize(
+        width
+          ? {
+              width,
+              withoutEnlargement: true,
+            }
+          : undefined
+      )
       .jpeg({
-        quality: quality,
-        mozjpeg: true
+        quality,
+        mozjpeg: true,
       })
       .toBuffer();
 
+    // Si ya cumple, salir
+    if (output.length <= MAX_SIZE) {
+      break;
+    }
 
-    quality -= 10;
+    // Primero bajar calidad
+    if (quality > 30) {
+      quality -= 10;
+    } else {
+      // Si ya no podemos bajar mucho más la calidad,
+      // reducimos dimensiones un 20%
+      width = Math.floor(width * 0.8);
 
+      // Evitar tamaños absurdamente pequeños
+      if (width < 500) {
+        throw new Error(
+          `No fue posible reducir la imagen por debajo de 8 MB. Tamaño actual: ${(output.length / 1024 / 1024).toFixed(2)} MB`
+        );
+      }
+    }
   }
 
+  console.log(
+    `Imagen optimizada: ${(output.length / 1024 / 1024).toFixed(2)} MB`
+  );
 
   return output;
-
 }
