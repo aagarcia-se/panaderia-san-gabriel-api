@@ -1,9 +1,10 @@
-import { processingImagesWithClaudeIA, processingImagesWithGeminiIA } from "./ocr.utils.js";
+import { optimizeImage, processingImagesWithClaudeIA, processingImagesWithGeminiIA } from "./ocr.utils.js";
 
 
 export const procesarImagenOcrService = async (file) => {
   try {
-    const imagenBase64 = file.buffer.toString("base64");
+    const optimizedImage = await optimizeImage(file.buffer);
+    const imagenBase64 = optimizedImage.toString("base64");
     const mimeType = file.mimetype;
 
     let detalleProductosImage;

@@ -1,5 +1,6 @@
 import anthropicIA from "../../config/AIModels/Anthropic.js";
 import geminiIA from "../../config/AIModels/GeminiIA.js";
+import sharp from "sharp";
 
 export const processingImagesWithClaudeIA = async (imagenBase64, mimeType) => {
   try {
@@ -86,3 +87,38 @@ export const processingImagesWithGeminiIA = async (imagenBase64, mimeType) => {
     throw error;
   }
 };
+
+export async function optimizeImage(buffer) {
+
+  const maxSize = 10 * 1024 * 1024; // 10 MB
+
+
+  // tamaño actual
+  if (buffer.length <= maxSize) {
+    return buffer;
+  }
+
+
+  let quality = 90;
+  let output = buffer;
+
+
+  while (output.length > maxSize && quality > 40) {
+
+
+    output = await sharp(buffer)
+      .jpeg({
+        quality: quality,
+        mozjpeg: true
+      })
+      .toBuffer();
+
+
+    quality -= 10;
+
+  }
+
+
+  return output;
+
+}
