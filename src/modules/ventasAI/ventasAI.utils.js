@@ -1,9 +1,9 @@
 
 
-export const crearPayloadDetalleVenta = (detalleVentaImage, productosMap, fechaCreacion) => {
-    const lista = Array.isArray(detalleVentaImage)
-        ? detalleVentaImage
-        : detalleVentaImage.detalleventa ?? [];
+export const crearPayloadDetalleVenta = (detalleVenta, productosMap, fechaCreacion) => {
+    const lista = Array.isArray(detalleVenta)
+        ? detalleVenta
+        : detalleVenta.detalleventa ?? [];
 
     return lista
         .map((detalle) => {
@@ -18,4 +18,21 @@ export const crearPayloadDetalleVenta = (detalleVentaImage, productosMap, fechaC
                 controlarStockDiario: producto?.controlarStockDiario ?? 0,
             };
         });
+};
+
+export const convertirFilasAUnidadesFrances = (productos) => {
+    return productos.map((producto) => {
+        if (producto.idProducto != 1) return producto;
+
+        const cantidad = parseFloat(producto.Sobrantes);
+        const filasEnteras = Math.floor(cantidad);
+        const mediaFila = cantidad % 1 >= 0.5 ? 3 : 0; // 0.5 = media fila = 3 unidades
+
+        const unidades = (filasEnteras * 6) + mediaFila;
+
+        return {
+            ...producto,
+            Sobrantes: unidades,
+        };
+    });
 };

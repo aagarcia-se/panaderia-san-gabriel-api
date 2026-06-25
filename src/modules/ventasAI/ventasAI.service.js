@@ -1,7 +1,7 @@
 
 import { consultarProductosOptimizadoService } from "../productos/productos.service.js";
 import { ingresarVentaService } from "../ventas/venta.service.js";
-import { crearPayloadDetalleVenta } from "./ventasAI.utils.js";
+import { convertirFilasAUnidadesFrances, crearPayloadDetalleVenta } from "./ventasAI.utils.js";
 import { procesarImagenOcrService } from "../ocr/ocr.service.js";
 
 export const IngresarVentasAIService = async (venta, image) => {
@@ -10,15 +10,18 @@ export const IngresarVentasAIService = async (venta, image) => {
 
         console.time("ProcesarImagen");
         const detalleProductosImage = await procesarImagenOcrService(image); 
-        console.timeEnd("ProcesarImagen");       
+        console.timeEnd("ProcesarImagen");  
+        
+        const detalleProductosConvertido = convertirFilasAUnidadesFrances(detalleProductosImage.detalleVenta);
 
-        const idsProductos = detalleProductosImage.detalleVenta.map(
+
+        const idsProductos = detalleProductosConvertido.map(
             detalle => Number(detalle.idProducto)
         );
 
         const productosMap = await consultarProductosOptimizadoService(idsProductos);
 
-        const detalleVenta = crearPayloadDetalleVenta(detalleProductosImage.detalleVenta, productosMap, fechaCreacion);
+        const detalleVenta = crearPayloadDetalleVenta(detalleProductosConvertido, productosMap, fechaCreacion);
 
         venta.detalleVenta = detalleVenta;
 
