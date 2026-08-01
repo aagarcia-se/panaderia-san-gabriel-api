@@ -18,5 +18,5 @@ export const calcularDiferencia = (montoEsperado, montoTotalIngresado, montoTota
 }
 
 export const calcularVentaNeta = (montoTotalIngresado, montoTotalGasto) => {
-    return montoTotalIngresado - montoTotalGasto;
+    return montoTotalIngresado + montoTotalGasto;
 }
