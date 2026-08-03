@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarCantidadUnidadesService, eliminarcantidadUnidadeServices, ingrearCantidadUnidadesService, modificarCantidaUnidaesService } from "../OrdenesProdConfig/ordenesprodconfig.service.js";
-import { crearProductoDao, actualizarProductoDao, consultarProductosDao, eliminarProductoDao, desactivarProductoDao, consultarProductosOptimizadoDao } from "./productos.dao.js";
+import { crearProductoDao, actualizarProductoDao, consultarProductosDao, eliminarProductoDao, desactivarProductoDao, consultarProductosOptimizadoDao, constultarProductosParaInventarioDao } from "./productos.dao.js";
 
 
 export const crearProductoService = async (dataProducto) => {
@@ -112,6 +112,20 @@ export const consultarProductosOptimizadoService = async (idsProductos) => {
     return {
       getProductos: (idProducto) => productosMap.get(idProducto) ?? null
     }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const constultarProductosParaInventarioService = async () => {
+  try {
+    const productos = await constultarProductosParaInventarioDao();
+    
+    if (productos.length === 0) {
+      const error = getError(1);
+      throw new CustomError(error);
+    }
+    return productos;
   } catch (error) {
     throw error;
   }
