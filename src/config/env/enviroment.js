@@ -15,6 +15,12 @@ export const enviroment = {
       sid_twilio: process.env.ACCOUNTSID_DEV,
       token_twilio: process.env.AUTHTOKEN_DEV,
     },
+    anthropic: {
+      api_key: process.env.ANTHROPIC_API_KEY_DEV,
+    },
+    gemini: {
+      api_key: process.env.GEMINI_API_KEY_DEV,
+    },
   },
   pil: {
     database: {
@@ -30,6 +36,12 @@ export const enviroment = {
       sid_twilio: process.env.ACCOUNTSID_PIL,
       token_twilio: process.env.AUTHTOKEN_PIL,
     },
+    anthropic: {
+      api_key: process.env.ANTHROPIC_API_KEY_PIL,
+    },
+    gemini: {
+      api_key: process.env.GEMINI_API_KEY_PIL,
+    },
   },
   prod: {
     database: {
@@ -44,6 +56,12 @@ export const enviroment = {
     smsConfig: {
       sid_twilio: process.env.ACCOUNTSID_PROD,
       token_twilio: process.env.AUTHTOKEN_PROD,
+    },
+    anthropic: {
+      api_key: process.env.ANTHROPIC_API_KEY_PROD,
+    },
+    gemini: {
+      api_key: process.env.GEMINI_API_KEY_PROD,
     },
   },
 };

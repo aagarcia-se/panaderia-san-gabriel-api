@@ -20,14 +20,23 @@ export const filtrarProductosPorCategoria = (detalleVenta, categorias) => {
  * Calcula las unidades vendidas de productos de panadería.
  * @param {number} unidadesProducidas - Unidades producidas.
  * @param {number} unidadesNoVendidas - Unidades no vendidas.
+ * @param {Object} detalle - Detalle del producto.
  * @returns {number} - Unidades vendidas.
  * @throws {CustomError} - Si las unidades no vendidas son mayores que las producidas.
  */
-const calcularUnidadesDePanaderiaVendidas = (unidadesProducidas, unidadesNoVendidas) => {
+const calcularUnidadesDePanaderiaVendidas = (unidadesProducidas, unidadesNoVendidas, detalle) => {
     try {
         if (unidadesNoVendidas > unidadesProducidas) {
-            const error = getError(18);
-            throw new CustomError(error);
+            const errorInfo = getError(18);
+            throw new CustomError({
+                ...errorInfo,
+                data: {
+                    idProducto:         detalle.idProducto,
+                    nombreProducto:     detalle.nombreProducto,
+                    unidadesProducidas,
+                    unidadesNoVendidas,
+                }
+            });
         }
         return unidadesProducidas - unidadesNoVendidas;
     } catch (error) {
@@ -269,7 +278,7 @@ export const obtenerProductosPanaderiaVendidosOptimizado = async (encabezadoVent
             if (detalle.controlarStock === 1 && detalle.controlarStockDiario === 0) {
                 const productoEnStock = stockProductos.getStock(detalle.idProducto);
                 if (productoEnStock.idStock !== 0 && productoEnStock.stock > 0) {
-                    const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas);
+                    const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStock.stock, detalle.unidadesNoVendidas, detalle);
                     if (cantidadVendida > 0) {
                         return { ...detalle, cantidadVendida };
                     }

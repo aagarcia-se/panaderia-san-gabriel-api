@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authMiddleware from "../../middlewares/authMiddleware.js";
-import { actualizarProductoController, consultarProductosController, desactivarProductoController, elminarProductoController, ingresarProductoController } from "./productos.controller.js";
+import { actualizarProductoController, consultarProductosController, consultarProductosParaInventarioController, desactivarProductoController, elminarProductoController, ingresarProductoController } from "./productos.controller.js";
 
 export const productosRoute = Router();
 
@@ -9,3 +9,4 @@ productosRoute.get("/consultarProductos", authMiddleware, consultarProductosCont
 productosRoute.put("/actualizarProducto/", authMiddleware, actualizarProductoController);
 productosRoute.delete("/elminarProducto/:idProducto", authMiddleware, elminarProductoController);
 productosRoute.delete("/desactivarProducto/:idProducto", authMiddleware, desactivarProductoController);
+productosRoute.get("/consultarProductosParaInventario", authMiddleware, consultarProductosParaInventarioController);

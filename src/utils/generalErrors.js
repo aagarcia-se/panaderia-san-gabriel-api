@@ -109,8 +109,13 @@ const databaseErrorMap = {
     message: "El stock actual es menor que el stock erróneo ingresado. Verifica los datos.",
     statusCode: 409,
     code: 409,
+  },
+  21: {
+    message: "No hay productos vendidos para este turno, no se debe ingresar la venta.",
+    statusCode: 422,
+    code: 422,
   }
-  // Agregar más errores de base de datos aquí según sea necesario
+  // Agregar más errores de base de datos aquí según sea necesa|rio
 };
 
 export const getError = (typeError) => {
