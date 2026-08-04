@@ -35,3 +35,30 @@ export const consultarCategoriasDao = async () => {
     throw new CustomError(dbError);
   }
 };
+
+export const actualizarCategoriaDao = async (data) => {
+  try {
+    const query =
+      "update categorias set nombreCategoria = ?, descripcionCategoria = ? where idCategoria = ?";
+    const result = await Connection.execute(query, [
+      data.nombreCategoria,
+      data.descripcionCategoria,
+      data.idCategoria,
+    ]);
+    return result.toJSON().changes > 0;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const eliminarCategoriaDao = async (idCategoria) => {
+  try {
+    const query = "update categorias set estado = 'N' where idCategoria = ?";
+    const result = await Connection.execute(query, [idCategoria]);
+    return result.toJSON().changes > 0;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+};
