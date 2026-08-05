@@ -109,6 +109,7 @@ export const consultarStockProductosDao = async (idSucursal) => {
                         INNER JOIN SUCURSALES su ON sp.idSucursal = su.idSucursal
                         where sp.idSucursal = ?
                         and sp.estado = 'A'
+                        and p.controlarInventario = 1
                         and p.estado = 'A'
                         order by sp.stock desc;`;
     const stockProductos = await Connection.execute(query, [idSucursal]);
@@ -283,6 +284,7 @@ export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
                     inner join CATEGORIAS c ON p.idCategoria = c.idCategoria
                     where std.idSucursal = ?
                     and std.fechaValidez = ?
+                    and p.controlarInventario = 1
                     and std.estado = 'A'
                     order by std.idProducto asc;`;
     const productosExistentes = await Connection.execute(query, [
