@@ -114,6 +114,11 @@ const databaseErrorMap = {
     message: "No hay productos vendidos para este turno, no se debe ingresar la venta.",
     statusCode: 422,
     code: 422,
+  },
+  22: {
+    message: "No se puede eliminar la categoría porque tiene productos asociados.",
+    statusCode: 409,
+    code: 409,
   }
   // Agregar más errores de base de datos aquí según sea necesa|rio
 };
