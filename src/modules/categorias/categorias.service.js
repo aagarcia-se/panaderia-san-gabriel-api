@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarCategoriaDao, consultarCategoriasDao, eliminarCategoriaDao, ingresarCagetoriaDao } from "./categorias.dao.js";
+import { actualizarCategoriaDao, consultarCategoriaConProductosDao, consultarCategoriasDao, eliminarCategoriaDao, ingresarCagetoriaDao } from "./categorias.dao.js";
 
 export const ingresarCategoriaService = async (categoria) => {
   try {
@@ -49,8 +49,14 @@ export const actualizarCategoriaService = async (data) => {
 
 export const eliminarCategoriaService = async (idCategoria) => {
   try {
-    const resDelete = await eliminarCategoriaDao(idCategoria);
 
+    const cantidadProductos = await consultarCategoriaConProductosDao(idCategoria);
+    if(cantidadProductos >= 1){
+      const error = getError(22);
+      throw new CustomError(error);
+    }
+
+    const resDelete = await eliminarCategoriaDao(idCategoria);
     if(resDelete === 0){
       const error = getError(3);
       throw new CustomError(error);
