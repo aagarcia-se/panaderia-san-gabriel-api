@@ -102,7 +102,8 @@ export const consultarStockProductoDao = async (idProducto, idSucursal) => {
 export const consultarStockProductosDao = async (idSucursal) => {
     try{
         const query = `select sp.idStock, sp.idProducto, p.nombreProducto, p.idCategoria, cat.nombreCategoria,
-                        sp.idSucursal, su.nombreSucursal, sp.stock as cantidadExistente, sp.fechaActualizacion
+                        sp.idSucursal, su.nombreSucursal, sp.stock as cantidadExistente,
+  						p.controlarStock, p.controlarStockDiario, sp.fechaActualizacion
                         from STOCKPRODUCTOS sp
                         INNER JOIN PRODUCTOS p ON sp.idProducto = p.idProducto
                         INNER JOIN CATEGORIAS cat ON p.idCategoria = cat.idCategoria
@@ -277,7 +278,8 @@ export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
   try {
     const query = `select std.idStockDiario, std.idProducto, p.nombreProducto, P.idCategoria, c.nombreCategoria,
                     std.idSucursal, s.nombreSucursal,
-                    std.stock as cantidadExistente, std.fechaValidez
+                    std.stock as cantidadExistente, 
+  				    p.controlarStock, p.controlarStockDiario, std.fechaValidez
                     from STOCKPRODUCTOSDIARIOS std
                     inner join PRODUCTOS p ON std.idProducto = p.idProducto
                     inner join SUCURSALES s ON std.idSucursal = s.idSucursal
@@ -380,7 +382,7 @@ try {
             FROM STOCKPRODUCTOSDIARIOS
             WHERE idProducto IN (${placeholders})
             AND idSucursal = ?
-            AND fechaValidez = ?
+            AND DATE(fechaValidez) = DATE(?)
             AND estado = 'A';
         `;
 
@@ -453,7 +455,7 @@ export const actualizarStockProductoDiariosBatchDao = async (datasStockProductoD
         const query = `UPDATE STOCKPRODUCTOSDIARIOS SET stock = ?, fechaActualizacion = ?
                        WHERE idProducto = ?
                        AND idSucursal = ?
-                       AND fechaValidez = ?`;
+                       AND DATE(fechaValidez) = DATE(?)`;
 
         const batch = datasStockProductoDiario.map(dataStockProductoDiario => ({
             sql: query,
