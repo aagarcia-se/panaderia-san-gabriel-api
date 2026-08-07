@@ -74,8 +74,9 @@ export const consultarTrasladosDao = async () => {
 
 export const consultarDetalleDeTraladoDao = async (idTraslado) => {
     try {
-        const query = `SELECT tp.idTraslado, so.nombreSucursal AS sucursalOrigen,
-                        sd.nombreSucursal AS sucursalDestino, concat(u.nombreUsuario, ' ', u.apellidoUsuario) AS usuarioResponsable,
+        const query = `SELECT tp.idTraslado, tp.idSucursalOrigen, so.nombreSucursal AS sucursalOrigen,
+                        tp.idSucursalDestino, sd.nombreSucursal AS sucursalDestino, 
+  						tp.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario) AS usuarioResponsable,
                         tp.fechaTraslado
                         FROM TRASLADOSPRODUCTOS tp 
                         INNER JOIN SUCURSALES so ON tp.idSucursalOrigen = so.idSucursal
@@ -90,7 +91,8 @@ export const consultarDetalleDeTraladoDao = async (idTraslado) => {
             return 0;
         }
 
-        const queryDetalle = `select td.idTrasladoDetalle, td.idProducto, p.nombreProducto, td.cantidadATrasladar 
+        const queryDetalle = `select td.idTrasladoDetalle, td.idProducto, p.nombreProducto, td.cantidadATrasladar,
+								p.controlarStock, p.controlarStockDiario
                                 from TRASLADOSPRODUCTOSDETALLES td
                                 inner join productos p on td.idProducto = p.idProducto
                                 where td.idTraslado = ?;`;

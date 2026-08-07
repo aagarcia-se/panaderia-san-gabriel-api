@@ -4,7 +4,11 @@ const descontarStock = (cantidadExistente, cantidadADescontar) => {
 }
 
 export const crearPayloadDescontarStockDiario = (descuentoInfo, productoIngresado, productoEnStock) => {
-    
+
+    console.log(productoEnStock.stock)
+    console.log(productoIngresado.stockADescontar)
+    console.log(productoIngresado)
+
     const payloadDescontarDiario = {
         idProducto: productoIngresado.idProducto,
         idSucursal: descuentoInfo.idSucursal,
@@ -12,6 +16,7 @@ export const crearPayloadDescontarStockDiario = (descuentoInfo, productoIngresad
         fechaActualizacion: productoIngresado.fechaDescuento,
         fechaValidez: descuentoInfo.fechaCreacion,
     }
+
 
     return payloadDescontarDiario;
 }
