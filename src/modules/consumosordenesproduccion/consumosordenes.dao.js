@@ -5,7 +5,6 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const registrarBatchConsumoOrdenProduccionDao = async (consumoOrdenProduccion) => {  
     try {
-  
       const insertCosumoIngredientes = `INSERT INTO CONSUMOSORDENESPRODUCCION (idDetalleOrdenProduccion, idIngrediente, cantidadUsada, unidadMedida, fechaCreacion)
                             VALUES (?, ?, ?, ?, ?);
                             `;

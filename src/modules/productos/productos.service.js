@@ -13,7 +13,7 @@ export const crearProductoService = async (dataProducto) => {
       throw new CustomError(error);
     }
 
-    if(dataProducto.idCategoria == 1 && dataProducto.tipoProduccion === "bandejas"){
+    if(dataProducto.tipoProduccion === "bandejas"){
       dataProducto.idProducto = productoCreado;
       await ingrearCantidadUnidadesService(dataProducto);
     }
