@@ -3,7 +3,6 @@ import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const crearProductoDao = async (dataProductos) => {
-  console.log(dataProductos)
     try {
         const query =`insert into productos (nombreProducto, idCategoria, controlarStock, controlarStockDiario, controlarInventario, tipoProduccion, fechaCreacion) 
                       values (?, ?, ?, ?, ?, ?, ?);`;
@@ -20,7 +19,6 @@ export const crearProductoDao = async (dataProductos) => {
         
         return Number(resProdcutosInsert.toJSON().lastInsertRowid);
       } catch (error) {
-        console.log(error)
         const dbError = getDatabaseError(error.message);
         throw new CustomError(dbError);
       }
