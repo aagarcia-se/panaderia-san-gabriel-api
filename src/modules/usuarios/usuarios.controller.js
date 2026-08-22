@@ -1,4 +1,4 @@
-import { actualizarUsuarioService, consultarUsuariosService, crearUsuarioService, bloquearUsuarioService, elminarUsuarioService, desbloquearUsuarioService, cambiarPasswordService, actualizarDatosUsuarioService } from "./usuarios.service.js";
+import { actualizarUsuarioService, consultarUsuariosService, crearUsuarioService, bloquearUsuarioService, elminarUsuarioService, desbloquearUsuarioService, cambiarPasswordService, actualizarDatosUsuarioService, resetearContraseniaServices } from "./usuarios.service.js";
 
 
 export const crearUsuarioController = async (req, res, next) => {
@@ -109,6 +109,22 @@ export const actualizarDatosUsuarioController = async (req, res, next) => {
       status: 200,
       message: "Actualización exitosa",
       usuarioActualizado: usuarioActualizado,
+    };
+    res.status(200).json(responseData);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de manejo de errores
+  }
+};
+
+export const resetarContraseniaController = async (req, res, next) => {
+  try {
+
+    const idUsuario = req.query.idUsuario;
+    const passGenerada = await resetearContraseniaServices(idUsuario);
+    const responseData = {
+      status: 200,
+      message: "Reinicio exitoso",
+      passGenerada: passGenerada,
     };
     res.status(200).json(responseData);
   } catch (error) {
