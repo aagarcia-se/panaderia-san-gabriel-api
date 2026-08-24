@@ -108,7 +108,7 @@ export const elminarUsuarioDao = async (idUsuario) => {
 export const cambiarPasswordDao = async (newPassData) => {
   try{
 
-    const updataPassScript = `update usuarios set contrasena = ? 
+    const updataPassScript = `update usuarios set contrasena = ?, cambioContrasenia = 0
                               where usuario = ?`;
   
     const resUpdate = await Connection.execute(updataPassScript, [
@@ -154,12 +154,27 @@ export const consultarCantidadEmpleadosDao = async () => {
   }
 }
 
-export const actualizarContraseniaDao = async (idUsuario, password) => {
+export const ingresarContraseniaTemporalDao = async (idUsuario, password) => {
   try {
     const query = "UPDATE usuarios SET contrasena = ?, cambioContrasenia = 1 WHERE idUsuario = ?";
     const usuario = await Connection.execute(query, [
       password,
       idUsuario
+    ]);
+
+    return usuario.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const actualizarContraseniaDao = async (data) => {
+  try {
+    const query = "UPDATE usuarios SET contrasena = ?, cambioContrasenia = 0 WHERE idUsuario = ?";
+    const usuario = await Connection.execute(query, [
+      data.contrasena,
+      data.idUsuario
     ]);
 
     return usuario.toJSON().rowsAffected;
