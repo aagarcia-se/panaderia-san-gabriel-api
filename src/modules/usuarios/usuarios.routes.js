@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { actualizarDatosUsuarioController, actualizarUsuarioController, bloquearUsuarioController, cambiarPasswordController, consultarUsuariosController, crearUsuarioController, desbloquearUsuarioController, eliminarUsuarioController, resetarContraseniaController } from "./usuarios.controller.js";
+import { actualizarContraseniaController, actualizarDatosUsuarioController, actualizarUsuarioController, bloquearUsuarioController, cambiarPasswordController, consultarUsuariosController, crearUsuarioController, desbloquearUsuarioController, eliminarUsuarioController, resetarContraseniaController } from "./usuarios.controller.js";
 import authMiddleware from "../../middlewares/authMiddleware.js";
 
 export const usuariosRoute = Router();
@@ -13,3 +13,4 @@ usuariosRoute.delete("/eliminarUsuario/:idUsuario", authMiddleware, eliminarUsua
 usuariosRoute.put("/actualizar-pass", authMiddleware, cambiarPasswordController);
 usuariosRoute.put("/actualizar-datos-usuario", authMiddleware, actualizarDatosUsuarioController);
 usuariosRoute.put("/resetear-contrasenia", authMiddleware, resetarContraseniaController);
+usuariosRoute.put("/actualizar-contrasenia", authMiddleware, actualizarContraseniaController);

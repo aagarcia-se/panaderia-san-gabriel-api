@@ -6,7 +6,7 @@ export const iniciarSesionDao = async (usuario) => {
   try {
     // 1. Query para obtener los datos del usuario (incluyendo la contraseña hasheada)
     const queryUsuario = `SELECT u.idUsuario, u.usuario, u.nombreUsuario, u.apellidoUsuario, u.correoUsuario,
-                          u.telefonoUsuario, u.idRol, u.idSucursal, r.nombreRol, s.nombreSucursal, u.contrasena, u.estadoUsuario
+                          u.telefonoUsuario, u.cambioContrasenia, u.idRol, u.idSucursal, r.nombreRol, s.nombreSucursal, u.contrasena, u.estadoUsuario
                           FROM USUARIOS u
                           INNER JOIN ROLES r ON u.idRol = r.idRol
                           INNER JOIN SUCURSALES s ON u.idSucursal = s.idSucursal
@@ -44,6 +44,7 @@ export const iniciarSesionDao = async (usuario) => {
         nombre: userData.nombreUsuario,
         apellido: userData.apellidoUsuario,
         telefono: userData.telefonoUsuario,
+        cambioContrasenia: userData.cambioContrasenia,
         correo: userData.correoUsuario,
         idRol: userData.idRol,
         rol: userData.nombreRol,
