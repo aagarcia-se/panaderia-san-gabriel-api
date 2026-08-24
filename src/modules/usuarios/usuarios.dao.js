@@ -153,3 +153,18 @@ export const consultarCantidadEmpleadosDao = async () => {
       throw new CustomError(dbError);
   }
 }
+
+export const actualizarContraseniaDao = async (idUsuario, password) => {
+  try {
+    const query = "UPDATE usuarios SET contrasena = ?, cambioContrasenia = 1 WHERE idUsuario = ?";
+    const usuario = await Connection.execute(query, [
+      password,
+      idUsuario
+    ]);
+
+    return usuario.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}

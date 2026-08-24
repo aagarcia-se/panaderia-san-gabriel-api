@@ -39,18 +39,20 @@ const databaseErrorMap = {
   },
 
   // Errores de Autenticación
+  // Se utiliza un mensaje genérico para evitar
+  // revelar si el usuario existe o si la contraseña es incorrecta.
   8: {
     message: "Usuario o contraseña inválidos.",
-    statusCode: 404,
-    code: 404,
+    statusCode: 401,
+    code: 401,
   },
   9: {
-    message: "Usuario no encontrado.",
-    statusCode: 404,
-    code: 404,
+    message: "Usuario o contraseña inválidos.",
+    statusCode: 401,
+    code: 401,
   },
   10: {
-    message: "Contraseña incorrecta.",
+    message: "Usuario o contraseña inválidos.",
     statusCode: 401,
     code: 401,
   },
@@ -90,46 +92,58 @@ const databaseErrorMap = {
     statusCode: 500,
     code: 500,
   },
+
+  // Usuario bloqueado
+  // Se utiliza un mensaje genérico para no revelar
+  // información sobre el estado de la cuenta.
   17: {
-    message: "Usuario bloqueado",
-    statusCode: 403,
-    code: 403,
+    message: "Usuario o contraseña inválidos.",
+    statusCode: 401,
+    code: 401,
   },
+
+  // Errores de Negocio
   18: {
-    message: "Unidades restantes no puede ser mayor a las unidades producidas",
+    message:
+      "Unidades restantes no puede ser mayor a las unidades producidas.",
     statusCode: 422,
     code: 422,
   },
   19: {
-    message: "Ya existe una orden con el turno, sucursal y fecha ingresada.",
+    message:
+      "Ya existe una orden con el turno, sucursal y fecha ingresada.",
     statusCode: 409,
     code: 409,
   },
   20: {
-    message: "El stock actual es menor que el stock erróneo ingresado. Verifica los datos.",
+    message:
+      "El stock actual es menor que el stock erróneo ingresado. Verifica los datos.",
     statusCode: 409,
     code: 409,
   },
   21: {
-    message: "No hay productos vendidos para este turno, no se debe ingresar la venta.",
+    message:
+      "No hay productos vendidos para este turno, no se debe ingresar la venta.",
     statusCode: 422,
     code: 422,
   },
   22: {
-    message: "No se puede eliminar la categoría porque tiene productos asociados.",
+    message:
+      "No se puede eliminar la categoría porque tiene productos asociados.",
     statusCode: 409,
     code: 409,
-  }
-  // Agregar más errores de base de datos aquí según sea necesa|rio
+  },
 };
 
 export const getError = (typeError) => {
   const typeErrorStr = String(typeError);
+
   for (const [key, value] of Object.entries(databaseErrorMap)) {
-    if (typeErrorStr === key) { // Comparación exacta
+    if (typeErrorStr === key) {
       return value;
     }
   }
+
   return {
     message: "Error desconocido.",
     statusCode: 500,
