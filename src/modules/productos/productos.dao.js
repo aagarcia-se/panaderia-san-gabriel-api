@@ -27,7 +27,8 @@ export const crearProductoDao = async (dataProductos) => {
 export const consultarProductosDao = async () => {
   try {
     // Consulta SQL
-    const query = `select idProducto, nombreProducto, idCategoria,  estado from productos;`
+    const query = `select idProducto, nombreProducto, idCategoria,  estado from productos
+                  where estado = 'A';`
 
     // Ejecutar la consulta
     const productos = await Connection.execute(query);
@@ -80,6 +81,40 @@ export const desactivarProductoDao = async (idProducto) => {
     const producto = await Connection.execute(query, [idProducto]);
 
     return producto.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const consultarProductosConPreciosDao = async () => {
+  try {
+    // Consulta SQL
+    const query = `SELECT p.idProducto, p.nombreProducto, 
+                        p.controlarStock,
+                        p.controlarStockDiario,
+                        p.controlarInventario,
+                        p.tipoProduccion,
+                        conf.unidadesPorBandeja,
+                        ca.idCategoria,
+                        ca.nombreCategoria, 
+                        pr.idPrecio, 
+                        pr.cantidad, 
+                        pr.precio, 
+                        pr.precioPorUnidad,
+                        pr.fechaInicio, 
+                        pr.fechaFin
+                  FROM PRODUCTOS p
+                  INNER JOIN PRECIOS pr ON p.idProducto = pr.idProducto
+                  INNER JOIN CATEGORIAS ca ON p.idCategoria = ca.idCategoria
+  				        LEFT JOIN CONFIGORDEN conf ON p.idProducto = conf.idProducto
+                  WHERE p.estado = 'A'`
+
+    // Ejecutar la consulta
+    const preciosProductos = await Connection.execute(query);
+
+    // Devolver los registros encontrados
+    return preciosProductos.rows;
   } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);

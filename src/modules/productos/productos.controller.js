@@ -1,4 +1,4 @@
-import { actualizarProductoService, constultarProductosParaInventarioService, consultarProductoService, crearProductoService, desactivarProductoService, elminarProductoService, } from "./productos.service.js";
+import { actualizarProductoService, constultarProductosParaInventarioService, consultarProductosConPreciosService, consultarProductoService, crearProductoService, desactivarProductoService, elminarProductoService, } from "./productos.service.js";
 
 export const ingresarProductoController = async (req, res, next) => {
   try {
@@ -84,3 +84,17 @@ export const consultarProductosParaInventarioController = async (req, res, next)
     next(error); // Pasa el error al middleware de manejo de errores
   }
 };  
+
+export const consultarProductosConPreciosController = async (req, res, next) => {
+  try {
+    const productos = await consultarProductosConPreciosService();
+    const responseData = {
+      status: 200,
+      message: "Consulta exitosa",
+      productos,
+    };
+    res.status(200).json(responseData);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de manejo de errores
+  }
+};
