@@ -28,6 +28,7 @@ import { ordenesBatchRoutes } from "./modules/OrdenesProduccionBatch/ordenesprod
 import { ocrRoutes } from "./modules/ocr/ocr.route.js";
 import { ventasAIRoutes } from "./modules/ventasAI/ventasAI.routes.js";
 import { healthRoutes } from "./modules/Health/health.route.js";
+import { ventasBatchRoutes } from "./modules/VentasBatch/ventasbatch.route.js";
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use("/api", ordenesBatchRoutes);
 app.use("/api", ocrRoutes);
 app.use("/api", ventasAIRoutes);
 app.use("/api", healthRoutes);
+app.use("/api", ventasBatchRoutes)
 
 // Middleware de manejo de errores
 app.use(errorHandler);

@@ -58,7 +58,6 @@ export const eliminarCategoriaDao = async (idCategoria) => {
     const result = await Connection.execute(query, [idCategoria]);
     return result.toJSON().changes > 0;
   } catch (error) {
-    console.log(error.message)
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
