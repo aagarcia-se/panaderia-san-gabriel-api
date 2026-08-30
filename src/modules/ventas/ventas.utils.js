@@ -274,7 +274,6 @@ export const obtenerProductosPanaderiaVendidosOptimizado = async (encabezadoVent
         ]);
 
         const detallesEnOrden = ventaDetalle.map((detalle) => {
-
             if (detalle.controlarStock === 1 && detalle.controlarStockDiario === 0) {
                 const productoEnStock = stockProductos.getStock(detalle.idProducto);
                 if (productoEnStock.idStock !== 0 && productoEnStock.stock > 0) {
@@ -286,7 +285,7 @@ export const obtenerProductosPanaderiaVendidosOptimizado = async (encabezadoVent
             } else {
                 const productoEnStockDiario = stockProductosDiarios.getStockDiario(detalle.idProducto);
                 if (productoEnStockDiario.idStockDiario !== 0 && productoEnStockDiario.stock > 0) {
-                    const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStockDiario.stock, detalle.unidadesNoVendidas);
+                    const cantidadVendida = calcularUnidadesDePanaderiaVendidas(productoEnStockDiario.stock, detalle.unidadesNoVendidas, detalle);
                     if (cantidadVendida > 0) {
                         return { ...detalle, cantidadVendida };
                     }

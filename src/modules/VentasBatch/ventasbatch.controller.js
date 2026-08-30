@@ -1,7 +1,5 @@
 import { ingresarVentaBatchService } from "./ventasbatch.service.js";
 
-
-
 export const ingresarVentaBatchController = async (req, res, next) => {
     try {
         if (!req.files || req.files.length === 0) {
