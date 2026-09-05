@@ -1,6 +1,6 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
-import { actualizarCategoriaDao, consultarCategoriaConProductosDao, consultarCategoriasDao, eliminarCategoriaDao, ingresarCagetoriaDao } from "./categorias.dao.js";
+import { actualizarCategoriaDao, consultarCategoriaConProductosDao, consultarCategoriasDao, desctivarCategoriaDao, eliminarCategoriaDao, ingresarCagetoriaDao } from "./categorias.dao.js";
 
 export const ingresarCategoriaService = async (categoria) => {
   try {
@@ -63,6 +63,20 @@ export const eliminarCategoriaService = async (idCategoria) => {
     }
 
     return idCategoria;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const desctivarCategoriaService = async (idCategoria) => {
+  try {
+    const result = await desctivarCategoriaDao(idCategoria);
+    if (result === 0) {
+      const error = getError(4);
+      throw new CustomError(error);
+    }
+
+    return result;
   } catch (error) {
     throw error;
   }

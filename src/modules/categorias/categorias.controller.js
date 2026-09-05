@@ -1,4 +1,4 @@
-import { actualizarCategoriaService, consultarCategoriasService, eliminarCategoriaService, ingresarCategoriaService } from "./categorias.service.js";
+import { actualizarCategoriaService, consultarCategoriasService, desctivarCategoriaService, eliminarCategoriaService, ingresarCategoriaService } from "./categorias.service.js";
 
 export const ingresarCategoriaController = async (req, res, next) => {
     try {
@@ -49,6 +49,21 @@ export const eliminarCategoriaController = async (req, res, next) => {
       status: 200,
       message: "Eliminación exitosa",
       idCategoria,
+    };
+    res.status(200).json(responseData);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de manejo de errores
+  }
+};
+
+export const desctivarCategoriaController = async (req, res, next) => {
+  try {
+    const { idCategoria } = req.params;
+    const produtoDesactivado = await desctivarCategoriaService(idCategoria);
+    const responseData = {
+      status: 200,
+      message: "Eliminación exitosa",
+      produtoDesactivado
     };
     res.status(200).json(responseData);
   } catch (error) {
