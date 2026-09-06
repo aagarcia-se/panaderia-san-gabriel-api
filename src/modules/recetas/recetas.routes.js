@@ -9,5 +9,3 @@ recetasRoute.get("/consultar-receta/:idProducto", authMiddleware, consultarRecet
 recetasRoute.post("/ingresar-receta", authMiddleware, ingresarRecetaController);
 recetasRoute.put("/actualizar-receta", authMiddleware, actualizarRecetaController);
 recetasRoute.delete("/elminar-receta/:idProducto", authMiddleware, elminarRectaControler);
-
-

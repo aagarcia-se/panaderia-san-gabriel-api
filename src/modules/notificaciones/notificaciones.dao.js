@@ -96,3 +96,25 @@ export const consultarUsuariosNotificacionesDao = async () => {
         throw new CustomError(dbError);
     }
 }
+
+export const gestionarNotificacionDao = async (usuariosNoti) => {
+    try {
+        const deleteNoti = `UPDATE activacion_notificaciones SET activo = ?, fechaActualizacion = ? WHERE idUsuario = ? AND tipoEvento = ?;`;
+
+        const batch = usuariosNoti.map((usuario) => ({
+            sql: deleteNoti,
+            args: [
+                usuario.activo,
+                usuario.fechaActualizacion,
+                usuario.idUsuario,
+                usuario.tipoEvento
+            ]
+        }));
+
+        const result = await Connection.batch(batch);
+        return result.length;
+    } catch (error) {
+        const dbError = getDatabaseError(error.message);
+        throw new CustomError(dbError);
+    }
+}
