@@ -70,7 +70,6 @@ export const eliminarcantidadUnidadesDao = async (idProducto) => {
 export const consultarCantidadUnidadesBatchDao = async (idsProductos) => {
     try {
         const placeholders = idsProductos.map(() => '?').join(', ');
-        console.log(placeholders)
         const query = `SELECT idProducto, unidadesPorBandeja FROM CONFIGORDEN WHERE idProducto IN (${placeholders})`;
         
         const result = await Connection.execute(query, idsProductos);
