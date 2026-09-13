@@ -171,6 +171,9 @@ export const ingresarOrdenProduccionServiceVersion2 = async (ordenProduccion) =>
   try {
       const { encabezadoOrden, detalleOrden } = ordenProduccion;
 
+      console.log(encabezadoOrden);
+      console.log(detalleOrden)
+
       const ordenExist = await consultarDetalleOrdenPorCriteriosService(
           encabezadoOrden.ordenTurno,
           encabezadoOrden.fechaAProducir,
