@@ -6,22 +6,9 @@ import { crearPayloadOrdenProduccionBatch } from "./ordenesprodbatch.utils.js";
 
 export const ingresarOrdenProduccionBatchService = async (ordenHaader, csvString) => {
     try {
-        console.log(ordenHaader)
-        console.log(csvString)
         const registros = parsearCSV(csvString);
-        console.log(registros)
         const ordenProduccion = crearPayloadOrdenProduccionBatch(ordenHaader, registros);
-
-        const productosB = ordenProduccion.detalleOrden.map(producto => 
-            console.log(producto)
-        )
-
-        console.log(productosB)
-
-        console.log("------------------------------")
         const resultado = await ingresarOrdenProduccionServiceVersion2(ordenProduccion);
-
-        console.log("resutaldo" + resultado)
 
         // 👈 validar aquí, antes de continuar
         if (resultado.idOrdenGenerada === 0) {

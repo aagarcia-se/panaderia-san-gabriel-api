@@ -4,63 +4,37 @@ export const crearPayloadOrdenProduccionBatch = (ordenProduccion, registros) => 
     const detalleOrden = [];
 
     registros.forEach(fila => {
-
-        // Normalizar nombres de propiedades
-        const codigo = fila.Codigo ?? fila['﻿Codigo'];
-        const producto = fila.Producto;
-        const bandejas = fila.Bandejas;
-
         // Detectar cambio de sección
-        if (
-            String(codigo).trim() === 'Codigo' &&
-            String(producto).trim() === 'Producto'
-        ) {
-            tipoProduccionActual =
-                String(bandejas).trim().toLowerCase() === 'harina'
-                    ? 'harina'
-                    : 'bandejas';
-
+        if (fila.Codigo === 'Codigo' && fila.Producto === 'Producto') {
+            tipoProduccionActual = fila.Bandejas === 'Harina' ? 'harina' : 'bandejas';
             return;
         }
 
-        // Ignorar filas vacías
-        if (!codigo || !producto) return;
+        // Ignorar filas vacías o sin código numérico válido
+        if (!fila.Codigo || !fila.Producto || isNaN(parseInt(fila.Codigo))) return;
 
-        const codigoNumerico = parseInt(codigo);
-        const cantidad = parseFloat(bandejas);
+        const cantidad = parseFloat(fila.Bandejas);
 
-        // Validar código
-        if (isNaN(codigoNumerico)) return;
-
-        // Validar cantidad
-        if (
-            bandejas === undefined ||
-            bandejas === null ||
-            String(bandejas).trim() === '' ||
-            isNaN(cantidad)
-        ) {
-            return;
-        }
+        // 👈 Si la cantidad es vacía o no es un número válido, no agregar
+        if (!fila.Bandejas || fila.Bandejas === '' || isNaN(cantidad)) return;
 
         detalleOrden.push({
-            idProducto: codigoNumerico,
-            cantidadBandejas:
-                tipoProduccionActual === 'bandejas' ? cantidad : 0,
-            cantidadHarina:
-                tipoProduccionActual === 'harina' ? cantidad : 0,
-            tipoProduccion: tipoProduccionActual,
-            fechaCreacion: ordenProduccion.fechaCreacion,
+            idProducto:       parseInt(fila.Codigo),
+            cantidadBandejas: tipoProduccionActual === 'bandejas' ? cantidad : 0,
+            cantidadHarina:   tipoProduccionActual === 'harina'   ? cantidad : 0,
+            tipoProduccion:   tipoProduccionActual,
+            fechaCreacion:    ordenProduccion.fechaCreacion,
         });
     });
 
     return {
         encabezadoOrden: {
-            idSucursal: ordenProduccion.idSucursal,
-            ordenTurno: ordenProduccion.ordenTurno,
+            idSucursal:     ordenProduccion.idSucursal,
+            ordenTurno:     ordenProduccion.ordenTurno,
             nombrePanadero: ordenProduccion.nombrePanadero,
             fechaAProducir: ordenProduccion.fechaAProducir,
-            idUsuario: ordenProduccion.idUsuario,
-            fechaCreacion: ordenProduccion.fechaCreacion,
+            idUsuario:      ordenProduccion.idUsuario,
+            fechaCreacion:  ordenProduccion.fechaCreacion,
         },
         detalleOrden,
     };
