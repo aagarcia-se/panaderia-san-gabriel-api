@@ -2,6 +2,7 @@ import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { registrarBatchConsumoOrdenProduccionServices } from "../consumosordenesproduccion/consumosordenes.service.js";
 import { CalcularCantidadIngredientes, CalcularCantidadIngredientesOptimizado } from "../consumosordenesproduccion/cosumoordenesproduccion.utils.js";
+import { consultarRecetaBatchService } from "../recetas/recetas.service.js";
 import { elminarStockDiarioService, procesarStockPorOrdenProduccionServices } from "../StockProductos/stockProductos.service.js";
 import { actualizarEstadoOrdenProduccionDao, consultarDetalleOrdenPorCriteriosDao, consultarDetalleOrdenProduccionDao, consultarOrdenProduccionDao, consultarUnidadesDeProductoPorOrdenDao, consultarUnidadesDeProductosPorOrdenOptimizadoDao, eliminarOrdenProduccionDao, ingresarOrdenProduccionDao } from "./ordenesproduccion.dao.js";
 import { procesarDetallesOrden, procesarDetallesOrdenBatch } from "./ordenesproduccion.utils.js";
@@ -167,48 +168,96 @@ export const consultarUnidadesDeProductosPorOrdenOptimizadoService = async (idOr
 };
 
 export const ingresarOrdenProduccionServiceVersion2 = async (ordenProduccion) => {
-    try {
-        const { encabezadoOrden, detalleOrden } = ordenProduccion;
+  try {
+      const { encabezadoOrden, detalleOrden } = ordenProduccion;
 
-        const ordenExist = await consultarDetalleOrdenPorCriteriosService(
-            encabezadoOrden.ordenTurno,
-            encabezadoOrden.fechaAProducir,
-            encabezadoOrden.idSucursal
-        );
+      const ordenExist = await consultarDetalleOrdenPorCriteriosService(
+          encabezadoOrden.ordenTurno,
+          encabezadoOrden.fechaAProducir,
+          encabezadoOrden.idSucursal
+      );
 
-        if (ordenExist.encabezadoOrden !== null) {
-            const errorInfo = getError(19);
-            throw new CustomError(errorInfo);
-        }
+      if (ordenExist.encabezadoOrden !== null) {
+          const errorInfo = getError(19);
+          throw new CustomError(errorInfo);
+      }
 
-        const detallesActualizados = await procesarDetallesOrdenBatch(detalleOrden);
+      const detallesActualizados = await procesarDetallesOrdenBatch(detalleOrden);
 
-        const resultado = await ingresarOrdenProduccionDao({
-            orden: encabezadoOrden,
-            detallesOrden: detallesActualizados
-        });
+      const resultado = await ingresarOrdenProduccionDao({
+          orden: encabezadoOrden,
+          detallesOrden: detallesActualizados
+      });
 
-        // 👈 validar aquí, antes de continuar
-        if (resultado.idOrdenGenerada === 0) {
-            const errorInfo = getError(2);
-            throw new CustomError(errorInfo);
-        }
+      if (resultado.idOrdenGenerada === 0) {
+          const errorInfo = getError(2);
+          throw new CustomError(errorInfo);
+      }
 
-        const OrdenProdNew = {
-            detallesOrden: resultado.idDetalleOrdenProduccion.map((idDetalle, index) => ({
-                idDetalleOrdenProduccion: idDetalle,
-                ...detallesActualizados[index]
-            }))
-        };
+      const OrdenProdNew = {
+          detallesOrden: resultado.idDetalleOrdenProduccion.map((idDetalle, index) => ({
+              idDetalleOrdenProduccion: idDetalle,
+              ...detallesActualizados[index]
+          }))
+      };
 
-        const consumoOrdenProduccion = await CalcularCantidadIngredientesOptimizado(OrdenProdNew);
+      const consumoOrdenProduccion = await CalcularCantidadIngredientesOptimizado(OrdenProdNew);
 
-        if (consumoOrdenProduccion && consumoOrdenProduccion.length > 0) {
-            await registrarBatchConsumoOrdenProduccionServices(consumoOrdenProduccion);
-        }
+      if (consumoOrdenProduccion && consumoOrdenProduccion.length > 0) {
+          await registrarBatchConsumoOrdenProduccionServices(consumoOrdenProduccion);
+      }
 
-        return resultado;
-    } catch (error) {
-        throw error;
-    }
+      // Releer encabezado + detalle recién insertados, usando la misma
+      // consulta que sirve el endpoint de consulta — mismo shape siempre.
+      const detalleOrdenCompleto = await consultarDetalleOrdenProduccionService(
+          resultado.idOrdenGenerada
+      );
+
+      // Índice por idDetalleOrdenProduccion para cruzar consumo -> producto
+      // (nombre y cantidad producida), sin volver a consultar la BD.
+      const detallePorId = new Map(
+          detalleOrdenCompleto.detalleOrden.map((d) => [d.idDetalleOrdenProduccion, d])
+      );
+
+      const idsProductos = detalleOrdenCompleto.detalleOrden.map((d) => d.idProducto);
+
+      // Trae las recetas (con nombreIngrediente) de los productos de esta
+      // orden — se usa solo como catálogo para traducir idIngrediente ->
+      // nombreIngrediente, no como fuente del consumo en sí.
+      const recetasPorProducto = await consultarRecetaBatchService(idsProductos);
+      const nombreIngredientePorId = new Map();
+      for (const filas of recetasPorProducto.values()) {
+          for (const fila of filas) {
+              nombreIngredientePorId.set(fila.idIngrediente, fila.nombreIngrediente);
+          }
+      }
+
+      // Shape final que espera el frontend para generar el PDF — el mismo
+      // que devuelve /consultar-consumo-ingredientes.
+      const ingredientesConsumidos = consumoOrdenProduccion.map((item) => {
+          const detalleProducto = detallePorId.get(item.idDetalleOrdenProduccion);
+          const cantidadProducida = detalleProducto
+              ? (detalleProducto.cantidadUnidades || detalleProducto.cantidadHarina)
+              : null;
+
+          return {
+              OrdenID: resultado.idOrdenGenerada,
+              FechaProduccion: encabezadoOrden.fechaAProducir,
+              Producto: detalleProducto?.nombreProducto ?? '',
+              CantidadProducida: cantidadProducida,
+              Ingrediente: nombreIngredientePorId.get(item.idIngrediente) ?? '',
+              CantidadUsada: item.cantidadUsada,
+              UnidadMedida: item.unidadMedida,
+              FechaConsumo: item.fechaCreacion,
+          };
+      });
+
+      return {
+          idOrdenGenerada: resultado.idOrdenGenerada,
+          detalleOrden: detalleOrdenCompleto,
+          ingredientesConsumidos
+      };
+  } catch (error) {
+      throw error;
+  }
 };

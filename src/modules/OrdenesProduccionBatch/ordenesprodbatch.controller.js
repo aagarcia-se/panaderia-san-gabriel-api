@@ -12,11 +12,11 @@ export const ingresarOrdenProduccionBatchController = async (req, res, next) => 
 
         const csvString = req.file.buffer.toString('utf-8');
         const ordenHaader = JSON.parse(req.body.ordenHaader);
-        const idOrdenProduccion = await ingresarOrdenProduccionBatchService(ordenHaader, csvString);
+        const ordenProduccion = await ingresarOrdenProduccionBatchService(ordenHaader, csvString);
         const responseData = {
             status: 200,
             message: "Ingreso exitoso",
-            idOrdenProduccion
+            ordenProduccion
         };
         res.status(200).json(responseData);
     } catch (error) {

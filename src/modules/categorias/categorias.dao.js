@@ -80,3 +80,17 @@ export const consultarCategoriaConProductosDao = async (idCategoria) => {
     throw new CustomError(dbError);
   }
 }
+
+export const desctivarCategoriaDao = async (idCategoria) => {
+  try {
+    const query =
+      "update categorias set estado = 'N' where idCategoria = ?";
+    const categoria = await Connection.execute(query, [
+      idCategoria
+    ]);
+    return categoria.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
