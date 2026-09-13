@@ -9,6 +9,7 @@ export const ingresarOrdenProduccionBatchService = async (ordenHaader, csvString
         console.log(ordenHaader)
         console.log(csvString)
         const registros = parsearCSV(csvString);
+        console.log(registro)
         const ordenProduccion = crearPayloadOrdenProduccionBatch(ordenHaader, registros);
 
         const productosB = ordenProduccion.detalleOrden.map(producto => 
@@ -16,7 +17,7 @@ export const ingresarOrdenProduccionBatchService = async (ordenHaader, csvString
         )
 
         console.log(productosB)
-        
+
         console.log("------------------------------")
         const resultado = await ingresarOrdenProduccionServiceVersion2(ordenProduccion);
 
