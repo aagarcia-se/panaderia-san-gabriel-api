@@ -89,7 +89,6 @@ export const ingresarRecetaDao = async (receta) => {
 };
 
 export const actualizarRecetaDao = async (receta) => {
-  console.log(receta)
     const { idProducto, detallesReceta } = receta;
   
     try {
