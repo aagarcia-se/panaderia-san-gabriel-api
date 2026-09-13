@@ -27,8 +27,6 @@ export const crearPayloadOrdenProduccionBatch = (ordenProduccion, registros) => 
         });
     });
 
-    console.log(detalleOrden)
-
     return {
         encabezadoOrden: {
             idSucursal:     ordenProduccion.idSucursal,
