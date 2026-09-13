@@ -171,6 +171,8 @@ export const ingresarOrdenProduccionServiceVersion2 = async (ordenProduccion) =>
   try {
       const { encabezadoOrden, detalleOrden } = ordenProduccion;
 
+      console.log(detalleOrden)
+
       const ordenExist = await consultarDetalleOrdenPorCriteriosService(
           encabezadoOrden.ordenTurno,
           encabezadoOrden.fechaAProducir,
@@ -184,10 +186,7 @@ export const ingresarOrdenProduccionServiceVersion2 = async (ordenProduccion) =>
 
       const detallesActualizados = await procesarDetallesOrdenBatch(detalleOrden);
 
-      const resultado = await ingresarOrdenProduccionDao({
-          orden: encabezadoOrden,
-          detallesOrden: detallesActualizados
-      });
+      const resultado = await ingresarOrdenProduccionDao({orden: encabezadoOrden, detallesOrden: detallesActualizados });
 
       if (resultado.idOrdenGenerada === 0) {
           const errorInfo = getError(2);
@@ -209,9 +208,7 @@ export const ingresarOrdenProduccionServiceVersion2 = async (ordenProduccion) =>
 
       // Releer encabezado + detalle recién insertados, usando la misma
       // consulta que sirve el endpoint de consulta — mismo shape siempre.
-      const detalleOrdenCompleto = await consultarDetalleOrdenProduccionService(
-          resultado.idOrdenGenerada
-      );
+      const detalleOrdenCompleto = await consultarDetalleOrdenProduccionService(resultado.idOrdenGenerada);
 
       // Índice por idDetalleOrdenProduccion para cruzar consumo -> producto
       // (nombre y cantidad producida), sin volver a consultar la BD.
