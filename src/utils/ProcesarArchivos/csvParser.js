@@ -1,8 +1,10 @@
 import { parse } from 'csv-parse/sync';
 
 export const parsearCSV = (csvString) => {
-    // Eliminar BOM UTF-8 si existe
-    const csvLimpio = csvString.replace(/^\uFEFF/, '');
+    // Eliminar BOM UTF-8 y espacios innecesarios
+    const csvLimpio = csvString
+        .replace(/^\uFEFF/, '')
+        .trim();
 
     const delimiter = csvLimpio.includes(';') ? ';' : ',';
 
