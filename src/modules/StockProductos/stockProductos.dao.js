@@ -327,6 +327,7 @@ export const consultarStockGeneralDao = async (idSucursal, fecha) => {
                               std.stock               AS cantidadExistente,
                               p.controlarStock,
                               p.controlarStockDiario,
+                              p.controlarStockDiario,
                               'Stock Diario'          AS tipoStock
                           FROM STOCKPRODUCTOSDIARIOS std
                           INNER JOIN PRODUCTOS p   ON std.idProducto = p.idProducto
@@ -351,6 +352,7 @@ export const consultarStockGeneralDao = async (idSucursal, fecha) => {
                               su.nombreSucursal,
                               sp.stock                AS cantidadExistente,
                               p.controlarStock,
+                              p.controlarStockDiario,
                               p.controlarStockDiario,
                               'Stock General'         AS tipoStock
                           FROM STOCKPRODUCTOS sp
