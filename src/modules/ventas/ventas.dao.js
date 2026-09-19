@@ -3,57 +3,57 @@ import CustomError from "../../utils/CustomError.js";
 import { getDatabaseError } from "../../utils/databaseErrors.js";
 
 export const ingresarVentaDao = async (venta) => {
-    const {encabezadoVenta, detallesVenta, detalleIngreso} = venta;
-    try {
-      // 1. Insertar encabezado
-      const ventaInsert = `INSERT INTO VENTAS (idUsuario, idSucursal, ventaTurno, fechaVenta, totalVenta, fechaCreacion)
+  const { encabezadoVenta, detallesVenta, detalleIngreso } = venta;
+  try {
+    // 1. Insertar encabezado
+    const ventaInsert = `INSERT INTO VENTAS (idUsuario, idSucursal, ventaTurno, fechaVenta, totalVenta, fechaCreacion)
                                 VALUES (?, ?, ?, ?, ?, ?);`;
-  
-      const resVenta = await Connection.execute(ventaInsert, [
-        encabezadoVenta.idUsuario,
-        encabezadoVenta.idSucursal,
-        encabezadoVenta.ventaTurno,
-        encabezadoVenta.fechaVenta, 
-        detalleIngreso.montoTotalIngresado,
-        encabezadoVenta.fechaCreacion
-      ]);
-      const idVenta = resVenta.toJSON().lastInsertRowid;
 
-      if (!idVenta) {
-        return 0;
-      }
-  
-      // 2. Insertar detalles usando el ID generado     
-      const ventaDetalleInsert = `INSERT INTO DETALLESVENTAS (idVenta, idProducto, cantidadVendida, precioUnitario, subtotal)
+    const resVenta = await Connection.execute(ventaInsert, [
+      encabezadoVenta.idUsuario,
+      encabezadoVenta.idSucursal,
+      encabezadoVenta.ventaTurno,
+      encabezadoVenta.fechaVenta,
+      detalleIngreso.montoTotalIngresado,
+      encabezadoVenta.fechaCreacion
+    ]);
+    const idVenta = resVenta.toJSON().lastInsertRowid;
+
+    if (!idVenta) {
+      return 0;
+    }
+
+    // 2. Insertar detalles usando el ID generado     
+    const ventaDetalleInsert = `INSERT INTO DETALLESVENTAS (idVenta, idProducto, cantidadVendida, precioUnitario, subtotal)
                                   VALUES (?, ?, ?, ?, ?);
                                  `;
-  
-      const batchDetalleVenta = detallesVenta.map((detalle) => ({
-        sql: ventaDetalleInsert,
-        args: [
-            idVenta,
-            detalle.idProducto,
-            detalle.cantidadVendida,
-            detalle.precioUnitario,
-            detalle.subtotal
-        ]
-      }));
-  
-      const resBatch = await Connection.batch(batchDetalleVenta);
-  
-      // Extraer solo los lastInsertRowid de los resultados del batch
-      const lastInsertRowids = resBatch.map(result => result.lastInsertRowid);
-  
-      return {idVenta, ...venta};
-  
-    } catch (error) {
-      const dbError = getDatabaseError(error.message);
-      throw new CustomError(dbError);
-    }
+
+    const batchDetalleVenta = detallesVenta.map((detalle) => ({
+      sql: ventaDetalleInsert,
+      args: [
+        idVenta,
+        detalle.idProducto,
+        detalle.cantidadVendida,
+        detalle.precioUnitario,
+        detalle.subtotal
+      ]
+    }));
+
+    const resBatch = await Connection.batch(batchDetalleVenta);
+
+    // Extraer solo los lastInsertRowid de los resultados del batch
+    const lastInsertRowids = resBatch.map(result => result.lastInsertRowid);
+
+    return { idVenta, ...venta };
+
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 };
 
 export const consultarVentasPorUsuarioDao = async (idUsuario) => {
-  try{
+  try {
 
     const consulta = `select v.idVenta, v.ventaTurno, v.idUsuario, concat(u.nombreUsuario, ' ', u.apellidoUsuario)nombreUsuario, v.idSucursal, s.nombreSucursal, 
                       v.fechaVenta, v.totalVenta, v.estadoVenta from ventas v
@@ -62,14 +62,14 @@ export const consultarVentasPorUsuarioDao = async (idUsuario) => {
                       where 
                         (v.idUsuario = ? OR ? IS NULL OR ? = '')
                         order by v.idVenta desc;`
-  
-      // Ejecutar la consulta
-      const ventasPorUsuario = await Connection.execute(consulta, [idUsuario, idUsuario, idUsuario]);
 
-      // Devolver los registros encontrados
-      return ventasPorUsuario.rows;
+    // Ejecutar la consulta
+    const ventasPorUsuario = await Connection.execute(consulta, [idUsuario, idUsuario, idUsuario]);
 
-  }catch(error){
+    // Devolver los registros encontrados
+    return ventasPorUsuario.rows;
+
+  } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
@@ -77,13 +77,13 @@ export const consultarVentasPorUsuarioDao = async (idUsuario) => {
 }
 
 export const eliminarVentaDao = async (idVenta) => {
-  try{
+  try {
     const scriptDelete = `DELETE FROM VENTAS WHERE idVenta = ?`;
 
     const resDelete = await Connection.execute(scriptDelete, [idVenta]);
 
     return resDelete.toJSON().rowsAffected;;
-  }catch(error){
+  } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
@@ -146,20 +146,20 @@ export const consultarDetalleVentaDao = async (idVenta) => {
 };
 
 export const consultarVentaporId = async (idVenta) => {
-  try{
+  try {
 
     const consulta = `select idVenta, idUsuario, idSucursal, ventaTurno,
                       fechaVenta, totalVenta, estadoVenta, fechaCreacion
                       from VENTAS
                       where idVenta = ?;`
-  
-      // Ejecutar la consulta
-      const ventaPorId = await Connection.execute(consulta, [idVenta]);
 
-      // Devolver los registros encontrados
-      return ventaPorId.rows[0];
+    // Ejecutar la consulta
+    const ventaPorId = await Connection.execute(consulta, [idVenta]);
 
-  }catch(error){
+    // Devolver los registros encontrados
+    return ventaPorId.rows[0];
+
+  } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
@@ -167,8 +167,8 @@ export const consultarVentaporId = async (idVenta) => {
 }
 
 export const consultarTopProductosMasVendiddosDao = async () => {
-    try {
-        const query = `SELECT 
+  try {
+    const query = `SELECT 
                         p.idProducto,
                         p.nombreProducto,
                         SUM(dv.cantidadVendida) AS cantidad_total_vendida
@@ -186,10 +186,34 @@ export const consultarTopProductosMasVendiddosDao = async () => {
                     ORDER BY 
                         cantidad_total_vendida DESC
                     LIMIT 5;`;
-        const result = await Connection.execute(query);
-        return result.rows;
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    const result = await Connection.execute(query);
+    return result.rows;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
+
+export const consultarVentasPorSucursalDao = async (idSucursal) => {
+  try {
+
+    const consulta = `select v.idVenta, v.ventaTurno, v.idUsuario, concat(u.nombreUsuario, ' ', 
+                      u.apellidoUsuario)nombreUsuario, v.idSucursal, s.nombreSucursal, 
+                      v.fechaVenta, v.totalVenta, v.estadoVenta from ventas v
+                      INNER JOIN usuarios u ON v.idUsuario = u.idUsuario
+                      INNER JOIN SUCURSALES s ON v.idSucursal = s.idSucursal
+                        where v.idSucursal =  ?
+                        order by v.idVenta desc;`
+
+    // Ejecutar la consulta
+    const ventasPorUsuario = await Connection.execute(consulta, [idSucursal]);
+
+    // Devolver los registros encontrados
+    return ventasPorUsuario.rows;
+
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+
 }

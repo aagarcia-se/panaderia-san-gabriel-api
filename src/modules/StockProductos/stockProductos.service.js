@@ -1,7 +1,7 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { consultarDetalleOrdenProduccionService } from "../oredenesproduccion/ordenesproduccion.service.js";
-import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, actualizarStockProductoDiariosBatchDao, actualizarStockProductosBatchDao, consultarStockDiarioPorSucursalDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductoDiarioOptimizadoDao, consultarStockProductosDao, consultarStockProductosOptimizadoDao, IngresarHistorialStockBatchDao, IngresarHistorialStockDao, registrarStockProductoBatchDao, registrarStockProductoDao, registrarStockProductoDiarioBatchDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
+import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, actualizarStockProductoDiariosBatchDao, actualizarStockProductosBatchDao, consultarStockDiarioPorSucursalDao, consultarStockGeneralDao, consultarStockProductoDao, consultarStockProductoDiarioDao, consultarStockProductoDiarioOptimizadoDao, consultarStockProductosDao, consultarStockProductosOptimizadoDao, IngresarHistorialStockBatchDao, IngresarHistorialStockDao, registrarStockProductoBatchDao, registrarStockProductoDao, registrarStockProductoDiarioBatchDao, registrarStockProductoDiarioDao } from "./stockProductos.dao.js";
 import { crearPayloadActualizarDebitoStockDiario, crearPayloadActualizarDebitoStockGeneral, crearPayloadEgresoPorVenta, crearPayloadHistorial, crearPayloadStockProductoDiarioExistente, crearPayloadStockProductoDiarioInexistente, payloadStockDiarioIngresoManualExistente, payloadStockDiarioIngresoManualInexistente, payloadStockProductoExistente, payloadStockProductoInexistente } from "./stockProductos.utils.js";
 
 /*------------------------------------------------------------------------------
@@ -343,6 +343,24 @@ export const elminarStockDiarioService = async (idOrdenProduccion) => {
   }
 }
 
+
+//Consultas unificacion de tablas
+//----------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------- 
+export const consultarStockGeneralService = async (idSucursal, fecha) => {
+  try {
+    const stockProductos = await consultarStockGeneralDao(idSucursal, fecha);
+
+    if (stockProductos.length === 0) {
+      const error = getError(1);
+      throw new CustomError(error);
+    }
+
+    return stockProductos;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // ------------------------------------------------------
 // ------------- SERVICIOS OPTIMIZADOS  ------------------

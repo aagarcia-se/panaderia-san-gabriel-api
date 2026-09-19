@@ -6,72 +6,72 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 ----------------- Gestion de la tabla Historial Stock ----------------
 ----------------------------------------------------------------------*/
 export const IngresarHistorialStockDao = async (dataHistorialStock) => {
-    try{
-        const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, stockAnterior, stockNuevo, cantidad, fechaMovimiento, observaciones, tipoReferencia)
+  try {
+    const insert = `insert into HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, stockAnterior, stockNuevo, cantidad, fechaMovimiento, observaciones, tipoReferencia)
         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
-            const historialStock = await Connection.execute(insert, [
-            dataHistorialStock.idUsuario,
-            dataHistorialStock.idProducto,
-            dataHistorialStock.idSucursal,
-            dataHistorialStock.tipoMovimiento || 'INGRESO',
-            dataHistorialStock.stockAnterior,
-            dataHistorialStock.stockNuevo,
-            dataHistorialStock.cantidad,
-            dataHistorialStock.fechaActualizacion,
-            dataHistorialStock.observaciones || "Ingreso Manual",
-            dataHistorialStock.tipoReferencia || "CONTROL DE STOCK"
-            ]);
+    const historialStock = await Connection.execute(insert, [
+      dataHistorialStock.idUsuario,
+      dataHistorialStock.idProducto,
+      dataHistorialStock.idSucursal,
+      dataHistorialStock.tipoMovimiento || 'INGRESO',
+      dataHistorialStock.stockAnterior,
+      dataHistorialStock.stockNuevo,
+      dataHistorialStock.cantidad,
+      dataHistorialStock.fechaActualizacion,
+      dataHistorialStock.observaciones || "Ingreso Manual",
+      dataHistorialStock.tipoReferencia || "CONTROL DE STOCK"
+    ]);
 
-        const historialStockIngresado = {
-            idHistorialStock: parseInt(historialStock.toJSON().lastInsertRowid),
-            ...dataHistorialStock
-        }
-        return historialStockIngresado;
-
-    }catch(error){
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
+    const historialStockIngresado = {
+      idHistorialStock: parseInt(historialStock.toJSON().lastInsertRowid),
+      ...dataHistorialStock
     }
+    return historialStockIngresado;
+
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const actualizarHistorialStockDao = async (dataHistorialStock) => {
-    try{
-        const update = `update HISTORIALSTOCK set idProducto = ?, idSucursal = ?, tipoMovimiento = 'CORRECCION', cantidad = ?, stockAnterior = ?, stockActual = ?,
+  try {
+    const update = `update HISTORIALSTOCK set idProducto = ?, idSucursal = ?, tipoMovimiento = 'CORRECCION', cantidad = ?, stockAnterior = ?, stockActual = ?,
                         fechaMovimiento = ?, observaciones = ?, tipoReferencia = ? 
                         where idHistorialStock = ?;`;
-        const historialStock = await Connection.execute(update, [
-            dataHistorialStock.idProducto,
-            dataHistorialStock.idSucursal,
-            dataHistorialStock.cantidad,
-            dataHistorialStock.stockAnterior,
-            dataHistorialStock.stockActual,
-            dataHistorialStock.idHistorialStock,
-            dataHistorialStock.fechaMovimiento,
-            dataHistorialStock.observaciones,
-            dataHistorialStock.tipoReferencia
-        ]);
+    const historialStock = await Connection.execute(update, [
+      dataHistorialStock.idProducto,
+      dataHistorialStock.idSucursal,
+      dataHistorialStock.cantidad,
+      dataHistorialStock.stockAnterior,
+      dataHistorialStock.stockActual,
+      dataHistorialStock.idHistorialStock,
+      dataHistorialStock.fechaMovimiento,
+      dataHistorialStock.observaciones,
+      dataHistorialStock.tipoReferencia
+    ]);
 
-        const historialStockActualizado = {
-            idHistorialStock: parseInt(historialStock.toJSON().lastInsertRowid),
-            ...dataHistorialStock
-        }
-
-        return historialStockActualizado;
-    }catch(error){
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
+    const historialStockActualizado = {
+      idHistorialStock: parseInt(historialStock.toJSON().lastInsertRowid),
+      ...dataHistorialStock
     }
+
+    return historialStockActualizado;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const eliminarHistorialStockDao = async (idStock) => {
-    try {
-      const query = "update HISTORIALSTOCK set estado = 'N' where idHistorial = ?;";
-      const stockProducto = await Connection.execute(query, [idStock]);
-      return stockProducto.toJSON().rowsAffected;
-    } catch (error) {
-      const dbError = getDatabaseError(error.message);
-      throw new CustomError(dbError);
-    }
+  try {
+    const query = "update HISTORIALSTOCK set estado = 'N' where idHistorial = ?;";
+    const stockProducto = await Connection.execute(query, [idStock]);
+    return stockProducto.toJSON().rowsAffected;
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 
@@ -86,10 +86,10 @@ export const consultarStockProductoDao = async (idProducto, idSucursal) => {
                     and estado = 'A';`;
     const stockProducto = await Connection.execute(query, [idProducto, idSucursal]);
 
-    if(stockProducto.rows.length === 0){
-        return {
+    if (stockProducto.rows.length === 0) {
+      return {
         idStock: 0,
-        }
+      }
     }
 
     return stockProducto.rows[0];
@@ -97,11 +97,11 @@ export const consultarStockProductoDao = async (idProducto, idSucursal) => {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
   }
-} 
+}
 
 export const consultarStockProductosDao = async (idSucursal) => {
-    try{
-        const query = `select sp.idStock, sp.idProducto, p.nombreProducto, p.idCategoria, cat.nombreCategoria,
+  try {
+    const query = `select sp.idStock, sp.idProducto, p.nombreProducto, p.idCategoria, cat.nombreCategoria,
                         sp.idSucursal, su.nombreSucursal, sp.stock as cantidadExistente,
   						p.controlarStock, p.controlarStockDiario, sp.fechaActualizacion
                         from STOCKPRODUCTOS sp
@@ -115,10 +115,10 @@ export const consultarStockProductosDao = async (idSucursal) => {
                         order by sp.stock desc;`;
     const stockProductos = await Connection.execute(query, [idSucursal]);
     return stockProductos.rows;
-    }catch(error){
-      const dbError = getDatabaseError(error.message);
-      throw new CustomError(dbError);
-    }
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const registrarStockProductoDao = async (dataStockProducto) => {
@@ -126,16 +126,16 @@ export const registrarStockProductoDao = async (dataStockProducto) => {
     const query = `INSERT INTO STOCKPRODUCTOS (idProducto, idSucursal, stock, fechaActualizacion, fechaCreacion)
                    VALUES (?, ?, ?, ?, ?);`;
     const stockProducto = await Connection.execute(query, [
-        dataStockProducto.idProducto,
-        dataStockProducto.idSucursal,
-        dataStockProducto.stock,
-        dataStockProducto.fechaActualizacion,
-        dataStockProducto.fechaCreacion
+      dataStockProducto.idProducto,
+      dataStockProducto.idSucursal,
+      dataStockProducto.stock,
+      dataStockProducto.fechaActualizacion,
+      dataStockProducto.fechaCreacion
     ]);
 
     const stockProductoIngresado = {
-        idStock: parseInt(stockProducto.toJSON().lastInsertRowid),
-        ...dataStockProducto
+      idStock: parseInt(stockProducto.toJSON().lastInsertRowid),
+      ...dataStockProducto
     }
 
     return stockProductoIngresado;
@@ -150,18 +150,18 @@ export const actualizarStockProductoDao = async (dataStockProducto) => {
     const query = `UPDATE STOCKPRODUCTOS SET stock = ?, fechaActualizacion = ?
                    where idProducto = ?
                    and idSucursal = ?`
-                   ;
-                   
-     const resUpdate = await Connection.execute(query, [
-        dataStockProducto.stock,
-        dataStockProducto.fechaActualizacion,
-        dataStockProducto.idProducto,
-        dataStockProducto.idSucursal,
+      ;
+
+    const resUpdate = await Connection.execute(query, [
+      dataStockProducto.stock,
+      dataStockProducto.fechaActualizacion,
+      dataStockProducto.idProducto,
+      dataStockProducto.idSucursal,
     ]);
 
     const dataStockProductoUpdate = {
-        idStock: parseInt(resUpdate.toJSON().lastInsertRowid),
-        ...dataStockProducto
+      idStock: parseInt(resUpdate.toJSON().lastInsertRowid),
+      ...dataStockProducto
     }
 
     return dataStockProductoUpdate
@@ -192,15 +192,15 @@ export const consultarStockProductoDiarioDao = async (idProducto, idSucursal, fe
                     and idSucursal = ?
                     and fechaValidez = ?
                     and estado = 'A';`;
-    const stockProductoDiario = await Connection.execute(query, 
+    const stockProductoDiario = await Connection.execute(query,
       [idProducto,
-       idSucursal,
-       fechaValidez]);
+        idSucursal,
+        fechaValidez]);
 
-    if(stockProductoDiario.rows.length === 0){
-        return {
+    if (stockProductoDiario.rows.length === 0) {
+      return {
         idStockDiario: 0,
-        }
+      }
     }
 
     return stockProductoDiario.rows[0];
@@ -224,8 +224,8 @@ export const registrarStockProductoDiarioDao = async (dataStockProductoDiario) =
     ]);
 
     const stockProductoDiarioIngresado = {
-        idStock: parseInt(stockProducto.toJSON().lastInsertRowid),
-        ...dataStockProductoDiario
+      idStock: parseInt(stockProducto.toJSON().lastInsertRowid),
+      ...dataStockProductoDiario
     }
 
     return stockProductoDiarioIngresado;
@@ -241,8 +241,8 @@ export const actualizarStockProductoDiarioDao = async (dataStockProductoDiario) 
                    where idProducto = ?
                    and idSucursal = ?
                    and fechaValidez = ?`;
-                   
-     const resUpdate = await Connection.execute(query, [
+
+    const resUpdate = await Connection.execute(query, [
       dataStockProductoDiario.stock,
       dataStockProductoDiario.fechaActualizacion,
       dataStockProductoDiario.idProducto,
@@ -251,8 +251,8 @@ export const actualizarStockProductoDiarioDao = async (dataStockProductoDiario) 
     ]);
 
     const dataStockProductoDiarioUpdate = {
-        idStock: parseInt(resUpdate.toJSON().lastInsertRowid),
-        ...dataStockProductoDiario
+      idStock: parseInt(resUpdate.toJSON().lastInsertRowid),
+      ...dataStockProductoDiario
     }
 
     return dataStockProductoDiarioUpdate
@@ -290,14 +290,14 @@ export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
                     and std.estado = 'A'
                     order by std.idProducto asc;`;
     const productosExistentes = await Connection.execute(query, [
-      idSucursal, 
+      idSucursal,
       fecha
     ]);
 
-    if(productosExistentes.rows.length === 0){
-        return {
+    if (productosExistentes.rows.length === 0) {
+      return {
         idStockDiario: 0,
-        }
+      }
     }
 
     return productosExistentes.rows;
@@ -307,77 +307,143 @@ export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
   }
 }
 
+//Consultas unificacion de tablas
+//----------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------- 
+
+export const consultarStockGeneralDao = async (idSucursal, fecha) => {
+  try {
+    const query = `SELECT * FROM (
+                          SELECT 
+                              1                       AS orden,
+                              NULL                    AS idStock,
+                              std.idStockDiario       AS idStockDiario,
+                              std.idProducto,
+                              p.nombreProducto,
+                              p.idCategoria,
+                              c.nombreCategoria,
+                              std.idSucursal,
+                              s.nombreSucursal,
+                              std.stock               AS cantidadExistente,
+                              p.controlarStock,
+                              p.controlarStockDiario,
+                              p.controlarStockDiario,
+                              'Stock Diario'          AS tipoStock
+                          FROM STOCKPRODUCTOSDIARIOS std
+                          INNER JOIN PRODUCTOS p   ON std.idProducto = p.idProducto
+                          INNER JOIN SUCURSALES s  ON std.idSucursal  = s.idSucursal
+                          INNER JOIN CATEGORIAS c  ON p.idCategoria   = c.idCategoria
+                          WHERE std.idSucursal        = ?
+                            AND std.fechaValidez      = ?
+                            AND p.controlarInventario = 1
+                            AND std.estado            = 'A'
+
+                          UNION ALL
+
+                          SELECT 
+                              2                       AS orden,
+                              sp.idStock              AS idStock,
+                              NULL                    AS idStockDiario,
+                              sp.idProducto,
+                              p.nombreProducto,
+                              p.idCategoria,
+                              cat.nombreCategoria,
+                              sp.idSucursal,
+                              su.nombreSucursal,
+                              sp.stock                AS cantidadExistente,
+                              p.controlarStock,
+                              p.controlarStockDiario,
+                              p.controlarStockDiario,
+                              'Stock General'         AS tipoStock
+                          FROM STOCKPRODUCTOS sp
+                          INNER JOIN PRODUCTOS p    ON sp.idProducto  = p.idProducto
+                          INNER JOIN CATEGORIAS cat ON p.idCategoria  = cat.idCategoria
+                          INNER JOIN SUCURSALES su  ON sp.idSucursal  = su.idSucursal
+                          WHERE sp.idSucursal         = ?
+                            AND sp.estado             = 'A'
+                            AND p.controlarInventario = 1
+                            AND p.estado              = 'A'
+                      )
+                      ORDER BY orden ASC, idProducto asc, idCategoria DESC;`;
+
+    const stockProductos = await Connection.execute(query, [idSucursal, fecha, idSucursal]);
+    return stockProductos.rows; // filas crudas, el service crea el Map
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
+}
 
 //Consultas optimizadas
 //----------------------------------------------------------------------------- 
 //----------------------------------------------------------------------------- 
 export const registrarStockProductoBatchDao = async (datasStockProducto) => {
-    try {
-        const query = `INSERT INTO STOCKPRODUCTOS (idProducto, idSucursal, stock, fechaActualizacion, fechaCreacion)
+  try {
+    const query = `INSERT INTO STOCKPRODUCTOS (idProducto, idSucursal, stock, fechaActualizacion, fechaCreacion)
                        VALUES (?, ?, ?, ?, ?)`;
 
-        const batch = datasStockProducto.map(dataStockProducto => ({
-            sql: query,
-            args: [
-                dataStockProducto.idProducto,
-                dataStockProducto.idSucursal,
-                dataStockProducto.stock,
-                dataStockProducto.fechaActualizacion,
-                dataStockProducto.fechaCreacion
-            ]
-        }));
+    const batch = datasStockProducto.map(dataStockProducto => ({
+      sql: query,
+      args: [
+        dataStockProducto.idProducto,
+        dataStockProducto.idSucursal,
+        dataStockProducto.stock,
+        dataStockProducto.fechaActualizacion,
+        dataStockProducto.fechaCreacion
+      ]
+    }));
 
-        await Connection.batch(batch, "write");
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    await Connection.batch(batch, "write");
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const registrarStockProductoDiarioBatchDao = async (datasStockProductoDiario) => {
-    try {
-        const query = `INSERT INTO STOCKPRODUCTOSDIARIOS (idProducto, idSucursal, stock, fechaValidez, fechaActualizacion, fechaCreacion)
+  try {
+    const query = `INSERT INTO STOCKPRODUCTOSDIARIOS (idProducto, idSucursal, stock, fechaValidez, fechaActualizacion, fechaCreacion)
                        VALUES (?, ?, ?, ?, ?, ?)`;
 
-        const batch = datasStockProductoDiario.map(dataStockProductoDiario => ({
-            sql: query,
-            args: [
-                dataStockProductoDiario.idProducto,
-                dataStockProductoDiario.idSucursal,
-                dataStockProductoDiario.stock,
-                dataStockProductoDiario.fechaValidez,
-                dataStockProductoDiario.fechaActualizacion,
-                dataStockProductoDiario.fechaCreacion
-            ]
-        }));
+    const batch = datasStockProductoDiario.map(dataStockProductoDiario => ({
+      sql: query,
+      args: [
+        dataStockProductoDiario.idProducto,
+        dataStockProductoDiario.idSucursal,
+        dataStockProductoDiario.stock,
+        dataStockProductoDiario.fechaValidez,
+        dataStockProductoDiario.fechaActualizacion,
+        dataStockProductoDiario.fechaCreacion
+      ]
+    }));
 
-        await Connection.batch(batch, "write");
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    await Connection.batch(batch, "write");
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const consultarStockProductosOptimizadoDao = async (idsProductos, idSucursal) => {
-    try {
-        const placeholders = idsProductos.map(() => "?").join(", ");
-        const query = `select idStock, idProducto, idSucursal, stock from STOCKPRODUCTOS 
+  try {
+    const placeholders = idsProductos.map(() => "?").join(", ");
+    const query = `select idStock, idProducto, idSucursal, stock from STOCKPRODUCTOS 
                         where idProducto IN (${placeholders})
                         and idSucursal = ?
                         and estado = 'A';`;
 
-        const stockProductos = await Connection.execute(query, [...idsProductos, idSucursal]);
-        return stockProductos.rows; // filas crudas, el service crea el Map
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    const stockProductos = await Connection.execute(query, [...idsProductos, idSucursal]);
+    return stockProductos.rows; // filas crudas, el service crea el Map
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const consultarStockProductoDiarioOptimizadoDao = async (idsProductos, idSucursal, fechaValidez) => {
-try {
-        const placeholders = idsProductos.map(() => "?").join(", ");
-        const query = `
+  try {
+    const placeholders = idsProductos.map(() => "?").join(", ");
+    const query = `
             SELECT idStockDiario, idProducto, idSucursal, stock, fechaValidez 
             FROM STOCKPRODUCTOSDIARIOS
             WHERE idProducto IN (${placeholders})
@@ -386,91 +452,91 @@ try {
             AND estado = 'A';
         `;
 
-        const stockProductosDiarios = await Connection.execute(query, [
-            ...idsProductos,
-            idSucursal,
-            fechaValidez
-        ]);
+    const stockProductosDiarios = await Connection.execute(query, [
+      ...idsProductos,
+      idSucursal,
+      fechaValidez
+    ]);
 
-        return stockProductosDiarios.rows; // filas crudas, el service crea el Map
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    return stockProductosDiarios.rows; // filas crudas, el service crea el Map
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const IngresarHistorialStockBatchDao = async (dataHistorialStocks) => {
-    try {
-        const insert = `INSERT INTO HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, stockAnterior, stockNuevo, cantidad, fechaMovimiento, observaciones, tipoReferencia)
+  try {
+    const insert = `INSERT INTO HISTORIALSTOCK (idUsuario, idProducto, idSucursal, tipoMovimiento, stockAnterior, stockNuevo, cantidad, fechaMovimiento, observaciones, tipoReferencia)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
-        const batch = dataHistorialStocks.map(dataHistorialStock => ({
-            sql: insert,
-            args: [
-                dataHistorialStock.idUsuario,
-                dataHistorialStock.idProducto,
-                dataHistorialStock.idSucursal,
-                dataHistorialStock.tipoMovimiento || 'INGRESO',
-                dataHistorialStock.stockAnterior,
-                dataHistorialStock.stockNuevo,
-                dataHistorialStock.cantidad,
-                dataHistorialStock.fechaActualizacion,
-                dataHistorialStock.observaciones || "Ingreso Manual",
-                dataHistorialStock.tipoReferencia || "CONTROL DE STOCK"
-            ]
-        }));
+    const batch = dataHistorialStocks.map(dataHistorialStock => ({
+      sql: insert,
+      args: [
+        dataHistorialStock.idUsuario,
+        dataHistorialStock.idProducto,
+        dataHistorialStock.idSucursal,
+        dataHistorialStock.tipoMovimiento || 'INGRESO',
+        dataHistorialStock.stockAnterior,
+        dataHistorialStock.stockNuevo,
+        dataHistorialStock.cantidad,
+        dataHistorialStock.fechaActualizacion,
+        dataHistorialStock.observaciones || "Ingreso Manual",
+        dataHistorialStock.tipoReferencia || "CONTROL DE STOCK"
+      ]
+    }));
 
-        await Connection.batch(batch, "write"); // 1 sola llamada HTTP
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    await Connection.batch(batch, "write"); // 1 sola llamada HTTP
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const actualizarStockProductosBatchDao = async (datasStockProducto) => {
-    try {
-        const query = `UPDATE STOCKPRODUCTOS SET stock = ?, fechaActualizacion = ?
+  try {
+    const query = `UPDATE STOCKPRODUCTOS SET stock = ?, fechaActualizacion = ?
                        WHERE idProducto = ?
                        AND idSucursal = ?`;
 
-        const batch = datasStockProducto.map(dataStockProducto => ({
-            sql: query,
-            args: [
-                dataStockProducto.stock,
-                dataStockProducto.fechaActualizacion,
-                dataStockProducto.idProducto,
-                dataStockProducto.idSucursal,
-            ]
-        }));
+    const batch = datasStockProducto.map(dataStockProducto => ({
+      sql: query,
+      args: [
+        dataStockProducto.stock,
+        dataStockProducto.fechaActualizacion,
+        dataStockProducto.idProducto,
+        dataStockProducto.idSucursal,
+      ]
+    }));
 
-        await Connection.batch(batch, "write"); // 1 sola llamada HTTP
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    await Connection.batch(batch, "write"); // 1 sola llamada HTTP
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }
 
 export const actualizarStockProductoDiariosBatchDao = async (datasStockProductoDiario) => {
-    try {
-        const query = `UPDATE STOCKPRODUCTOSDIARIOS SET stock = ?, fechaActualizacion = ?
+  try {
+    const query = `UPDATE STOCKPRODUCTOSDIARIOS SET stock = ?, fechaActualizacion = ?
                        WHERE idProducto = ?
                        AND idSucursal = ?
                        AND DATE(fechaValidez) = DATE(?)`;
 
-        const batch = datasStockProductoDiario.map(dataStockProductoDiario => ({
-            sql: query,
-            args: [
-                dataStockProductoDiario.stock,
-                dataStockProductoDiario.fechaActualizacion,
-                dataStockProductoDiario.idProducto,
-                dataStockProductoDiario.idSucursal,
-                dataStockProductoDiario.fechaValidez,
-            ]
-        }));
+    const batch = datasStockProductoDiario.map(dataStockProductoDiario => ({
+      sql: query,
+      args: [
+        dataStockProductoDiario.stock,
+        dataStockProductoDiario.fechaActualizacion,
+        dataStockProductoDiario.idProducto,
+        dataStockProductoDiario.idSucursal,
+        dataStockProductoDiario.fechaValidez,
+      ]
+    }));
 
-        await Connection.batch(batch, "write"); // 1 sola llamada HTTP
-    } catch (error) {
-        const dbError = getDatabaseError(error.message);
-        throw new CustomError(dbError);
-    }
+    await Connection.batch(batch, "write"); // 1 sola llamada HTTP
+  } catch (error) {
+    const dbError = getDatabaseError(error.message);
+    throw new CustomError(dbError);
+  }
 }

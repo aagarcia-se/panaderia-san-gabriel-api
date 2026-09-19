@@ -1,4 +1,4 @@
-import { consultarDetalleVentaService, consultarVentasPorUsuarioService, eliminarVentaService, ingresarVentaService } from "./venta.service.js";
+import { consultarDetalleVentaService, consultarVentasPorSucursalService, consultarVentasPorUsuarioService, eliminarVentaService, ingresarVentaService } from "./venta.service.js";
 
 
 export const ingresarVentaController = async (req, res, next) => {
@@ -59,3 +59,18 @@ export const consultarDetalleVentaController = async (req, res, next) => {
     next(error);
   }
 }
+
+export const consultarVentasPorSucursalController = async (req, res, next) => {
+  try {
+    const {idSucursal} = req.params;
+    const ventas = await consultarVentasPorSucursalService(idSucursal);
+    const responseData = {
+      status: 200,
+      message: "Consulta exitosa",
+      ventas,
+    };
+    res.status(200).json(responseData);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de manejo de errores
+  }
+};
