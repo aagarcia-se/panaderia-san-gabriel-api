@@ -11,7 +11,7 @@ import { actualizarEstadoOrdenProduccionServices } from "../oredenesproduccion/o
 import { ingresarSobranteService } from "../sobrantes/sobrantes.service.js";
 import { actualizarStockProductoDao, actualizarStockProductoDiarioDao, actualizarStockProductoDiariosBatchDao, actualizarStockProductosBatchDao, consultarStockProductoDao, consultarStockProductoDiarioDao, IngresarHistorialStockBatchDao, IngresarHistorialStockDao } from "../StockProductos/stockProductos.dao.js";
 import { consultarStockProductoDiarioOptimizadoService, consultarStockProductosOptimizadoService, descontarStockPorVentasOptimizado } from "../StockProductos/stockProductos.service.js";
-import { consultarDetalleVentaDao, consultarVentaporId, consultarVentasPorUsuarioDao, eliminarVentaDao, ingresarVentaDao, } from "./ventas.dao.js";
+import { consultarDetalleVentaDao, consultarVentaporId, consultarVentasPorSucursalDao, consultarVentasPorUsuarioDao, eliminarVentaDao, ingresarVentaDao, } from "./ventas.dao.js";
 import { crearPayloadSobrante, procesarVentaService } from "./ventas.utils.js";
 
 export const ingresarVentaService = async (venta) => {
@@ -224,4 +224,19 @@ export const revertirVentaServices = async (idVenta, dateTime) => {
     } catch (error) {
         throw error;
     }
+};
+
+export const consultarVentasPorSucursalService = async (idSucursal) => {
+  try {
+    const ventas = await consultarVentasPorSucursalDao(idSucursal);
+
+    if (ventas.length === 0) {
+      const error = getError(1);
+      throw new CustomError(error);
+    }
+
+    return ventas;
+  } catch (error) {
+    throw error;
+  }
 };
