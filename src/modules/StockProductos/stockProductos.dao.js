@@ -112,6 +112,7 @@ export const consultarStockProductosDao = async (idSucursal) => {
                         and sp.estado = 'A'
                         and p.controlarInventario = 1
                         and p.estado = 'A'
+                        and sp.stock > 0
                         order by sp.stock desc;`;
     const stockProductos = await Connection.execute(query, [idSucursal]);
     return stockProductos.rows;
@@ -287,6 +288,7 @@ export const consultarStockDiarioPorSucursalDao = async (idSucursal, fecha) => {
                     where std.idSucursal = ?
                     and std.fechaValidez = ?
                     and p.controlarInventario = 1
+                    and std.stock > 0
                     and std.estado = 'A'
                     order by std.idProducto asc;`;
     const productosExistentes = await Connection.execute(query, [

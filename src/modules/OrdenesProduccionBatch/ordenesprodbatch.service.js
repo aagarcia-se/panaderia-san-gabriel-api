@@ -1,12 +1,13 @@
 import CustomError from "../../utils/CustomError.js";
 import { getError } from "../../utils/generalErrors.js";
 import { parsearCSV } from "../../utils/ProcesarArchivos/csvParser.js";
+import { parsearXLSX } from "../../utils/ProcesarArchivos/xlsxParser.js";
 import { ingresarOrdenProduccionServiceVersion2 } from "../oredenesproduccion/ordenesproduccion.service.js";
 import { crearPayloadOrdenProduccionBatch } from "./ordenesprodbatch.utils.js";
 
 export const ingresarOrdenProduccionBatchService = async (ordenHaader, csvString) => {
     try {
-        const registros = parsearCSV(csvString);
+        const registros = parsearXLSX(csvString);
         const ordenProduccion = crearPayloadOrdenProduccionBatch(ordenHaader, registros);
         const resultado = await ingresarOrdenProduccionServiceVersion2(ordenProduccion);
 

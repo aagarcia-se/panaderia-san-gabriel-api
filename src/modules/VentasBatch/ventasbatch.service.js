@@ -1,18 +1,19 @@
 import { parsearCSV } from "../../utils/ProcesarArchivos/csvParser.js";
+import { parsearXLSX } from "../../utils/ProcesarArchivos/xlsxParser.js";
 import { consultarProductosOptimizadoService } from "../productos/productos.service.js";
 import { ingresarVentaService } from "../ventas/venta.service.js";
 import { crearPayloadVentaBatch } from "./ventasbatch.utils.js";
 
-export const ingresarVentaBatchService = async (venta, csvString) => {
+export const ingresarVentaBatchService = async (venta, xlsxString) => {
     try {
-        const registros = parsearCSV(csvString);
+        const registros = parsearXLSX(xlsxString);
 
         const productos = registros.map(fila => {
             if(fila.Codigo && fila.Producto){
                 return {
                     idProducto: parseInt(fila.Codigo),
                     nombre: fila.Producto,
-                    unidadesNoVendidas: fila.Sobrante ? parseInt(fila.Sobrante) : 0
+                    unidadesNoVendidas: parseInt(fila.Cantidad) ? parseInt(fila.Cantidad) : 0
                 };
             }
             

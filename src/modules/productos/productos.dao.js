@@ -131,7 +131,8 @@ export const consultarProductosOptimizadoDao = async (idsProductos) => {
                         controlarStock, controlarStockDiario, tipoProduccion,
                         estado 
                         FROM productos 
-                        WHERE idProducto IN (${placeholders})`;
+                        WHERE idProducto IN (${placeholders})
+                        and estado = 'A'`;
 
         const productos = await Connection.execute(query, idsProductos);
 
