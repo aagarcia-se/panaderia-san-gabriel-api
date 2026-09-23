@@ -3,22 +3,27 @@ import { ingresarVentaBatchService } from "./ventasbatch.service.js";
 export const ingresarVentaBatchController = async (req, res, next) => {
     try {
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ status: 400, message: 'No se recibió ningún archivo CSV' });
+            return res.status(400).json({ status: 400, message: "No se recibió ningún archivo Excel" });
         }
 
         if (!req.body.venta) {
-            return res.status(400).json({ status: 400, message: 'No se recibieron datos de la venta' });
+            return res.status(400).json({ status: 400, message: "No se recibieron datos de la venta" });
         }
 
-        const csvString = req.files[0].buffer.toString('utf-8');
-        const venta = JSON.parse(req.body.venta);
-        const idVenta = await ingresarVentaBatchService(venta, csvString);
-        const responseData = {
-            status: 200,
+        const nombreArchivo = req.files[0].originalname;
+        if (!nombreArchivo.match(/\.(xlsx|xls)$/i)) {
+            return res.status(400).json({ status: 400, message: "Solo se permiten archivos Excel (.xlsx o .xls)" });
+        }
+        const xlsxString = req.files[0].buffer;
+        const venta   = JSON.parse(req.body.venta);
+        // ✅ Pasar el buffer directo — el service hace el parseo
+        const idVenta = await ingresarVentaBatchService(venta, xlsxString);
+
+        res.status(200).json({
+            status:  200,
             message: "Ingreso exitoso",
-            idVenta
-        };
-        res.status(200).json(responseData);
+            idVenta,
+        });
     } catch (error) {
         next(error);
     }
