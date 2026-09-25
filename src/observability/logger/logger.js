@@ -103,20 +103,6 @@ const sendToBetterStack = (
           message,
           payload
         );
-
-        /**
-         * Los errores son prioritarios.
-         *
-         * No esperamos el flush aquí.
-         * Simplemente iniciamos el proceso.
-         */
-        logtail.flush().catch((error) => {
-          console.error(
-            "Better Stack error flush:",
-            error
-          );
-        });
-
         break;
 
       case "info":
@@ -127,10 +113,21 @@ const sendToBetterStack = (
         );
         break;
     }
+
+    /**
+     * Iniciamos el flush inmediatamente,
+     * pero no bloqueamos el request de la API.
+     */
+    logtail.flush().catch((error) => {
+      console.error(
+        "Better Stack flush error:",
+        error
+      );
+    });
   } catch (error) {
     /**
      * Un problema de observabilidad nunca
-     * debe provocar un error en nuestra API.
+     * debe afectar el funcionamiento de la API.
      */
     console.error(
       "Better Stack logging error:",
