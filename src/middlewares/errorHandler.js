@@ -1,9 +1,5 @@
 import CustomError from "../utils/CustomError.js";
-
-import {
-  getLogger,
-  LOG_CATEGORIES,
-} from "../observability/index.js";
+import { getLogger, LOG_CATEGORIES, } from "../observability/index.js";
 
 const getErrorLogLevel = (error) => {
   const errorCode = error?.errorCode;
@@ -26,15 +22,24 @@ const getErrorLogLevel = (error) => {
 const errorHandler = (err, req, res, next) => {
   const logger = getLogger();
 
-  if (err instanceof CustomError) {
+  const isCustomError =
+    typeof CustomError === "function" &&
+    err instanceof CustomError;
+
+  if (isCustomError || err?.name === "CustomError") {
     const logLevel = getErrorLogLevel(err);
 
     logger[logLevel](
       {
-        category: err.category || LOG_CATEGORIES.SYSTEM,
+        category:
+        err.category || LOG_CATEGORIES.SYSTEM,
         operation: "errorHandler",
         statusCode: err.statusCode,
-        errorCode: err.errorCode || "UNKNOWN_ERROR",
+        errorCode:
+        err.errorCode || "UNKNOWN_ERROR",
+        method: req.method,
+        url: req.path,
+        requestId: req.requestId,
       },
       err.message
     );
@@ -54,15 +59,22 @@ const errorHandler = (err, req, res, next) => {
       operation: "errorHandler",
       statusCode: 500,
       errorName: err?.name || "Error",
-      errorCode: err?.code || "UNEXPECTED_ERROR",
+      errorCode: "UNEXPECTED_ERROR",
+      method: req.method,
+      url: req.path,
+      requestId: req.requestId,
       stack: err?.stack,
     },
-    err?.message || "Error interno del servidor"
+    err?.message ||
+      "Error interno del servidor"
   );
 
   return res.status(500).json({
     error: {
-      message: err?.message || "Error interno del servidor",
+      message:
+        err?.message ||
+        "Error interno del servidor",
+
       code: 500,
     },
   });

@@ -2,8 +2,6 @@ import { config } from "../../config/index.js";
 
 const configLog = config.observability;
 
-console.log(configLog.betterStack.ingestingHost)
-
 const observabilityConfig = {
   environment: configLog.environment || "development",
   application: configLog.application|| "unknown",
