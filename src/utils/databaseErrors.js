@@ -1,42 +1,71 @@
 const databaseErrorMap = {
+  // ==========================================
+  // DATABASE - DATA / CONSTRAINTS
+  // ==========================================
+
   "UNIQUE constraint failed": {
     message: "ya existe",
     statusCode: 409,
-    code: 401
+    code: 401,
+    category: "DATABASE",
+    errorCode: "UNIQUE_CONSTRAINT",
   },
-  "Cannot read properties of null (reading 'message')": {
-    message: "Internal Server Error",
+
+  "SQLite error: FOREIGN KEY constraint failed": {
+    message:
+      "Este registro se encuentra relacionado a otro o no existe",
+    statusCode: 409,
+    code: 402,
+    category: "DATABASE",
+    errorCode: "FOREIGN_KEY_CONSTRAINT",
+  },
+
+  "SQL_INPUT_ERROR: SQL input error: no such column:": {
+    message: "Campo no existe en BD",
     statusCode: 500,
+    code: 500,
+    category: "DATABASE",
+    errorCode: "DATABASE_COLUMN_NOT_FOUND",
   },
-  "Unsupported type of value": {
-    message: "Tipo de valor no soportado",
-    statusCode: 400,
-  },
+
+  // ==========================================
+  // DATABASE - CONNECTION / AVAILABILITY
+  // ==========================================
+
   "fetch failed": {
     message: "Servicio de base de datos no disponible",
     statusCode: 500,
+    code: 500,
+    category: "DATABASE",
+    errorCode: "DATABASE_UNAVAILABLE",
   },
-  "Cannot read properties of undefined (reading 'message')":{
+
+  // ==========================================
+  // INTERNAL / UNEXPECTED
+  // ==========================================
+
+  "Cannot read properties of null (reading 'message')": {
     message: "Internal Server Error",
     statusCode: 500,
+    code: 500,
+    category: "DATABASE",
+    errorCode: "DATABASE_INTERNAL_ERROR",
   },
-  "SQL_INPUT_ERROR: SQL input error: no such column:":{
-      message: "Campo no existen en BD",
-      statusCode: 500,
 
+  "Cannot read properties of undefined (reading 'message')": {
+    message: "Internal Server Error",
+    statusCode: 500,
+    code: 500,
+    category: "DATABASE",
+    errorCode: "DATABASE_INTERNAL_ERROR",
   },
-  "SQLite error: FOREIGN KEY constraint failed":{
-    message: "Este registro se encuentra relacionado a otro o no existe",
-    statusCode: 409,
-    code: 402
-  }
-
-  // Agregar más errores de base de datos aquí según sea necesarior
 };
 
 export const getDatabaseError = (errorMessage) => {
+  const message = String(errorMessage ?? "");
+
   for (const [key, value] of Object.entries(databaseErrorMap)) {
-    if (errorMessage.includes(key)) {
+    if (message.includes(key)) {
       return value;
     }
   }
@@ -44,5 +73,8 @@ export const getDatabaseError = (errorMessage) => {
   return {
     message: "Internal Server Error",
     statusCode: 500,
+    code: 500,
+    category: "DATABASE",
+    errorCode: "DATABASE_UNKNOWN_ERROR",
   };
 };

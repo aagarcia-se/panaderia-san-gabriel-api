@@ -82,7 +82,7 @@ export const eliminarVentaDao = async (idVenta) => {
 
     const resDelete = await Connection.execute(scriptDelete, [idVenta]);
 
-    return resDelete.toJSON().rowsAffected;;
+    return resDelete.toJSON().rowsAffected;
   } catch (error) {
     const dbError = getDatabaseError(error.message);
     throw new CustomError(dbError);
