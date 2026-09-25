@@ -3,6 +3,7 @@ import cors from "cors";
 import errorHandler from "./middlewares/errorHandler.js";
 import requestId from "./middlewares/requestId.js";
 import requestLogger from "./middlewares/requestLogger.js";
+import { flushLogsMiddleware } from "./middlewares/flushLogs.middleware.js";
 import { rolesRoute } from "./modules/roles/roles.Routes.js";
 import { sucursalesRoute } from "./modules/sucursales/sucursal.routes.js";
 import { permisosRoute } from "./modules/permisos/permisos.routes.js";
@@ -37,6 +38,7 @@ const app = express();
 //middlewares globales
 app.use(requestId);
 app.use(requestLogger);
+app.use(flushLogsMiddleware);
 
 // Aumentar el límite del body-parser a 10MB o más si es necesario
 app.use(express.json({ limit: "10mb" }));

@@ -1,66 +1,261 @@
 import pino from "pino";
+import { Logtail } from "@logtail/node";
 import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
-const isProduction = observabilityConfig.environment === "production";
+const isEnabled = observabilityConfig.enabled;
+
+const sourceToken =
+  observabilityConfig.betterStack?.sourceToken;
+
+const ingestingHost =
+  observabilityConfig.betterStack?.ingestingHost;
 
 const hasBetterStack =
-  isProduction &&
-  Boolean(process.env.BETTER_STACK_SOURCE_TOKEN) &&
-  Boolean(process.env.BETTER_STACK_INGESTING_HOST);
+  isEnabled &&
+  Boolean(sourceToken) &&
+  Boolean(ingestingHost);
 
-const targets = [
-  {
-    target: "pino/file",
-    level: observabilityConfig.logLevel,
-    options: {
-      destination: 1,
-    },
+/**
+ * Cliente de Better Stack.
+ *
+ * Se crea una sola instancia para reutilizarla
+ * durante la vida de la ejecución.
+ */
+const logtail = hasBetterStack
+  ? new Logtail(sourceToken, {
+      endpoint: `https://${ingestingHost}`,
+    })
+  : null;
+
+/**
+ * Logger local con Pino.
+ *
+ * Estos campos aparecen automáticamente
+ * en los logs de Vercel.
+ */
+const baseLogger = pino({
+  level: observabilityConfig.logLevel,
+
+  base: {
+    application:
+      observabilityConfig.application,
+
+    service:
+      observabilityConfig.service,
+
+    environment:
+      observabilityConfig.environment,
   },
-];
 
-if (hasBetterStack) {
-  targets.push({
-    target: "@logtail/pino",
-    level: observabilityConfig.logLevel,
-    options: {
-      sourceToken: observabilityConfig.betterStack.sourceToken,
-      options: {
-        endpoint: `https://${observabilityConfig.betterStack.ingestingHost}`,
-      },
-    },
-  });
-}
-
-const transport = pino.transport({
-  targets,
+  timestamp:
+    pino.stdTimeFunctions.isoTime,
 });
 
-const baseLogger = pino(
-  {
-    level: observabilityConfig.logLevel,
-
-    base: {
-      application: observabilityConfig.application,
-      service: observabilityConfig.service,
-      environment: observabilityConfig.environment,
-    },
-
-    timestamp: pino.stdTimeFunctions.isoTime,
-  },
-  transport
-);
-
-export const getLogger = () => {
-  const context = requestContext.getStore();
-
-  if (!context?.requestId) {
-    return baseLogger;
+/**
+ * Encola un log en Better Stack.
+ *
+ * IMPORTANTE: esto ya NO envía el log de inmediato.
+ * Solo lo agrega a la cola interna de @logtail/node.
+ * El envío real ocurre una sola vez por request,
+ * mediante flushLogs(), llamado desde el middleware
+ * flushLogs.middleware.js cuando la respuesta termina.
+ *
+ * Los campos application, service y environment
+ * se agregan explícitamente porque este log
+ * se envía directamente mediante @logtail/node
+ * y no pasa por Pino.
+ */
+const sendToBetterStack = (
+  level,
+  data,
+  message
+) => {
+  if (!logtail) {
+    return;
   }
 
-  return baseLogger.child({
-    requestId: context.requestId,
-  });
+  try {
+    const context =
+      requestContext.getStore();
+
+    const payload = {
+      /**
+       * Información general de la aplicación.
+       */
+      application:
+        observabilityConfig.application,
+
+      service:
+        observabilityConfig.service,
+
+      environment:
+        observabilityConfig.environment,
+
+      /**
+       * Información específica del evento.
+       */
+      ...(data || {}),
+
+      /**
+       * requestId del request actual.
+       *
+       * Se agrega al final para garantizar
+       * que el contexto actual tenga prioridad.
+       */
+      ...(context?.requestId
+        ? {
+            requestId:
+              context.requestId,
+          }
+        : {}),
+    };
+
+    switch (level) {
+      case "debug":
+        logtail.debug(
+          message,
+          payload
+        );
+        break;
+
+      case "warn":
+        logtail.warn(
+          message,
+          payload
+        );
+        break;
+
+      case "error":
+        logtail.error(
+          message,
+          payload
+        );
+        break;
+
+      case "info":
+      default:
+        logtail.info(
+          message,
+          payload
+        );
+        break;
+    }
+  } catch (error) {
+    /**
+     * La observabilidad nunca debe provocar
+     * un fallo en nuestra API.
+     */
+    console.error(
+      "Better Stack logging error:",
+      error
+    );
+  }
 };
+
+/**
+ * Envía a Better Stack todo lo que se haya
+ * encolado durante el request actual.
+ *
+ * Se llama UNA SOLA VEZ por request, desde
+ * flushLogs.middleware.js, envuelto en waitUntil
+ * para no bloquear la respuesta y a la vez
+ * garantizar que el contenedor no se congele
+ * antes de que el envío termine.
+ */
+export const flushLogs = async () => {
+  if (!logtail) {
+    return;
+  }
+
+  try {
+    await logtail.flush();
+  } catch (error) {
+    console.error(
+      "Better Stack flush error:",
+      error
+    );
+  }
+};
+
+/**
+ * Obtiene un logger asociado al request actual.
+ *
+ * Si existe requestId en AsyncLocalStorage,
+ * Pino crea un child logger con ese requestId.
+ */
+export const getLogger = () => {
+  const context =
+    requestContext.getStore();
+
+  const logger =
+    context?.requestId
+      ? baseLogger.child({
+          requestId:
+            context.requestId,
+        })
+      : baseLogger;
+
+  return {
+    debug(data, message) {
+      logger.debug(
+        data,
+        message
+      );
+
+      sendToBetterStack(
+        "debug",
+        data,
+        message
+      );
+    },
+
+    info(data, message) {
+      logger.info(
+        data,
+        message
+      );
+
+      sendToBetterStack(
+        "info",
+        data,
+        message
+      );
+    },
+
+    warn(data, message) {
+      logger.warn(
+        data,
+        message
+      );
+
+      sendToBetterStack(
+        "warn",
+        data,
+        message
+      );
+    },
+
+    error(data, message) {
+      logger.error(
+        data,
+        message
+      );
+
+      sendToBetterStack(
+        "error",
+        data,
+        message
+      );
+    },
+  };
+};
+
+/**
+ * Exportamos el cliente por si posteriormente
+ * necesitamos realizar un flush controlado
+ * desde otro punto de la aplicación.
+ */
+export { logtail };
 
 export default baseLogger;
