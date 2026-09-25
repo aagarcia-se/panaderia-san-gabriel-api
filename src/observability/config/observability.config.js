@@ -1,10 +1,19 @@
-const environment = process.env.APP_ENV || "development";
+import { config } from "../../config/index.js";
 
-const config = {
-  environment,
-  application: process.env.APP_NAME || "san-gabriel-api",
-  service: process.env.APP_SERVICE || "api",
-  logLevel: process.env.LOG_LEVEL || "info",
+const configLog = config.observability;
+
+console.log(configLog.betterStack.ingestingHost)
+
+const observabilityConfig = {
+  environment: configLog.environment || "development",
+  application: configLog.application|| "unknown",
+  service: configLog.service || "api",
+  logLevel: configLog.logLevel || "info",
+
+  betterStack: {
+    sourceToken: configLog.betterStack.sourceToken,
+    ingestingHost: configLog.betterStack.ingestingHost,
+  },
 };
 
-export default config;
+export default observabilityConfig;

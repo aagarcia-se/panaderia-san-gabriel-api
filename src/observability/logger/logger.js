@@ -1,10 +1,8 @@
 import pino from "pino";
-
-import config from "../config/observability.config.js";
+import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
-const isProduction =
-  config.environment === "production";
+const isProduction = observabilityConfig.environment === "production";
 
 const hasBetterStack =
   isProduction &&
@@ -14,7 +12,7 @@ const hasBetterStack =
 const targets = [
   {
     target: "pino/file",
-    level: config.logLevel,
+    level: observabilityConfig.logLevel,
     options: {
       destination: 1,
     },
@@ -24,11 +22,11 @@ const targets = [
 if (hasBetterStack) {
   targets.push({
     target: "@logtail/pino",
-    level: config.logLevel,
+    level: observabilityConfig.logLevel,
     options: {
-      sourceToken: process.env.BETTER_STACK_SOURCE_TOKEN,
+      sourceToken: observabilityConfig.betterStack.sourceToken,
       options: {
-        endpoint: `https://${process.env.BETTER_STACK_INGESTING_HOST}`,
+        endpoint: `https://${observabilityConfig.betterStack.ingestingHost}`,
       },
     },
   });
@@ -40,12 +38,12 @@ const transport = pino.transport({
 
 const baseLogger = pino(
   {
-    level: config.logLevel,
+    level: observabilityConfig.logLevel,
 
     base: {
-      application: config.application,
-      service: config.service,
-      environment: config.environment,
+      application: observabilityConfig.application,
+      service: observabilityConfig.service,
+      environment: observabilityConfig.environment,
     },
 
     timestamp: pino.stdTimeFunctions.isoTime,
