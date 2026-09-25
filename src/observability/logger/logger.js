@@ -1,5 +1,4 @@
 import pino from "pino";
-import { waitUntil } from "@vercel/functions";
 import { Logtail } from "@logtail/node";
 import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
@@ -54,58 +53,128 @@ const baseLogger = pino({
 });
 
 /**
- * Envía un log a Better Stack.
+ * Encola un log en Better Stack.
+ *
+ * IMPORTANTE: esto ya NO envía el log de inmediato.
+ * Solo lo agrega a la cola interna de @logtail/node.
+ * El envío real ocurre una sola vez por request,
+ * mediante flushLogs(), llamado desde el middleware
+ * flushLogs.middleware.js cuando la respuesta termina.
  *
  * Los campos application, service y environment
  * se agregan explícitamente porque este log
  * se envía directamente mediante @logtail/node
  * y no pasa por Pino.
  */
-const sendToBetterStack = (level, data, message) => {
+const sendToBetterStack = (
+  level,
+  data,
+  message
+) => {
   if (!logtail) {
     return;
   }
 
   try {
-    const context = requestContext.getStore();
+    const context =
+      requestContext.getStore();
 
     const payload = {
-      application: observabilityConfig.application,
-      service: observabilityConfig.service,
-      environment: observabilityConfig.environment,
+      /**
+       * Información general de la aplicación.
+       */
+      application:
+        observabilityConfig.application,
+
+      service:
+        observabilityConfig.service,
+
+      environment:
+        observabilityConfig.environment,
+
+      /**
+       * Información específica del evento.
+       */
       ...(data || {}),
-      ...(context?.requestId ? { requestId: context.requestId } : {}),
+
+      /**
+       * requestId del request actual.
+       *
+       * Se agrega al final para garantizar
+       * que el contexto actual tenga prioridad.
+       */
+      ...(context?.requestId
+        ? {
+            requestId:
+              context.requestId,
+          }
+        : {}),
     };
 
     switch (level) {
       case "debug":
-        logtail.debug(message, payload);
+        logtail.debug(
+          message,
+          payload
+        );
         break;
+
       case "warn":
-        logtail.warn(message, payload);
+        logtail.warn(
+          message,
+          payload
+        );
         break;
+
       case "error":
-        logtail.error(message, payload);
+        logtail.error(
+          message,
+          payload
+        );
         break;
+
       case "info":
       default:
-        logtail.info(message, payload);
+        logtail.info(
+          message,
+          payload
+        );
         break;
     }
-
-    /**
-     * En lugar de un fire-and-forget que Vercel puede
-     * cortar a mitad de camino, le decimos al runtime
-     * que mantenga viva la función hasta que el flush
-     * termine, sin bloquear la respuesta al cliente.
-     */
-    waitUntil(
-      logtail.flush().catch((error) => {
-        console.error("Better Stack flush error:", error);
-      })
-    );
   } catch (error) {
-    console.error("Better Stack logging error:", error);
+    /**
+     * La observabilidad nunca debe provocar
+     * un fallo en nuestra API.
+     */
+    console.error(
+      "Better Stack logging error:",
+      error
+    );
+  }
+};
+
+/**
+ * Envía a Better Stack todo lo que se haya
+ * encolado durante el request actual.
+ *
+ * Se llama UNA SOLA VEZ por request, desde
+ * flushLogs.middleware.js, envuelto en waitUntil
+ * para no bloquear la respuesta y a la vez
+ * garantizar que el contenedor no se congele
+ * antes de que el envío termine.
+ */
+export const flushLogs = async () => {
+  if (!logtail) {
+    return;
+  }
+
+  try {
+    await logtail.flush();
+  } catch (error) {
+    console.error(
+      "Better Stack flush error:",
+      error
+    );
   }
 };
 
