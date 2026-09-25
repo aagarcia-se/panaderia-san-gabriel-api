@@ -2,17 +2,25 @@ import pino from "pino";
 import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
-const isEnabled = observabilityConfig.enabled === true;
-console.log(observabilityConfig.enabled)
-console.log(isEnabled)
+try {
+  const logtailPino = await import("@logtail/pino");
 
+  console.log("LOGTAIL IMPORT OK:", Boolean(logtailPino));
+
+  console.log(
+    "LOGTAIL MODULE:",
+    Object.keys(logtailPino)
+  );
+} catch (error) {
+  console.error("LOGTAIL IMPORT ERROR:", error);
+}
+
+const isEnabled = observabilityConfig.enabled === true;
 
 const hasBetterStack =
   isEnabled &&
   Boolean(observabilityConfig.betterStack?.sourceToken) &&
   Boolean(observabilityConfig.betterStack?.ingestingHost);
-
-  console.log(hasBetterStack)
 
 const targets = [
   {
