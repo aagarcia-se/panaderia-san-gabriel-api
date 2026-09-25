@@ -1,6 +1,5 @@
 import pino from "pino";
 import { Logtail } from "@logtail/node";
-
 import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
@@ -31,6 +30,9 @@ const logtail = hasBetterStack
 
 /**
  * Logger local con Pino.
+ *
+ * Estos campos aparecen automáticamente
+ * en los logs de Vercel.
  */
 const baseLogger = pino({
   level: observabilityConfig.logLevel,
@@ -53,11 +55,10 @@ const baseLogger = pino({
 /**
  * Envía un log a Better Stack.
  *
- * IMPORTANTE:
- * No hacemos flush para logs normales.
- *
- * Esto permite que Logtail agrupe los eventos
- * y reduzca la cantidad de requests hacia Better Stack.
+ * Los campos application, service y environment
+ * se agregan explícitamente porque este log
+ * se envía directamente mediante @logtail/node
+ * y no pasa por Pino.
  */
 const sendToBetterStack = (
   level,
@@ -73,8 +74,29 @@ const sendToBetterStack = (
       requestContext.getStore();
 
     const payload = {
+      /**
+       * Información general de la aplicación.
+       */
+      application:
+        observabilityConfig.application,
+
+      service:
+        observabilityConfig.service,
+
+      environment:
+        observabilityConfig.environment,
+
+      /**
+       * Información específica del evento.
+       */
       ...(data || {}),
 
+      /**
+       * requestId del request actual.
+       *
+       * Se agrega al final para garantizar
+       * que el contexto actual tenga prioridad.
+       */
       ...(context?.requestId
         ? {
             requestId:
@@ -115,8 +137,14 @@ const sendToBetterStack = (
     }
 
     /**
-     * Iniciamos el flush inmediatamente,
-     * pero no bloqueamos el request de la API.
+     * Forzamos el envío de los logs pendientes,
+     * pero NO esperamos el resultado.
+     *
+     * Esto es importante para Vercel:
+     *
+     * - El log se agrega a Logtail.
+     * - Se inicia el flush inmediatamente.
+     * - La API no queda bloqueada esperando Better Stack.
      */
     logtail.flush().catch((error) => {
       console.error(
@@ -126,8 +154,8 @@ const sendToBetterStack = (
     });
   } catch (error) {
     /**
-     * Un problema de observabilidad nunca
-     * debe afectar el funcionamiento de la API.
+     * La observabilidad nunca debe provocar
+     * un fallo en nuestra API.
      */
     console.error(
       "Better Stack logging error:",
@@ -137,8 +165,10 @@ const sendToBetterStack = (
 };
 
 /**
- * Obtiene el logger correspondiente
- * al request actual.
+ * Obtiene un logger asociado al request actual.
+ *
+ * Si existe requestId en AsyncLocalStorage,
+ * Pino crea un child logger con ese requestId.
  */
 export const getLogger = () => {
   const context =
@@ -209,8 +239,8 @@ export const getLogger = () => {
 
 /**
  * Exportamos el cliente por si posteriormente
- * necesitamos hacer un flush controlado desde
- * el ciclo de vida de la aplicación.
+ * necesitamos realizar un flush controlado
+ * desde otro punto de la aplicación.
  */
 export { logtail };
 
