@@ -21,6 +21,7 @@
     "@libsql/client": "^0.14.0",
     "@logtail/node": "^0.5.10",
     "@logtail/pino": "^0.5.10",
+    "@vercel/functions": "^3.9.9",
     "argon2": "^0.41.1",
     "chardet": "^2.2.0",
     "cors": "^2.8.5",
@@ -37,7 +38,6 @@
     "pino": "^10.3.1",
     "sharp": "^0.35.2",
     "twilio": "^5.4.2",
-    "ws": "^7.5.9",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

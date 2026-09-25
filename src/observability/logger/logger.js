@@ -1,4 +1,5 @@
 import pino from "pino";
+import { waitUntil } from "@vercel/functions";
 import { Logtail } from "@logtail/node";
 import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
@@ -60,107 +61,51 @@ const baseLogger = pino({
  * se envía directamente mediante @logtail/node
  * y no pasa por Pino.
  */
-const sendToBetterStack = (
-  level,
-  data,
-  message
-) => {
+const sendToBetterStack = (level, data, message) => {
   if (!logtail) {
     return;
   }
 
   try {
-    const context =
-      requestContext.getStore();
+    const context = requestContext.getStore();
 
     const payload = {
-      /**
-       * Información general de la aplicación.
-       */
-      application:
-        observabilityConfig.application,
-
-      service:
-        observabilityConfig.service,
-
-      environment:
-        observabilityConfig.environment,
-
-      /**
-       * Información específica del evento.
-       */
+      application: observabilityConfig.application,
+      service: observabilityConfig.service,
+      environment: observabilityConfig.environment,
       ...(data || {}),
-
-      /**
-       * requestId del request actual.
-       *
-       * Se agrega al final para garantizar
-       * que el contexto actual tenga prioridad.
-       */
-      ...(context?.requestId
-        ? {
-            requestId:
-              context.requestId,
-          }
-        : {}),
+      ...(context?.requestId ? { requestId: context.requestId } : {}),
     };
 
     switch (level) {
       case "debug":
-        logtail.debug(
-          message,
-          payload
-        );
+        logtail.debug(message, payload);
         break;
-
       case "warn":
-        logtail.warn(
-          message,
-          payload
-        );
+        logtail.warn(message, payload);
         break;
-
       case "error":
-        logtail.error(
-          message,
-          payload
-        );
+        logtail.error(message, payload);
         break;
-
       case "info":
       default:
-        logtail.info(
-          message,
-          payload
-        );
+        logtail.info(message, payload);
         break;
     }
 
     /**
-     * Forzamos el envío de los logs pendientes,
-     * pero NO esperamos el resultado.
-     *
-     * Esto es importante para Vercel:
-     *
-     * - El log se agrega a Logtail.
-     * - Se inicia el flush inmediatamente.
-     * - La API no queda bloqueada esperando Better Stack.
+     * En lugar de un fire-and-forget que Vercel puede
+     * cortar a mitad de camino, le decimos al runtime
+     * que mantenga viva la función hasta que el flush
+     * termine, sin bloquear la respuesta al cliente.
      */
-    logtail.flush().catch((error) => {
-      console.error(
-        "Better Stack flush error:",
-        error
-      );
-    });
-  } catch (error) {
-    /**
-     * La observabilidad nunca debe provocar
-     * un fallo en nuestra API.
-     */
-    console.error(
-      "Better Stack logging error:",
-      error
+    waitUntil(
+      logtail.flush().catch((error) => {
+        console.error("Better Stack flush error:", error);
+      })
     );
+  } catch (error) {
+    console.error("Better Stack logging error:", error);
   }
 };
 
