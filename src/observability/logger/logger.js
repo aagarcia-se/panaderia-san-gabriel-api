@@ -4,36 +4,54 @@ import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
 const isEnabled = observabilityConfig.enabled;
-
-const sourceToken =
-  observabilityConfig.betterStack?.sourceToken;
-
-const ingestingHost =
-  observabilityConfig.betterStack?.ingestingHost;
+const sourceToken = observabilityConfig.betterStack?.sourceToken;
+const ingestingHost = observabilityConfig.betterStack?.ingestingHost;
 
 const hasBetterStack =
   isEnabled &&
   Boolean(sourceToken) &&
   Boolean(ingestingHost);
 
+/**
+ * Cliente de Better Stack.
+ *
+ * Solo se crea cuando observability está habilitado
+ * y las credenciales están configuradas.
+ */
 const logtail = hasBetterStack
   ? new Logtail(sourceToken, {
       endpoint: `https://${ingestingHost}`,
     })
   : null;
 
+/**
+ * Pino continúa siendo nuestro logger principal.
+ *
+ * Los logs siguen apareciendo en stdout/Vercel.
+ */
 const baseLogger = pino({
   level: observabilityConfig.logLevel,
 
   base: {
-    application: observabilityConfig.application,
-    service: observabilityConfig.service,
-    environment: observabilityConfig.environment,
+    application:
+      observabilityConfig.application,
+
+    service:
+      observabilityConfig.service,
+
+    environment:
+      observabilityConfig.environment,
   },
 
   timestamp: pino.stdTimeFunctions.isoTime,
 });
 
+/**
+ * Envía el evento a Better Stack.
+ *
+ * Un fallo de observabilidad nunca debe
+ * provocar que nuestra API falle.
+ */
 const sendToBetterStack = (
   level,
   data,
@@ -44,14 +62,16 @@ const sendToBetterStack = (
   }
 
   try {
-    const context = requestContext.getStore();
+    const context =
+      requestContext.getStore();
 
     const payload = {
       ...(data || {}),
 
       ...(context?.requestId
         ? {
-            requestId: context.requestId,
+            requestId:
+              context.requestId,
           }
         : {}),
     };
@@ -82,12 +102,18 @@ const sendToBetterStack = (
   }
 };
 
+/**
+ * Obtiene el logger asociado
+ * al contexto actual de la request.
+ */
 export const getLogger = () => {
-  const context = requestContext.getStore();
+  const context =
+    requestContext.getStore();
 
   const logger = context?.requestId
     ? baseLogger.child({
-        requestId: context.requestId,
+        requestId:
+          context.requestId,
       })
     : baseLogger;
 
