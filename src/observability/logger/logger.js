@@ -2,12 +2,17 @@ import pino from "pino";
 import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
-const isProduction = observabilityConfig.environment === "production";
+const isEnabled = observabilityConfig.enabled === true;
+console.log(observabilityConfig.enabled)
+console.log(isEnabled)
+
 
 const hasBetterStack =
-  isProduction &&
-  Boolean(process.env.BETTER_STACK_SOURCE_TOKEN) &&
-  Boolean(process.env.BETTER_STACK_INGESTING_HOST);
+  isEnabled &&
+  Boolean(observabilityConfig.betterStack?.sourceToken) &&
+  Boolean(observabilityConfig.betterStack?.ingestingHost);
+
+  console.log(hasBetterStack)
 
 const targets = [
   {
@@ -24,9 +29,11 @@ if (hasBetterStack) {
     target: "@logtail/pino",
     level: observabilityConfig.logLevel,
     options: {
-      sourceToken: observabilityConfig.betterStack.sourceToken,
+      sourceToken:
+        observabilityConfig.betterStack.sourceToken,
       options: {
-        endpoint: `https://${observabilityConfig.betterStack.ingestingHost}`,
+        endpoint:
+          `https://${observabilityConfig.betterStack.ingestingHost}`,
       },
     },
   });
@@ -63,4 +70,4 @@ export const getLogger = () => {
   });
 };
 
-export default baseLogger;
+export default baseLogger;  

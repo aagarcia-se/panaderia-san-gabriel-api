@@ -31,6 +31,7 @@ export const enviroment = {
       application: process.env.APP_NAME || "unknown",
       service: process.env.APP_SERVICE || "api",
       logLevel: process.env.LOG_LEVEL || "debug",
+      enabled: process.env.OBSERVABILITY_ENABLED || false,
 
       betterStack: {
         sourceToken: process.env.BETTER_STACK_SOURCE_TOKEN,
@@ -68,6 +69,7 @@ export const enviroment = {
       application: process.env.APP_NAME || "unknown",
       service: process.env.APP_SERVICE || "api",
       logLevel: process.env.LOG_LEVEL || "info",
+      enabled: process.env.OBSERVABILITY_ENABLED || false,
 
       betterStack: {
         sourceToken: process.env.BETTER_STACK_SOURCE_TOKEN,
@@ -105,6 +107,7 @@ export const enviroment = {
       application: process.env.APP_NAME || "unknown",
       service: process.env.APP_SERVICE || "api",
       logLevel: process.env.LOG_LEVEL || "info",
+      enabled: process.env.OBSERVABILITY_ENABLED || false,
 
       betterStack: {
         sourceToken: process.env.BETTER_STACK_SOURCE_TOKEN,

@@ -1,8 +1,8 @@
 import { config } from "../../config/index.js";
-
 const configLog = config.observability;
 
 const observabilityConfig = {
+  enabled: process.env.OBSERVABILITY_ENABLED === "true",
   environment: configLog.environment || "development",
   application: configLog.application|| "unknown",
   service: configLog.service || "api",
