@@ -3,13 +3,13 @@ import { config } from "dotenv";
 config();
 
 export const enviroment = {
-  dev: {
+  development: {
     database: {
       bd_url: process.env.DB_URL_DEV,
       bd_token: process.env.DB_TOKEN_DEV,
     },
     server: {
-      port: process.env.SERVER_DEV || 3000,
+      port: process.env.SERVER_PORT || 3000,
     },
     smsConfig: {
       sid_twilio: process.env.ACCOUNTSID_DEV,
@@ -22,7 +22,7 @@ export const enviroment = {
       api_key: process.env.GEMINI_API_KEY_DEV,
     },
   },
-  pil: {
+  staging: {
     database: {
       bd_url: process.env.DB_URL_PIL,
       bd_token: process.env.DB_TOKEN_PIL,
@@ -30,7 +30,7 @@ export const enviroment = {
       token_twilio: process.env.AUTHTOKEN_PIL,
     },
     server: {
-      port: process.env.SERVER_PROD || 3000,
+      port: process.env.SERVER_PORT || 3000,
     },
     smsConfig: {
       sid_twilio: process.env.ACCOUNTSID_PIL,
@@ -43,7 +43,7 @@ export const enviroment = {
       api_key: process.env.GEMINI_API_KEY_PIL,
     },
   },
-  prod: {
+  production: {
     database: {
       bd_url: process.env.DB_URL_PROD,
       bd_token: process.env.DB_TOKEN_PROD,
@@ -51,7 +51,7 @@ export const enviroment = {
       token_twilio: process.env.AUTHTOKEN_PROD,
     },
     server: {
-      port: process.env.SERVER_PROD || 3000,
+      port: process.env.SERVER_PORT || 3000,
     },
     smsConfig: {
       sid_twilio: process.env.ACCOUNTSID_PROD,
