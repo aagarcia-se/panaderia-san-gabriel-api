@@ -1,21 +1,9 @@
 import pino from "pino";
+import "@logtail/pino";
 import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
-try {
-  const logtailPino = await import("@logtail/pino");
-
-  console.log("LOGTAIL IMPORT OK:", Boolean(logtailPino));
-
-  console.log(
-    "LOGTAIL MODULE:",
-    Object.keys(logtailPino)
-  );
-} catch (error) {
-  console.error("LOGTAIL IMPORT ERROR:", error);
-}
-
-const isEnabled = observabilityConfig.enabled === true;
+const isEnabled = observabilityConfig.enabled;
 
 const hasBetterStack =
   isEnabled &&
@@ -78,4 +66,4 @@ export const getLogger = () => {
   });
 };
 
-export default baseLogger;  
+export default baseLogger;
