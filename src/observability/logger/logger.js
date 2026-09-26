@@ -146,34 +146,64 @@ export const flushLogs = async () => {
  * Pino crea un child logger con ese requestId.
  */
 export const getLogger = () => {
-  const context = requestContext.getStore();
+  const context =
+    requestContext.getStore();
 
   const logger =
     context?.requestId
       ? baseLogger.child({
-          requestId: context.requestId,
+          requestId:
+            context.requestId,
         })
       : baseLogger;
 
   return {
-    debug(data, message) {
+    debug(data, message, options = {}) {
       logger.debug(data, message);
-      sendToBetterStack("debug", data, message);
+
+      if (!options.skipRemote) {
+        sendToBetterStack(
+          "debug",
+          data,
+          message
+        );
+      }
     },
 
-    info(data, message) {
+    info(data, message, options = {}) {
       logger.info(data, message);
-      sendToBetterStack("info", data, message);
+
+      if (!options.skipRemote) {
+        sendToBetterStack(
+          "info",
+          data,
+          message
+        );
+      }
     },
 
-    warn(data, message) {
+    warn(data, message, options = {}) {
       logger.warn(data, message);
-      sendToBetterStack("warn", data, message);
+
+      if (!options.skipRemote) {
+        sendToBetterStack(
+          "warn",
+          data,
+          message
+        );
+      }
     },
 
-    error(data, message) {
+    error(data, message, options = {}) {
       logger.error(data, message);
-      sendToBetterStack("error", data, message);
+
+      if (!options.skipRemote) {
+        sendToBetterStack(
+          "error",
+          data,
+          message
+        );
+      }
     },
   };
 };
