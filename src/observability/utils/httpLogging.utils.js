@@ -1,4 +1,4 @@
-import observabilityConfig from "../config/observability.config";
+import observabilityConfig from "../config/observability.config.js";
 
 /**
  * Determina si una ruta está en la lista de exclusión
