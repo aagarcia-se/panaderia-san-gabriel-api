@@ -34,8 +34,8 @@ const databaseErrorMap = {
 
   "fetch failed": {
     message: "Servicio de base de datos no disponible",
-    statusCode: 500,
-    code: 500,
+    statusCode: 503,
+    code: 503,
     category: "DATABASE",
     errorCode: "DATABASE_UNAVAILABLE",
   },

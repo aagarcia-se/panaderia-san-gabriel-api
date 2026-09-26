@@ -5,11 +5,9 @@ import requestContext from "../context/requestContext.js";
 
 const isEnabled = observabilityConfig.enabled;
 
-const sourceToken =
-  observabilityConfig.betterStack?.sourceToken;
+const sourceToken = observabilityConfig.betterStack?.sourceToken;
 
-const ingestingHost =
-  observabilityConfig.betterStack?.ingestingHost;
+const ingestingHost = observabilityConfig.betterStack?.ingestingHost;
 
 const hasBetterStack =
   isEnabled &&
@@ -24,8 +22,8 @@ const hasBetterStack =
  */
 const logtail = hasBetterStack
   ? new Logtail(sourceToken, {
-      endpoint: `https://${ingestingHost}`,
-    })
+    endpoint: `https://${ingestingHost}`,
+  })
   : null;
 
 /**
@@ -36,20 +34,12 @@ const logtail = hasBetterStack
  */
 const baseLogger = pino({
   level: observabilityConfig.logLevel,
-
   base: {
-    application:
-      observabilityConfig.application,
-
-    service:
-      observabilityConfig.service,
-
-    environment:
-      observabilityConfig.environment,
+    application: observabilityConfig.application,
+    service: observabilityConfig.service,
+    environment: observabilityConfig.environment,
   },
-
-  timestamp:
-    pino.stdTimeFunctions.isoTime,
+  timestamp: pino.stdTimeFunctions.isoTime,
 });
 
 /**
@@ -66,31 +56,21 @@ const baseLogger = pino({
  * se envía directamente mediante @logtail/node
  * y no pasa por Pino.
  */
-const sendToBetterStack = (
-  level,
-  data,
-  message
-) => {
+const sendToBetterStack = (level, data, message) => {
   if (!logtail) {
     return;
   }
 
   try {
-    const context =
-      requestContext.getStore();
+    const context = requestContext.getStore();
 
     const payload = {
       /**
        * Información general de la aplicación.
        */
-      application:
-        observabilityConfig.application,
-
-      service:
-        observabilityConfig.service,
-
-      environment:
-        observabilityConfig.environment,
+      application: observabilityConfig.application,
+      service: observabilityConfig.service,
+      environment: observabilityConfig.environment,
 
       /**
        * Información específica del evento.
@@ -105,40 +85,27 @@ const sendToBetterStack = (
        */
       ...(context?.requestId
         ? {
-            requestId:
-              context.requestId,
-          }
+          requestId: context.requestId,
+        }
         : {}),
     };
 
     switch (level) {
       case "debug":
-        logtail.debug(
-          message,
-          payload
-        );
+        logtail.debug(message, payload);
         break;
 
       case "warn":
-        logtail.warn(
-          message,
-          payload
-        );
+        logtail.warn(message, (payload));
         break;
 
       case "error":
-        logtail.error(
-          message,
-          payload
-        );
+        logtail.error(message, payload);
         break;
 
       case "info":
       default:
-        logtail.info(
-          message,
-          payload
-        );
+        logtail.info(message, payload);
         break;
     }
   } catch (error) {
@@ -146,10 +113,7 @@ const sendToBetterStack = (
      * La observabilidad nunca debe provocar
      * un fallo en nuestra API.
      */
-    console.error(
-      "Better Stack logging error:",
-      error
-    );
+    console.error("Better Stack logging error:", error);
   }
 };
 
@@ -171,10 +135,7 @@ export const flushLogs = async () => {
   try {
     await logtail.flush();
   } catch (error) {
-    console.error(
-      "Better Stack flush error:",
-      error
-    );
+    console.error("Better Stack flush error:", error);
   }
 };
 
@@ -185,68 +146,34 @@ export const flushLogs = async () => {
  * Pino crea un child logger con ese requestId.
  */
 export const getLogger = () => {
-  const context =
-    requestContext.getStore();
+  const context = requestContext.getStore();
 
   const logger =
     context?.requestId
       ? baseLogger.child({
-          requestId:
-            context.requestId,
+          requestId: context.requestId,
         })
       : baseLogger;
 
   return {
     debug(data, message) {
-      logger.debug(
-        data,
-        message
-      );
-
-      sendToBetterStack(
-        "debug",
-        data,
-        message
-      );
+      logger.debug(data, message);
+      sendToBetterStack("debug", data, message);
     },
 
     info(data, message) {
-      logger.info(
-        data,
-        message
-      );
-
-      sendToBetterStack(
-        "info",
-        data,
-        message
-      );
+      logger.info(data, message);
+      sendToBetterStack("info", data, message);
     },
 
     warn(data, message) {
-      logger.warn(
-        data,
-        message
-      );
-
-      sendToBetterStack(
-        "warn",
-        data,
-        message
-      );
+      logger.warn(data, message);
+      sendToBetterStack("warn", data, message);
     },
 
     error(data, message) {
-      logger.error(
-        data,
-        message
-      );
-
-      sendToBetterStack(
-        "error",
-        data,
-        message
-      );
+      logger.error(data, message);
+      sendToBetterStack("error", data, message);
     },
   };
 };
