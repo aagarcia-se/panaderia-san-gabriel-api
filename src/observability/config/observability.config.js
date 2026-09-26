@@ -27,7 +27,7 @@ const observabilityConfig = {
    * /api/health/db, etc.
    */
   excludedFromRemotePaths: [
-    "/api/health*",
+    "/health*",
   ],
 };
 
