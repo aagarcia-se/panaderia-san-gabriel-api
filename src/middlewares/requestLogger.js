@@ -1,4 +1,5 @@
 import { getLogger, LOG_CATEGORIES } from "../observability/index.js";
+import { isExcludedFromRemoteLogs } from "../observability/utils/httpLogging.utils.js";
 
 const getLogLevel = (statusCode) => {
   if (statusCode >= 500) {
@@ -36,9 +37,21 @@ const requestLogger = (req, res, next) => {
 
     const logLevel = getLogLevel(statusCode);
 
+    /**
+     * Rutas de health check / monitoreo (definidas en
+     * observabilityConfig.excludedFromRemotePaths): se
+     * loguean local siempre, pero solo se envían a Better
+     * Stack si la respuesta fue un error (4xx/5xx). Si el
+     * health check responde bien (2xx/3xx), no viaja a
+     * Better Stack para no gastar cuota del plan free.
+     */
+    const isSuccess = statusCode < 400;
+    const skipRemote = isExcludedFromRemoteLogs(req.path) && isSuccess;
+
     logger[logLevel](
       logData,
-      "HTTP request completed"
+      "HTTP request completed",
+      { skipRemote }
     );
   });
 
