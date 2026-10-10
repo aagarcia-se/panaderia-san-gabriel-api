@@ -5,8 +5,8 @@ import { getDatabaseError } from "../../utils/databaseErrors.js";
 export const crearUsuarioDao = async (dataUser) => {
     try {
         const query =
-          `INSERT INTO USUARIOS(nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, idSucursal, fechaCreacion) 
-            values (?, ?, ?, ?, ?, ?, ?, ?);`;
+          `INSERT INTO USUARIOS(nombreUsuario, apellidoUsuario, usuario, contrasena, correoUsuario, idRol, idSucursal, cambioContrasenia, fechaCreacion) 
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
         const resultUsuario = await Connection.execute(query, [
             dataUser.nombreUsuario, 
@@ -16,6 +16,7 @@ export const crearUsuarioDao = async (dataUser) => {
             dataUser.correoUsuario,
             dataUser.idRol,
             dataUser.idSucursal,
+            dataUser.cambioContrasenia,
             dataUser.fechaCreacion
         ]);
     

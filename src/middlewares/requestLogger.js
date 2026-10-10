@@ -18,12 +18,8 @@ const requestLogger = (req, res, next) => {
 
   res.on("finish", () => {
     const endTime = process.hrtime.bigint();
-
-    const durationMs =
-      Number(endTime - startTime) / 1_000_000;
-
+    const durationMs = Number(endTime - startTime) / 1_000_000;
     const logger = getLogger();
-
     const statusCode = res.statusCode;
 
     const logData = {
@@ -48,11 +44,7 @@ const requestLogger = (req, res, next) => {
     const isSuccess = statusCode < 400;
     const skipRemote = isExcludedFromRemoteLogs(req.path) && isSuccess;
 
-    logger[logLevel](
-      logData,
-      "HTTP request completed",
-      { skipRemote }
-    );
+    logger[logLevel](logData, "HTTP request completed", { skipRemote });
   });
 
   next();

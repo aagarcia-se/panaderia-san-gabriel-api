@@ -1,4 +1,4 @@
-import { startServer } from "./server.js";
+// api/index.mjs
+import { createServer } from '../dist/server.js';
 
-
-startServer();
+export default createServer();

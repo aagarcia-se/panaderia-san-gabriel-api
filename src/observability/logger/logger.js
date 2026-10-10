@@ -4,15 +4,9 @@ import observabilityConfig from "../config/observability.config.js";
 import requestContext from "../context/requestContext.js";
 
 const isEnabled = observabilityConfig.enabled;
-
 const sourceToken = observabilityConfig.betterStack?.sourceToken;
-
 const ingestingHost = observabilityConfig.betterStack?.ingestingHost;
-
-const hasBetterStack =
-  isEnabled &&
-  Boolean(sourceToken) &&
-  Boolean(ingestingHost);
+const hasBetterStack = isEnabled && Boolean(sourceToken) && Boolean(ingestingHost);
 
 /**
  * Cliente de Better Stack.
@@ -21,9 +15,7 @@ const hasBetterStack =
  * durante la vida de la ejecución.
  */
 const logtail = hasBetterStack
-  ? new Logtail(sourceToken, {
-    endpoint: `https://${ingestingHost}`,
-  })
+  ? new Logtail(sourceToken, { endpoint: `https://${ingestingHost}` })
   : null;
 
 /**
@@ -65,29 +57,18 @@ const sendToBetterStack = (level, data, message) => {
     const context = requestContext.getStore();
 
     const payload = {
-      /**
-       * Información general de la aplicación.
-       */
+      // Información general de la aplicación.
       application: observabilityConfig.application,
       service: observabilityConfig.service,
       environment: observabilityConfig.environment,
 
-      /**
-       * Información específica del evento.
-       */
+      // Información específica del evento.
       ...(data || {}),
 
-      /**
-       * requestId del request actual.
-       *
-       * Se agrega al final para garantizar
-       * que el contexto actual tenga prioridad.
-       */
-      ...(context?.requestId
-        ? {
-          requestId: context.requestId,
-        }
-        : {}),
+      // requestId del request actual.
+      // Se agrega al final para garantizar que el
+      // contexto actual tenga prioridad.
+      ...(context?.requestId ? { requestId: context.requestId } : {}),
     };
 
     switch (level) {
@@ -96,7 +77,7 @@ const sendToBetterStack = (level, data, message) => {
         break;
 
       case "warn":
-        logtail.warn(message, (payload));
+        logtail.warn(message, payload);
         break;
 
       case "error":
@@ -109,10 +90,7 @@ const sendToBetterStack = (level, data, message) => {
         break;
     }
   } catch (error) {
-    /**
-     * La observabilidad nunca debe provocar
-     * un fallo en nuestra API.
-     */
+    // La observabilidad nunca debe provocar un fallo en nuestra API.
     console.error("Better Stack logging error:", error);
   }
 };
@@ -146,64 +124,28 @@ export const flushLogs = async () => {
  * Pino crea un child logger con ese requestId.
  */
 export const getLogger = () => {
-  const context =
-    requestContext.getStore();
-
-  const logger =
-    context?.requestId
-      ? baseLogger.child({
-          requestId:
-            context.requestId,
-        })
-      : baseLogger;
+  const context = requestContext.getStore();
+  const logger = context?.requestId ? baseLogger.child({ requestId: context.requestId }) : baseLogger;
 
   return {
     debug(data, message, options = {}) {
       logger.debug(data, message);
-
-      if (!options.skipRemote) {
-        sendToBetterStack(
-          "debug",
-          data,
-          message
-        );
-      }
+      if (!options.skipRemote) sendToBetterStack("debug", data, message);
     },
 
     info(data, message, options = {}) {
       logger.info(data, message);
-
-      if (!options.skipRemote) {
-        sendToBetterStack(
-          "info",
-          data,
-          message
-        );
-      }
+      if (!options.skipRemote) sendToBetterStack("info", data, message);
     },
 
     warn(data, message, options = {}) {
       logger.warn(data, message);
-
-      if (!options.skipRemote) {
-        sendToBetterStack(
-          "warn",
-          data,
-          message
-        );
-      }
+      if (!options.skipRemote) sendToBetterStack("warn", data, message);
     },
 
     error(data, message, options = {}) {
       logger.error(data, message);
-
-      if (!options.skipRemote) {
-        sendToBetterStack(
-          "error",
-          data,
-          message
-        );
-      }
+      if (!options.skipRemote) sendToBetterStack("error", data, message);
     },
   };
 };
