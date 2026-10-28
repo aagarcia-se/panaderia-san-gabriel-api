@@ -18,6 +18,12 @@ export const enviroment = {
       token_twilio: process.env.AUTHTOKEN_DEV,
     },
 
+    email: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    },
+
     anthropic: {
       api_key: process.env.ANTHROPIC_API_KEY_DEV,
     },
@@ -56,6 +62,12 @@ export const enviroment = {
       token_twilio: process.env.AUTHTOKEN_PIL,
     },
 
+    email: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    },
+
     anthropic: {
       api_key: process.env.ANTHROPIC_API_KEY_PIL,
     },
@@ -92,6 +104,12 @@ export const enviroment = {
     smsConfig: {
       sid_twilio: process.env.ACCOUNTSID_PROD,
       token_twilio: process.env.AUTHTOKEN_PROD,
+    },
+
+    email: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
     },
 
     anthropic: {

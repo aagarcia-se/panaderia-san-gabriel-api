@@ -1,4 +1,5 @@
 import { transporter } from "./transporter.js";
+import { config } from "../../config/index.js";
 
 export const enviarEmail = async (data, mailBody, dataAttachments = null) => {
 
@@ -10,7 +11,7 @@ export const enviarEmail = async (data, mailBody, dataAttachments = null) => {
   const [to, ...cc] = destinatarios; // Primer correo = to, el resto = cc
 
   const mailOptions = {
-    from: "panaderiasangabrields@gmail.com",
+    from: config.email.from,
     to,
     cc: cc.length > 0 ? cc : undefined, // Solo agrega cc si hay destinatarios extra
     subject: data.asunto,
