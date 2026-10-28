@@ -6,4 +6,4 @@ import { PERMISSIONS } from "../../auth/permissions.js";
 
 export const eliminacionesRoute = Router();
 
-eliminacionesRoute.get("/consultar-eliminacion-por-dia", authMiddleware, requirePermission(PERMISSIONS.REPORTS), consultarEliminacionPorDiaController);
+eliminacionesRoute.get("/consultar-eliminacion-por-dia", authMiddleware, requirePermission(PERMISSIONS.SALES), consultarEliminacionPorDiaController);
