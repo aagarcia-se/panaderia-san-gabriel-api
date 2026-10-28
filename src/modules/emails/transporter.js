@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import { config } from "../../config/index.js";
 
+//se modifico el transporter
+
 const emailConfig = config.email;
 
 if (!emailConfig?.user || !emailConfig?.pass) {
